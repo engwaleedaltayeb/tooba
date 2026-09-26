@@ -259,6 +259,26 @@
     cursor:pointer;
     padding:10px 16px;
   }
+  .theme-toggle{
+    position:fixed;
+    top:calc(env(safe-area-inset-top,0px) + 14px);
+    right:16px;
+    z-index:50;
+    width:34px; height:34px;
+    border-radius:50%;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text);
+    font-size:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    box-shadow:0 1px 3px var(--shadow);
+    transition:background .5s ease, transform .15s ease;
+  }
+  .theme-toggle:active{ transform:scale(0.9); }
+
   .install-btn{
     display:flex;
     align-items:center;
@@ -361,6 +381,7 @@
 </style>
 </head>
 <body data-mode="morning">
+<button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع الليلي">🌙</button>
 <div class="wrap">
   <button class="install-btn" id="installBtn">
     <span class="install-icon">⬇︎</span> إضافة للشاشة الرئيسية
@@ -537,6 +558,34 @@ document.getElementById('resetBtn').addEventListener('click', ()=>{
 });
 
 render();
+
+// الوضع الليلي
+const themeToggle = document.getElementById('themeToggle');
+const THEME_KEY = 'tooba-theme';
+
+function systemPrefersDark(){
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+function applyThemeIcon(){
+  const active = document.documentElement.getAttribute('data-theme') || (systemPrefersDark() ? 'dark' : 'light');
+  themeToggle.textContent = active === 'dark' ? '☀️' : '🌙';
+}
+(function initTheme(){
+  try{
+    const saved = localStorage.getItem(THEME_KEY);
+    if(saved === 'dark' || saved === 'light'){
+      document.documentElement.setAttribute('data-theme', saved);
+    }
+  }catch(e){}
+  applyThemeIcon();
+})();
+themeToggle.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') || (systemPrefersDark() ? 'dark' : 'light');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try{ localStorage.setItem(THEME_KEY, next); }catch(e){}
+  applyThemeIcon();
+});
 
 const progressBar = document.querySelector('.progress');
 window.addEventListener('scroll', () => {
