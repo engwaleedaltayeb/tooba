@@ -450,9 +450,9 @@
   .reset-btn{
     position:fixed;
     top:calc(env(safe-area-inset-top,0px) + 14px);
-    left:16px;
+    left:calc(env(safe-area-inset-left,0px) + 20px);
     z-index:50;
-    width:38px; height:38px;
+    width:34px; height:34px;
     border-radius:50%;
     border:1px solid var(--border);
     background:var(--surface);
@@ -469,7 +469,7 @@
   .theme-toggle{
     position:fixed;
     top:calc(env(safe-area-inset-top,0px) + 14px);
-    right:16px;
+    right:calc(env(safe-area-inset-right,0px) + 20px);
     z-index:50;
     width:34px; height:34px;
     border-radius:50%;
@@ -589,7 +589,7 @@
 </head>
 <body data-mode="morning">
 <button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع الليلي">🌙</button>
-<button class="reset-btn" id="resetBtn" aria-label="إعادة التعيين">↺</button>
+<button class="reset-btn" id="resetBtn" aria-label="إعادة التعيين"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
 <div class="wrap">
   <button class="install-btn" id="installBtn">
     <span class="install-icon">⬇︎</span> إضافة للشاشة الرئيسية
@@ -774,9 +774,9 @@ function render(){
           </button>
         ` : ''}
         <div class="card-actions">
-          <button class="card-reset-btn" aria-label="إعادة تعيين الذكر">↺</button>
+          <button class="card-reset-btn" aria-label="إعادة تعيين الذكر"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
           <button class="share-btn" aria-label="مشاركة">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
           </button>
         </div>
       </div>
