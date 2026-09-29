@@ -374,6 +374,40 @@
   .all-done-title{ font-size:19px; font-weight:600; color:var(--text); margin-top:6px; }
   .all-done-sub{ font-size:14px; color:var(--text-dim); }
 
+  .done-actions{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    width:100%;
+    max-width:320px;
+    margin-top:24px;
+  }
+  .done-btn{
+    height:50px;
+    padding:0 20px;
+    border-radius:25px;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text);
+    font-family:inherit;
+    font-size:15px;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    cursor:pointer;
+    box-shadow:0 1px 3px var(--shadow);
+    transition:transform .15s ease, background .3s ease;
+  }
+  .done-btn:active{ transform:scale(0.96); }
+  .done-btn.primary{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  [data-mode="evening"] .done-btn.primary{ background:#5872d4; border-color:#5872d4; }
+
   .undo-toast{
     --ta:var(--accent);
     position:fixed;
@@ -748,6 +782,21 @@ const days = ["الأحد","الإثنين","الثلاثاء","الأربعاء
 const now = new Date();
 dateLine.textContent = days[now.getDay()] + " · " + now.toLocaleDateString('ar-EG', {day:'numeric', month:'long'});
 
+async function shareOrCopy(btn, text, title){
+  const url = location.href;
+  try{
+    if(navigator.share){
+      await navigator.share({ title, text, url });
+    } else {
+      await navigator.clipboard.writeText(text + '\n' + url);
+      const label = btn.querySelector('span');
+      const original = label.textContent;
+      label.textContent = 'تم النسخ ✓';
+      setTimeout(() => label.textContent = original, 1800);
+    }
+  }catch(err){ /* المستخدم لغى المشاركة */ }
+}
+
 function render(){
   body.dataset.mode = mode;
   document.documentElement.style.setProperty('--accent', mode==='morning' ? 'var(--accent-morning)' : 'var(--accent-evening)');
@@ -835,8 +884,23 @@ function render(){
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg>
       <div class="all-done-title">${mode === 'morning' ? 'أتممت أذكار الصباح' : 'أتممت أذكار المساء'}</div>
       <div class="all-done-sub">تقبّل الله منك</div>
+      <div class="done-actions">
+        <button class="done-btn primary" id="remindBtn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span>ذكّر أحبابك وأصدقاءك بالأذكار</span>
+        </button>
+        <button class="done-btn" id="shareSiteBtn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
+          <span>شارك الموقع</span>
+        </button>
+      </div>
     `;
     listEl.appendChild(empty);
+    const remindText = mode === 'morning'
+      ? 'لا تنسَ أذكار الصباح 🤍 ذكّرتك بها هنا:'
+      : 'لا تنسَ أذكار المساء 🤍 ذكّرتك بها هنا:';
+    empty.querySelector('#remindBtn').addEventListener('click', (e) => shareOrCopy(e.currentTarget, remindText, 'أذكار الصباح والمساء'));
+    empty.querySelector('#shareSiteBtn').addEventListener('click', (e) => shareOrCopy(e.currentTarget, 'أذكار الصباح والمساء', 'أذكار الصباح والمساء'));
   }
   updateProgress();
 }
