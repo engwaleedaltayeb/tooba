@@ -59,6 +59,7 @@
     transition:background .5s ease, color .5s ease;
   }
   .wrap{
+    overflow-x:clip;
     max-width:680px;
     margin:0 auto;
     padding:56px 24px 100px;
@@ -140,22 +141,97 @@
   .progress.scrolled{
     border-bottom-color:var(--border);
   }
+  .bar-wrap{ position:relative; margin-top:10px; }
   .bar{
-    height:18px;
+    height:12px;
     background:var(--border);
     border-radius:999px;
     overflow:hidden;
-    margin-top:10px;
-    box-shadow:inset 0 1px 3px rgba(0,0,0,0.08);
+    transform-origin:center;
+  }
+  .bar.pop{ animation:barPop .6s cubic-bezier(.2,.9,.3,1.3); }
+  @keyframes barPop{
+    0%{ transform:scaleY(1); }
+    35%{ transform:scaleY(1.5) scaleX(1.012); }
+    70%{ transform:scaleY(.92); }
+    100%{ transform:scaleY(1); }
   }
   .bar-fill{
+    --bar:#cf9a12;
     position:relative;
     height:100%;
     width:0%;
     border-radius:999px;
-    background:var(--accent);
-    box-shadow:inset 0 -3px 0 rgba(0,0,0,0.16), inset 0 2px 0 rgba(255,255,255,0.35);
-    transition:width .45s cubic-bezier(.25,.9,.4,1.2), background .5s ease;
+    overflow:hidden;
+    background:var(--bar);
+    transition:width .5s cubic-bezier(.25,.9,.4,1.25);
+  }
+  [data-mode="evening"] .bar-fill{ --bar:#5872d4; }
+  /* لمعة تعدي على البار عند التقدم */
+  .bar-shine{
+    position:absolute;
+    top:0; bottom:0;
+    left:100%;
+    width:70px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.85), transparent);
+    transform:skewX(-20deg);
+    pointer-events:none;
+    opacity:0;
+  }
+  .bar-fill.shine .bar-shine{ animation:shineSweep .85s ease-out; }
+  @keyframes shineSweep{
+    0%{ left:100%; opacity:1; }
+    100%{ left:-80px; opacity:1; }
+  }
+  /* اكتمال 100%: ذهبي متحرك */
+  .bar-wrap.full .bar-fill{
+    background:#eeb10f;
+  }
+  /* شرارات وكونفيتي */
+  .spark{
+    position:absolute;
+    top:50%;
+    pointer-events:none;
+    z-index:5;
+  }
+  /* رسالة تشجيع عند الوصول لمحطة */
+  .cheer{
+    position:absolute;
+    top:calc(100% + 10px);
+    left:50%;
+    z-index:6;
+    padding:7px 16px;
+    border-radius:999px;
+    background:#cf9a12;
+    color:#fff;
+    font-size:14px;
+    font-weight:700;
+    white-space:nowrap;
+    box-shadow:0 6px 18px rgba(0,0,0,.18);
+    opacity:0;
+    pointer-events:none;
+    transform:translate(-50%,-6px) scale(.7);
+  }
+  [data-mode="evening"] .cheer{ background:#5872d4; }
+  .cheer.show{ animation:cheerIn 2s ease forwards; }
+  @keyframes cheerIn{
+    0%{ opacity:0; transform:translate(-50%,-6px) scale(.7); }
+    12%{ opacity:1; transform:translate(-50%,0) scale(1.1); }
+    20%{ transform:translate(-50%,0) scale(1); }
+    85%{ opacity:1; transform:translate(-50%,0) scale(1); }
+    100%{ opacity:0; transform:translate(-50%,-4px) scale(.96); }
+  }
+  /* الرقم يكبر لما يزيد */
+  .pnum{ display:inline-block; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; }
+  .pnum.bump{ animation:numBump .55s cubic-bezier(.2,.9,.3,1.4); }
+  @keyframes numBump{
+    0%{ transform:scale(1); }
+    40%{ transform:scale(1.7); color:var(--accent); }
+    100%{ transform:scale(1); }
+  }
+  [data-mode="evening"] .pnum.bump{ color:#8ba0e8; }
+  @media (prefers-reduced-motion: reduce){
+    .bar.pop, .pnum.bump, .bar-fill.shine .bar-shine{ animation:none !important; }
   }
 
   .list{ display:flex; flex-direction:column; gap:14px; }
@@ -259,12 +335,194 @@
     line-height:2.1;
     color:var(--text);
   }
+  .zikr-text{ font-size:var(--zikr-size,22px); }
+  .zikr-fadl{
+    margin-top:14px;
+    padding:12px 14px;
+    border-radius:14px;
+    background:color-mix(in srgb, var(--accent) 8%, transparent);
+    font-size:calc(var(--zikr-size,22px) * .64);
+    line-height:1.8;
+    color:var(--text);
+  }
+  .zikr-fadl b{ color:var(--accent); font-weight:600; margin-inline-end:4px; }
+  [data-mode="evening"] .zikr-fadl b{ color:#6c85d6; }
+  .zikr-src{
+    margin-top:8px;
+    font-size:calc(var(--zikr-size,22px) * .56);
+    color:var(--text-dim);
+  }
+  .count-chip{ position:relative; }
+  .chip-ring{
+    position:absolute;
+    left:-1.5px; top:-1.5px;
+    overflow:visible;
+    pointer-events:none;
+  }
+  .chip-ring path{
+    fill:none;
+    stroke:currentColor;
+    stroke-width:3;
+    stroke-linecap:round;
+    transition:stroke-dasharray .55s cubic-bezier(.3,.7,.25,1);
+  }
+  .count-chip.resetting .chip-ring path{ opacity:0; transition:stroke-dasharray .45s cubic-bezier(.3,.7,.25,1), opacity .15s ease .32s; }
+  .count-chip.completing .chip-ring path{ transition-duration:.06s; }
+  .font-ctrl{
+    display:flex; justify-content:center; align-items:center; gap:6px;
+    margin:6px 0 22px;
+  }
+  .font-ctrl button{
+    width:38px; height:34px; border-radius:999px;
+    border:1px solid var(--border); background:var(--surface); color:var(--text-dim);
+    font-family:'Noto Naskh Arabic',serif; cursor:pointer;
+    box-shadow:0 1px 3px var(--shadow);
+    transition:transform .15s ease, opacity .2s ease;
+  }
+  .font-ctrl button:active{ transform:scale(0.92); }
+  .font-ctrl button:disabled{ opacity:.35; pointer-events:none; }
+  #fontMinus{ font-size:15px; }
+  #fontPlus{ font-size:22px; }
   .zikr-note{
     margin-top:12px;
     font-size:13.5px;
     color:var(--text-dim);
     line-height:1.7;
   }
+  .card.leaving{
+    transform:translateX(-115%);
+    opacity:0;
+    pointer-events:none;
+    transition:transform .32s cubic-bezier(.5,0,.75,0), opacity .28s ease;
+  }
+  .card.collapsing{
+    height:0 !important;
+    padding-top:0;
+    padding-bottom:0;
+    margin-bottom:-14px;
+    border-width:0;
+    transition:height .26s ease, padding .26s ease, margin .26s ease, border-width .26s ease;
+  }
+  @keyframes slideBackIn{
+    from{ transform:translateX(-40px); opacity:0; }
+    to{ transform:translateX(0); opacity:1; }
+  }
+  .card.enter{ animation:slideBackIn .35s cubic-bezier(.2,.8,.3,1); }
+
+  .all-done{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    padding:56px 24px;
+    text-align:center;
+    color:var(--accent);
+  }
+  [data-mode="evening"] .all-done{ color:#6c85d6; }
+  .all-done-title{ font-size:19px; font-weight:600; color:var(--text); margin-top:6px; }
+  .all-done-sub{ font-size:14px; color:var(--text-dim); }
+
+  .done-actions{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    width:100%;
+    max-width:320px;
+    margin-top:24px;
+  }
+  .done-btn{
+    height:50px;
+    padding:0 20px;
+    border-radius:25px;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text);
+    font-family:inherit;
+    font-size:15px;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    cursor:pointer;
+    box-shadow:0 1px 3px var(--shadow);
+    transition:transform .15s ease, background .3s ease;
+  }
+  .done-btn:active{ transform:scale(0.96); }
+  .done-btn.primary{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  [data-mode="evening"] .done-btn.primary{ background:#5872d4; border-color:#5872d4; }
+
+  .undo-toast{
+    --ta:var(--accent);
+    position:fixed;
+    left:50%;
+    bottom:calc(env(safe-area-inset-bottom,0px) + 20px);
+    transform:translate(-50%, 160%);
+    opacity:0;
+    pointer-events:none;
+    z-index:60;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    max-width:calc(100% - 32px);
+    padding:8px 12px;
+    border-radius:999px;
+    background:color-mix(in srgb, var(--surface) 80%, transparent);
+    -webkit-backdrop-filter:blur(18px) saturate(170%);
+    backdrop-filter:blur(18px) saturate(170%);
+    border:1px solid var(--border);
+    box-shadow:0 10px 32px rgba(0,0,0,0.16);
+    transition:transform .4s cubic-bezier(.2,.9,.3,1.1), opacity .25s ease;
+  }
+  .undo-toast.show{ transform:translate(-50%, 0); opacity:1; pointer-events:auto; }
+  [data-mode="evening"] .undo-toast{ --ta:#6c85d6; }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) [data-mode="evening"] .undo-toast{ --ta:#8ba0e8; }
+  }
+  :root[data-theme="dark"] [data-mode="evening"] .undo-toast{ --ta:#8ba0e8; }
+  .undo-ring{
+    position:relative;
+    width:34px; height:34px;
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .undo-ring svg{ position:absolute; inset:0; transform:rotate(-90deg); }
+  .ring-bg{ fill:none; stroke:var(--border); stroke-width:3; }
+  .ring-fg{
+    fill:none;
+    stroke:var(--ta);
+    stroke-width:3;
+    stroke-linecap:round;
+    stroke-dasharray:94.25;
+    stroke-dashoffset:0;
+  }
+  #undoCount{
+    position:relative;
+    font-family:system-ui, sans-serif;
+    font-size:14px;
+    font-weight:700;
+    color:var(--text);
+    font-variant-numeric:tabular-nums;
+  }
+  .undo-text{ font-size:15px; font-weight:500; color:var(--text); white-space:nowrap; }
+  .undo-btn{
+    border:none;
+    background:color-mix(in srgb, var(--ta) 14%, transparent);
+    color:var(--ta);
+    font-family:inherit;
+    font-size:15px;
+    font-weight:600;
+    padding:10px 18px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:transform .15s ease;
+  }
+  .undo-btn:active{ transform:scale(0.94); }
+
   .hint{
     text-align:center;
     color:var(--text-dim);
@@ -274,9 +532,9 @@
   .reset-btn{
     position:fixed;
     top:calc(env(safe-area-inset-top,0px) + 14px);
-    left:16px;
+    left:calc(env(safe-area-inset-left,0px) + 20px);
     z-index:50;
-    width:38px; height:38px;
+    width:34px; height:34px;
     border-radius:50%;
     border:1px solid var(--border);
     background:var(--surface);
@@ -293,7 +551,7 @@
   .theme-toggle{
     position:fixed;
     top:calc(env(safe-area-inset-top,0px) + 14px);
-    right:16px;
+    right:calc(env(safe-area-inset-right,0px) + 20px);
     z-index:50;
     width:34px; height:34px;
     border-radius:50%;
@@ -413,7 +671,7 @@
 </head>
 <body data-mode="morning">
 <button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع الليلي">🌙</button>
-<button class="reset-btn" id="resetBtn" aria-label="إعادة التعيين">↺</button>
+<button class="reset-btn" id="resetBtn" aria-label="إعادة التعيين"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
 <div class="wrap">
   <button class="install-btn" id="installBtn">
     <span class="install-icon">⬇︎</span> إضافة للشاشة الرئيسية
@@ -432,14 +690,34 @@
     </div>
   </div>
 
+  <div class="font-ctrl" aria-label="حجم الخط">
+    <button id="fontMinus" aria-label="تصغير الخط">أ</button>
+    <button id="fontPlus" aria-label="تكبير الخط">أ</button>
+  </div>
+
   <div class="progress">
     <span id="progressText">0 من 0</span>
-    <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+    <div class="bar-wrap" id="barWrap">
+      <div class="bar"><div class="bar-fill" id="barFill"><span class="bar-shine"></span></div></div>
+      <div class="cheer" id="cheer"></div>
+    </div>
   </div>
 
   <div class="list" id="list"></div>
 
   <p class="hint">اضغط على الذكر لعدّ التكرار</p>
+</div>
+
+<div class="undo-toast" id="undoToast" role="status" aria-live="polite">
+  <div class="undo-ring">
+    <svg viewBox="0 0 36 36" width="34" height="34" aria-hidden="true">
+      <circle class="ring-bg" cx="18" cy="18" r="15"/>
+      <circle class="ring-fg" id="ringFg" cx="18" cy="18" r="15"/>
+    </svg>
+    <span id="undoCount">5</span>
+  </div>
+  <span class="undo-text">تم إكمال الذكر</span>
+  <button class="undo-btn" id="undoBtn">تراجع</button>
 </div>
 
 <div class="sheet-overlay" id="sheetOverlay">
@@ -557,6 +835,95 @@ const days = ["الأحد","الإثنين","الثلاثاء","الأربعاء
 const now = new Date();
 dateLine.textContent = days[now.getDay()] + " · " + now.toLocaleDateString('ar-EG', {day:'numeric', month:'long'});
 
+const META = [
+["من قالها حين يصبح أُجير من الجن حتى يمسي، ومن قالها حين يمسي أُجير منهم حتى يصبح","رواه الحاكم وصححه الألباني"],
+["من قالها ثلاثًا حين يصبح وحين يمسي كفته من كل شيء","رواه أبو داود والترمذي"],
+["من قالها ثلاثًا حين يصبح وحين يمسي كفته من كل شيء","رواه أبو داود والترمذي"],
+["من قالها ثلاثًا حين يصبح وحين يمسي كفته من كل شيء","رواه أبو داود والترمذي"],
+[null,"رواه مسلم"],
+["من قالها موقنًا بها في نهاره فمات قبل أن يمسي فهو من أهل الجنة، وكذلك من قالها في ليله","رواه البخاري"],
+["كان حقًّا على الله أن يرضيه يوم القيامة","رواه أحمد وأبو داود والترمذي"],
+["من قالها أربع مرات أعتقه الله من النار","رواه أبو داود"],
+["فقد أدّى شكر يومه (أو ليلته)","رواه أبو داود والنسائي"],
+["كفاه الله ما أهمّه من أمر الدنيا والآخرة","رواه ابن السني وأبو داود موقوفًا"],
+["لم يضرّه شيء","رواه أبو داود والترمذي"],
+[null,"رواه الترمذي وأبو داود"],
+[null,"رواه أحمد وابن السني"],
+["لو وُزنت بما قيل من الذكر منذ الصباح لوزنتهنّ","رواه مسلم"],
+[null,"رواه أبو داود"],
+[null,"رواه أبو داود"],
+[null,"رواه أبو داود وابن ماجه"],
+[null,"رواه الحاكم وصححه الألباني"],
+[null,"رواه أبو داود"],
+[null,"رواه أبو داود والترمذي"],
+["من قالها ثلاثًا حين يمسي لم تضرّه حُمّة تلك الليلة","رواه أحمد والترمذي"],
+["من صلّى عليّ حين يصبح وحين يمسي عشرًا أدركته شفاعتي يوم القيامة","رواه الطبراني وحسّنه الألباني"],
+["يحمي من الشرك الخفي","رواه أحمد والبخاري في الأدب المفرد"],
+["أذهب الله همّه وقضى دَينه","رواه أبو داود"],
+["غُفر له وإن كان فرّ من الزحف","رواه أبو داود والترمذي"],
+null,
+["كان كمن أعتق أربعة أنفس من ولد إسماعيل","متفق عليه"],
+null,
+null,
+["لا يأتي أحد يوم القيامة بأفضل مما جاء به إلا من قال مثله أو زاد عليه","رواه مسلم"]
+];
+// ترتيب المساء نفسه، مع تبديل آخر ذكرين
+function metaFor(i){ return META[mode==='evening' ? (i===28?29:i===29?28:i) : i]; }
+
+// حجم الخط
+const FONT_STEPS = [18,20,22,25,28,32];
+const FONT_KEY = 'tooba-font-step';
+let fontStep = 2;
+try{ const f = parseInt(localStorage.getItem(FONT_KEY),10); if(f>=0 && f<FONT_STEPS.length) fontStep = f; }catch(e){}
+function applyFont(){
+  document.documentElement.style.setProperty('--zikr-size', FONT_STEPS[fontStep] + 'px');
+  document.getElementById('fontMinus').disabled = fontStep === 0;
+  document.getElementById('fontPlus').disabled = fontStep === FONT_STEPS.length - 1;
+}
+function changeFont(d){
+  fontStep = Math.max(0, Math.min(FONT_STEPS.length - 1, fontStep + d));
+  try{ localStorage.setItem(FONT_KEY, fontStep); }catch(e){}
+  applyFont();
+}
+document.getElementById('fontMinus').addEventListener('click', () => changeFont(-1));
+document.getElementById('fontPlus').addEventListener('click', () => changeFont(1));
+applyFont();
+
+async function shareOrCopy(btn, text, title){
+  const url = 'https://toobaapp.com';
+  try{
+    if(navigator.share){
+      await navigator.share({ title, text, url });
+    } else {
+      await navigator.clipboard.writeText(text + '\n' + url);
+      const label = btn.querySelector('span');
+      const original = label.textContent;
+      label.textContent = 'تم النسخ ✓';
+      setTimeout(() => label.textContent = original, 1800);
+    }
+  }catch(err){ /* المستخدم لغى المشاركة */ }
+}
+
+const ringPrev = { morning:{}, evening:{} };
+function drawRing(chip, f, prev){
+  if(!chip || f <= 0) return;
+  const r = chip.getBoundingClientRect();
+  const w = r.width, h = r.height;
+  if(!w) return;
+  const rad = (h - 1.5) / 2;
+  const x0 = 0.75, y0 = 0.75, x1 = w - 0.75, y1 = h - 0.75, cx = w / 2;
+  const d = 'M' + cx + ' ' + y0 + 'H' + (x1 - rad) + 'A' + rad + ' ' + rad + ' 0 0 1 ' + (x1 - rad) + ' ' + y1 +
+            'H' + (x0 + rad) + 'A' + rad + ' ' + rad + ' 0 0 1 ' + (x0 + rad) + ' ' + y0 + 'H' + cx;
+  chip.insertAdjacentHTML('beforeend',
+    '<svg class="chip-ring" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" aria-hidden="true">' +
+    '<path d="' + d + '" pathLength="100" style="stroke-dasharray:' + Math.max(prev * 100, 0.01).toFixed(2) + ' 100"/></svg>');
+  const rect = chip.querySelector('.chip-ring path');
+  void rect.getBoundingClientRect();
+  rect.style.strokeDasharray = (f * 100).toFixed(2) + ' 100';
+}
+let resizeT = null;
+window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(render, 150); });
+
 function render(){
   body.dataset.mode = mode;
   document.documentElement.style.setProperty('--accent', mode==='morning' ? 'var(--accent-morning)' : 'var(--accent-evening)');
@@ -568,22 +935,27 @@ function render(){
   listEl.innerHTML = '';
   items.forEach((item, i) => {
     const remaining = progress[mode][i] ?? item.count;
+    if(remaining <= 0) return; // الأذكار المكتملة تختفي من القائمة
+    const m = metaFor(i);
     const card = document.createElement('div');
-    card.className = 'card' + (remaining <= 0 ? ' done' : '');
+    card.className = 'card';
+    card.dataset.index = i;
     card.innerHTML = `
       ${item.note ? `<div class="card-title">${item.note}</div>` : ''}
       <div class="zikr-text">${item.text}</div>
+      ${m && m[0] ? `<div class="zikr-fadl"><b>الفضل:</b>${m[0]}</div>` : ''}
+      ${m && m[1] ? `<div class="zikr-src">${m[1]}</div>` : ''}
       <div class="card-bottom">
-        <div class="count-chip">${remaining <= 0 ? '✓' : remaining}</div>
+        <div class="count-chip">${remaining}</div>
         ${item.count > 1 && remaining > 0 ? `
           <button class="complete-all-btn" aria-label="إكمال كل التكرارات">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l4 4L15 7"/><path d="M9 12l4 4L22 7"/></svg>
           </button>
         ` : ''}
         <div class="card-actions">
-          <button class="card-reset-btn" aria-label="إعادة تعيين الذكر">↺</button>
+          <button class="card-reset-btn" aria-label="إعادة تعيين الذكر"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
           <button class="share-btn" aria-label="مشاركة">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
           </button>
         </div>
       </div>
@@ -592,16 +964,25 @@ function render(){
     if(completeAllBtn){
       completeAllBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        progress[mode][i] = 0;
-        saveProgress();
-        render();
+        const current = progress[mode][i] ?? item.count;
+        completeItem(card, i, current);
       });
     }
     card.querySelector('.card-reset-btn').addEventListener('click', (e) => {
       e.stopPropagation();
       delete progress[mode][i];
       saveProgress();
-      render();
+      updateProgress();
+      const chip = card.querySelector('.count-chip');
+      const path = chip.querySelector('.chip-ring path');
+      if(path && !reduceMotion){
+        chip.classList.add('resetting');
+        chip.childNodes[0].nodeValue = item.count;
+        path.style.strokeDasharray = '0.01 100';
+        setTimeout(() => { if(card.isConnected) render(); }, 500);
+      } else {
+        render();
+      }
     });
     card.querySelector('.share-btn').addEventListener('click', async (e) => {
       e.stopPropagation();
@@ -623,7 +1004,11 @@ function render(){
     card.addEventListener('touchcancel', () => card.classList.remove('pressed'), { passive:true });
     card.addEventListener('click', () => {
       const current = progress[mode][i] ?? item.count;
-      if(current <= 0) return;
+      if(current <= 0 || card.classList.contains('leaving')) return;
+      if(current - 1 <= 0){
+        completeItem(card, i, current);
+        return;
+      }
       progress[mode][i] = current - 1;
       saveProgress();
       card.classList.add('pulse');
@@ -631,21 +1016,209 @@ function render(){
       render();
     });
     listEl.appendChild(card);
+    const f = (item.count - remaining) / item.count;
+    drawRing(card.querySelector('.count-chip'), f, ringPrev[mode][i] ?? f);
+    ringPrev[mode][i] = f;
   });
+  if(!listEl.children.length){
+    const empty = document.createElement('div');
+    empty.className = 'all-done';
+    empty.innerHTML = `
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg>
+      <div class="all-done-title">${mode === 'morning' ? 'أتممت أذكار الصباح' : 'أتممت أذكار المساء'}</div>
+      <div class="all-done-sub">تقبّل الله منك</div>
+      <div class="done-actions">
+        <button class="done-btn primary" id="remindBtn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span>ذكّر أحبابك وأصدقاءك بالأذكار</span>
+        </button>
+        <button class="done-btn" id="shareSiteBtn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
+          <span>شارك الموقع</span>
+        </button>
+      </div>
+    `;
+    listEl.appendChild(empty);
+    const remindText = mode === 'morning'
+      ? 'لا تنسَ أذكار الصباح 🤍 ذكّرتك بها هنا:'
+      : 'لا تنسَ أذكار المساء 🤍 ذكّرتك بها هنا:';
+    empty.querySelector('#remindBtn').addEventListener('click', (e) => shareOrCopy(e.currentTarget, remindText, 'أذكار الصباح والمساء'));
+    empty.querySelector('#shareSiteBtn').addEventListener('click', (e) => shareOrCopy(e.currentTarget, 'أذكار الصباح والمساء', 'أذكار الصباح والمساء'));
+  }
   updateProgress();
+}
+
+// ---------- إكمال الذكر: سلايد لليسار + مهلة تراجع 5 ثواني ----------
+const UNDO_SECONDS = 5;
+const RING_LEN = 94.25;
+const undoToast = document.getElementById('undoToast');
+const undoCount = document.getElementById('undoCount');
+const undoBtn = document.getElementById('undoBtn');
+const ringFg = document.getElementById('ringFg');
+let undoState = null;
+
+function hideUndo(){
+  if(undoState){ clearInterval(undoState.interval); undoState = null; }
+  undoToast.classList.remove('show');
+}
+
+function showUndo(m, index, prev){
+  if(undoState){ clearInterval(undoState.interval); }
+  undoState = { mode:m, index, prev, interval:null };
+  let sec = UNDO_SECONDS;
+  undoCount.textContent = sec;
+  ringFg.style.transition = 'none';
+  ringFg.style.strokeDashoffset = '0';
+  void ringFg.getBoundingClientRect();
+  ringFg.style.transition = 'stroke-dashoffset ' + UNDO_SECONDS + 's linear';
+  ringFg.style.strokeDashoffset = RING_LEN;
+  undoToast.classList.add('show');
+  undoState.interval = setInterval(() => {
+    sec--;
+    if(sec <= 0){ hideUndo(); return; }
+    undoCount.textContent = sec;
+  }, 1000);
+}
+
+function slideOut(card, done){
+  card.classList.add('leaving');
+  setTimeout(() => {
+    card.style.height = card.offsetHeight + 'px';
+    void card.offsetHeight;
+    card.classList.add('collapsing');
+    setTimeout(done, 260);
+  }, 320);
+}
+
+// تثبيت الشاشة: نمنع انكماش ارتفاع الصفحة من تحريك المحتوى للأسفل
+const wrapEl = document.querySelector('.wrap');
+function lockScrollHeight(){
+  wrapEl.style.minHeight = (window.scrollY + window.innerHeight) + 'px';
+}
+function unlockScrollHeight(){
+  wrapEl.style.minHeight = '';
+}
+window.addEventListener('scroll', () => {
+  if(!wrapEl.style.minHeight) return;
+  const need = window.scrollY + window.innerHeight;
+  if(need < parseFloat(wrapEl.style.minHeight)) wrapEl.style.minHeight = need + 'px';
+}, { passive:true });
+
+function completeItem(card, index, prevRemaining){
+  if(card.dataset.completing) return;
+  card.dataset.completing = '1';
+  progress[mode][index] = 0;
+  saveProgress();
+  updateProgress();
+  lockScrollHeight();
+  showUndo(mode, index, prevRemaining);
+  // الرقم يبقى صفر والإطار يكمل قبل ما الكارد تختفي
+  const chip = card.querySelector('.count-chip');
+  if(chip){
+    chip.classList.add('completing');
+    chip.childNodes[0].nodeValue = '';
+    chip.insertAdjacentHTML('afterbegin', '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>');
+    if(data[mode][index].count > 1){
+      const path = chip.querySelector('.chip-ring path');
+      if(path) path.style.strokeDasharray = '100 100';
+      else drawRing(chip, 1, 0);
+    }
+  }
+  setTimeout(() => slideOut(card, () => {
+    render();
+    if(listEl.querySelector('.all-done')){
+      unlockScrollHeight();
+      window.scrollTo({ top:0, behavior:'smooth' });
+    }
+  }), reduceMotion ? 0 : 50);
+}
+
+undoBtn.addEventListener('click', () => {
+  if(!undoState) return;
+  const { mode:m, index, prev } = undoState;
+  progress[m][index] = prev;
+  saveProgress();
+  hideUndo();
+  render();
+  const back = listEl.querySelector('[data-index="' + index + '"]');
+  if(back) back.classList.add('enter');
+});
+
+// ---------- حماس البروجريس بار ----------
+const barWrap = document.getElementById('barWrap');
+const barEl = barWrap.querySelector('.bar');
+const cheerEl = document.getElementById('cheer');
+const lastDone = { morning:null, evening:null };
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const MILESTONES = [[100,'ما شاء الله! أتممت الأذكار'],[75,'اقتربت من النهاية'],[50,'نصف الطريق!'],[25,'بداية ممتازة']];
+let cheerTimer = null;
+
+function burst(rightPct, count, o){
+  if(reduceMotion) return;
+  for(let k = 0; k < count; k++){
+    const p = document.createElement('i');
+    p.className = 'spark';
+    const s = o.size[0] + Math.random() * (o.size[1] - o.size[0]);
+    const x = o.spreadBar ? (5 + Math.random() * 90) : rightPct;
+    p.style.right = x + '%';
+    p.style.width = s + 'px';
+    p.style.height = (o.rect ? s * 0.55 : s) + 'px';
+    p.style.background = o.colors[k % o.colors.length];
+    p.style.borderRadius = o.rect ? '2px' : '50%';
+    barWrap.appendChild(p);
+    const dx = (Math.random() - 0.5) * 2 * o.dx;
+    const up = o.up[0] + Math.random() * (o.up[1] - o.up[0]);
+    const rot = (Math.random() - 0.5) * 720;
+    const a = p.animate([
+      { transform:'translate(0,-50%) scale(1) rotate(0deg)', opacity:1 },
+      { transform:'translate(' + (dx * 0.6) + 'px,' + (-up) + 'px) scale(1) rotate(' + (rot * 0.5) + 'deg)', opacity:1, offset:0.45 },
+      { transform:'translate(' + dx + 'px,' + o.fall + 'px) scale(.5) rotate(' + rot + 'deg)', opacity:0 }
+    ], { duration: o.dur[0] + Math.random() * (o.dur[1] - o.dur[0]), easing:'cubic-bezier(.2,.7,.4,1)', fill:'forwards' });
+    a.onfinish = () => p.remove();
+  }
+}
+
+function showCheer(text){
+  cheerEl.textContent = text;
+  cheerEl.classList.remove('show');
+  void cheerEl.offsetWidth;
+  cheerEl.classList.add('show');
+  clearTimeout(cheerTimer);
+  cheerTimer = setTimeout(() => cheerEl.classList.remove('show'), 2000);
+}
+
+function celebrate(prev, done, total, pct){
+  barEl.classList.remove('pop'); void barEl.offsetWidth; barEl.classList.add('pop');
+  barFill.classList.remove('shine'); void barFill.offsetWidth; barFill.classList.add('shine');
+  const num = progressText.querySelector('.pnum');
+  if(num) num.classList.add('bump');
+  burst(pct, 10, { colors:['#ffffff','#ffe08a','#ffd166','#fff3c4'], size:[3,6], dx:30, up:[14,34], fall:6, dur:[550,950] });
+  const prevPct = prev / total * 100;
+  const hit = MILESTONES.find(([m]) => prevPct < m && pct >= m);
+  if(hit) showCheer(hit[1]);
+  if(done === total){
+    burst(50, 38, { spreadBar:true, rect:true, colors:['#f2b01e','#ff6b6b','#4ecdc4','#5b8def','#ff9ff3','#7bd88f','#ffe58a'], size:[6,10], dx:90, up:[30,80], fall:170, dur:[1100,1700] });
+  }
 }
 
 function updateProgress(){
   const items = data[mode];
   const total = items.length;
   const done = items.filter((item,i) => (progress[mode][i] ?? item.count) <= 0).length;
-  progressText.textContent = done + ' من ' + total;
-  barFill.style.width = (done/total*100) + '%';
+  const pct = done / total * 100;
+  progressText.innerHTML = '<b class="pnum">' + done + '</b> من ' + total;
+  barFill.style.width = pct + '%';
+  barWrap.classList.toggle('full', done === total);
+  const prev = lastDone[mode];
+  lastDone[mode] = done;
+  if(prev !== null && done > prev) celebrate(prev, done, total, pct);
 }
 
-btnMorning.addEventListener('click', ()=>{ mode='morning'; render(); });
-btnEvening.addEventListener('click', ()=>{ mode='evening'; render(); });
+btnMorning.addEventListener('click', ()=>{ hideUndo(); unlockScrollHeight(); mode='morning'; render(); });
+btnEvening.addEventListener('click', ()=>{ hideUndo(); unlockScrollHeight(); mode='evening'; render(); });
 document.getElementById('resetBtn').addEventListener('click', ()=>{
+  hideUndo();
+  unlockScrollHeight();
   progress[mode] = {};
   saveProgress();
   render();
