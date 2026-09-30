@@ -4,8 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>أذكار الصباح والمساء</title>
-<meta name="theme-color" id="tcLight" content="#fbfbfa" media="(prefers-color-scheme: light)">
-<meta name="theme-color" id="tcDark" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" id="themeMeta" content="#fbfbfa">
+<script>
+(function(){
+  var t = null;
+  try{ t = localStorage.getItem('tooba-theme'); }catch(e){}
+  var dark = t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if(t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('themeMeta').setAttribute('content', dark ? '#000000' : '#fbfbfa');
+})();
+</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -50,6 +59,9 @@
     --border:rgba(255,255,255,0.09);
     --shadow:rgba(0,0,0,0.4);
   }
+  html{ background:var(--bg); color-scheme:light dark; }
+  :root[data-theme="light"]{ color-scheme:light; }
+  :root[data-theme="dark"]{ color-scheme:dark; }
   html,body{height:100%;}
   *{margin:0; box-sizing:border-box;}
   body{
@@ -1243,8 +1255,12 @@ function applyThemeIcon(){
   themeToggle.textContent = active === 'dark' ? '☀️' : '🌙';
   // لون شريط الحالة يتبع الثيم الفعلي: أسود للداك، ولون الخلفية للايت
   const c = active === 'dark' ? '#000000' : '#fbfbfa';
-  document.getElementById('tcLight').setAttribute('content', c);
-  document.getElementById('tcDark').setAttribute('content', c);
+  const old = document.getElementById('themeMeta');
+  const fresh = document.createElement('meta');
+  fresh.name = 'theme-color';
+  fresh.id = 'themeMeta';
+  fresh.content = c;
+  old.replaceWith(fresh);
 }
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyThemeIcon);
 (function initTheme(){
