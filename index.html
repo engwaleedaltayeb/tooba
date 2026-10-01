@@ -1092,9 +1092,9 @@ function render(){
       const shareText = item.text + (item.note ? `\n— ${item.note}` : '');
       try{
         if(navigator.share){
-          await navigator.share({ text: shareText, title: 'أذكار' });
+          await navigator.share({ text: shareText, title: 'أذكار', url: 'https://toobaapp.com' });
         } else {
-          await navigator.clipboard.writeText(shareText);
+          await navigator.clipboard.writeText(shareText + '\nhttps://toobaapp.com');
           btn.textContent = '✓';
           setTimeout(()=> btn.innerHTML = originalHTML, 1500);
         }
