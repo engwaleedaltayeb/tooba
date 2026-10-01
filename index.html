@@ -411,6 +411,21 @@
   }
   .font-ctrl button:active{ transform:scale(0.92); }
   .font-ctrl button:disabled{ opacity:.35; pointer-events:none; }
+  #hapticBtn{ display:flex; align-items:center; justify-content:center; margin-inline-start:8px; }
+  #hapticBtn .hslash{ transition:opacity .2s ease; }
+  #hapticBtn.on{
+    color:var(--accent);
+    border-color:color-mix(in srgb, var(--accent) 45%, transparent);
+    background:color-mix(in srgb, var(--accent) 12%, var(--surface));
+  }
+  #hapticBtn.on .hslash{ opacity:0; }
+  [data-mode="evening"] #hapticBtn.on{ color:#6c85d6; border-color:color-mix(in srgb, #6c85d6 45%, transparent); background:color-mix(in srgb, #6c85d6 12%, var(--surface)); }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) [data-mode="evening"] #hapticBtn.on{ color:#8ba0e8; border-color:color-mix(in srgb, #8ba0e8 45%, transparent); background:color-mix(in srgb, #8ba0e8 14%, var(--surface)); }
+  }
+  :root[data-theme="dark"] [data-mode="evening"] #hapticBtn.on{ color:#8ba0e8; border-color:color-mix(in srgb, #8ba0e8 45%, transparent); background:color-mix(in srgb, #8ba0e8 14%, var(--surface)); }
+  #hapticBtn.buzz{ animation:hbuzz .35s linear; }
+  @keyframes hbuzz{ 0%,100%{transform:translateX(0)} 20%{transform:translateX(-2px)} 40%{transform:translateX(2px)} 60%{transform:translateX(-2px)} 80%{transform:translateX(2px)} }
   #fontMinus{ font-size:15px; }
   #fontPlus{ font-size:22px; }
   .zikr-note{
@@ -723,6 +738,9 @@
   <div class="font-ctrl" aria-label="حجم الخط">
     <button id="fontMinus" aria-label="تصغير الخط">أ</button>
     <button id="fontPlus" aria-label="تكبير الخط">أ</button>
+    <button id="hapticBtn" aria-label="الاهتزاز" aria-pressed="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3.5" width="8" height="17" rx="2"/><path d="M4.5 8v8"/><path d="M19.5 8v8"/><path d="M2 10.5v3"/><path d="M22 10.5v3"/><path class="hslash" d="M3.5 3L20.5 21"/></svg>
+    </button>
   </div>
 
   <div class="progress">
@@ -952,8 +970,11 @@ function drawRing(chip, f, prev){
   rect.style.strokeDasharray = (f * 100).toFixed(2) + ' 100';
 }
 // اهتزاز خفيف: vibrate على أندرويد، وحيلة switch الخفية على iOS
+let hapticOn = false;
+try{ hapticOn = localStorage.getItem('tooba-haptic') === '1'; }catch(e){}
 let hapticLabel = null;
-function haptic(kind){
+function haptic(kind, force){
+  if(!hapticOn && !force) return;
   try{
     if(navigator.vibrate){
       navigator.vibrate(kind === 'done' ? [12, 45, 22] : 8);
@@ -970,6 +991,22 @@ function haptic(kind){
     if(kind === 'done') setTimeout(() => hapticLabel.click(), 90);
   }catch(e){}
 }
+const hapticBtn = document.getElementById('hapticBtn');
+function applyHapticBtn(){
+  hapticBtn.classList.toggle('on', hapticOn);
+  hapticBtn.setAttribute('aria-pressed', hapticOn ? 'true' : 'false');
+  hapticBtn.setAttribute('aria-label', hapticOn ? 'إيقاف الاهتزاز' : 'تفعيل الاهتزاز');
+}
+hapticBtn.addEventListener('click', () => {
+  hapticOn = !hapticOn;
+  try{ localStorage.setItem('tooba-haptic', hapticOn ? '1' : '0'); }catch(e){}
+  applyHapticBtn();
+  if(hapticOn){
+    haptic('done', true);
+    hapticBtn.classList.remove('buzz'); void hapticBtn.offsetWidth; hapticBtn.classList.add('buzz');
+  }
+});
+applyHapticBtn();
 let resizeT = null;
 window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(render, 150); });
 
