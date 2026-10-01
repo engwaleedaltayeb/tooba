@@ -787,6 +787,54 @@
   body.focus[data-mode="tasbeeh"] .toggle,
   body.focus[data-mode="tasbeeh"] .font-ctrl{ display:none; }
   body.focus[data-mode="tasbeeh"] .tasbih{ min-height:calc(100vh - 120px); }
+  body:not(.focus) .tasbih{ min-height:42vh; }
+  body.focus[data-mode="tasbeeh"] .wirds{ display:none; }
+  .wirds{ display:flex; flex-direction:column; gap:12px; margin-top:6px; }
+  .wirds-head{ text-align:center; font-size:15px; font-weight:600; color:var(--text-dim); margin:0 0 4px; }
+  .wirds-head.all{ color:var(--accent-text); }
+  .wird{
+    display:flex; align-items:center; gap:14px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:14px 16px;
+    box-shadow:0 1px 2px var(--shadow);
+    cursor:pointer; user-select:none; -webkit-user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    transition:transform .15s ease, border-color .3s ease, background .3s ease;
+  }
+  .wird:active{ transform:scale(0.985); }
+  .wird.done{
+    border-color:color-mix(in srgb, var(--accent-tasbeeh) 45%, transparent);
+    background:color-mix(in srgb, var(--accent-tasbeeh) 7%, var(--surface));
+  }
+  .wird-ring{ position:relative; width:56px; height:56px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .wird-ring svg.ring{ position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg); }
+  .wird-ring .wfg{ transition:stroke-dashoffset .4s ease; }
+  .wnum{ position:relative; font-family:system-ui, sans-serif; font-size:17px; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; display:flex; align-items:center; justify-content:center; }
+  .wird.done .wnum{ color:var(--accent-text); }
+  .wird-body{ flex:1; min-width:0; }
+  .wird-name{ font-size:16px; font-weight:600; color:var(--text); }
+  .wird-name small{ font-size:12.5px; font-weight:400; color:var(--text-dim); margin-inline-start:6px; font-family:system-ui, sans-serif; }
+  .wird-hint{
+    display:table;
+    max-width:100%;
+    margin-top:6px;
+    padding:6px 12px;
+    border-radius:12px;
+    background:color-mix(in srgb, var(--accent-tasbeeh) 8%, transparent);
+    font-size:13.5px; line-height:1.7; color:var(--text);
+    transition:background .3s ease, color .3s ease;
+  }
+  .wird.done .wird-hint{ background:var(--accent-tasbeeh); color:#fff; font-weight:600; }
+  .wird-reset{
+    width:36px; height:36px; border-radius:50%;
+    border:1px solid var(--border); background:transparent; color:var(--text-dim);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;
+    transition:transform .15s ease, color .2s ease;
+  }
+  .wird-reset:active{ transform:scale(0.9) rotate(-45deg); }
+  .wird-reset[hidden]{ display:none; }
 </style>
 </head>
 <body data-mode="morning">
@@ -1144,7 +1192,7 @@ document.addEventListener('click', (e) => {
   if(mode !== 'tasbeeh') return;
   // composedPath يحفظ مسار الضغطة حتى لو العنصر اتشال من الصفحة أثناء المعالجة (زي أيقونة زر التركيز)
   const path = e.composedPath ? e.composedPath() : [e.target];
-  if(path.some(el => el.matches && el.matches('button, a, .sheet-overlay, .undo-toast'))) return;
+  if(path.some(el => el.matches && el.matches('button, a, .sheet-overlay, .undo-toast, .wird'))) return;
   tasbihCount++;
   try{ localStorage.setItem(TASBIH_KEY, tasbihCount); }catch(err){}
   haptic('tap');
@@ -1161,6 +1209,88 @@ focusBtn.addEventListener('click', () => {
   focusBtn.setAttribute('aria-label', on ? 'إنهاء وضع التركيز' : 'وضع التركيز');
 });
 
+// ---------- الأوراد اليومية ----------
+const WIRDS = [
+  { id:'istighfar', name:'ورد الاستغفار', target:100 },
+  { id:'salah',     name:'ورد الصلاة على النبي', target:100 },
+  { id:'tasbih',    name:'ورد التسبيح والتحميد', target:100 },
+  { id:'hawqala',   name:'ورد الحوقلة', target:100 }
+];
+const WIRD_KEY = 'tooba-wird';
+let wirdCounts = {};
+try{
+  const raw = JSON.parse(localStorage.getItem(WIRD_KEY));
+  if(raw && raw.date === new Date().toDateString()) wirdCounts = raw.counts || {};
+}catch(e){}
+function saveWird(){
+  try{ localStorage.setItem(WIRD_KEY, JSON.stringify({ date:new Date().toDateString(), counts:wirdCounts })); }catch(e){}
+}
+function wirdHint(c, t){
+  if(c >= t) return 'اكتمل الورد، تقبّل الله منك';
+  if(c === 0) return 'استعن بالله وابدأ';
+  const p = c / t;
+  if(p < .25) return 'بداية مباركة، واصل';
+  if(p < .5)  return 'ما شاء الله، أنت في الطريق';
+  if(p < .75) return 'تجاوزت النصف، أحسنت';
+  if(p < .9)  return 'اقتربت، لا تتوقف الآن';
+  return 'باقي القليل، أكمل الورد!';
+}
+const WIRD_RING = 94.25;
+const WIRD_CHECK = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const WIRD_RESET = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>';
+function updateWird(w){
+  const el = document.querySelector('.wird[data-id="' + w.id + '"]');
+  if(!el) return;
+  const c = Math.min(wirdCounts[w.id] || 0, w.target);
+  const done = c >= w.target;
+  el.classList.toggle('done', done);
+  el.querySelector('.wfg').style.strokeDashoffset = (WIRD_RING * (1 - c / w.target)).toFixed(2);
+  el.querySelector('.wnum').innerHTML = done ? WIRD_CHECK : c;
+  el.querySelector('.wird-name small').textContent = c + ' من ' + w.target;
+  el.querySelector('.wird-hint').textContent = wirdHint(c, w.target);
+  el.querySelector('.wird-reset').hidden = c === 0;
+  const head = document.getElementById('wirdsHead');
+  if(head){
+    const n = WIRDS.filter(x => (wirdCounts[x.id] || 0) >= x.target).length;
+    head.classList.toggle('all', n === WIRDS.length);
+    head.textContent = n === WIRDS.length ? 'ما شاء الله! أتممت أوراد اليوم كلها'
+      : n > 0 ? 'أحسنت! أكملت ' + n + ' من ' + WIRDS.length + ' أوراد'
+      : 'أوراد اليوم';
+  }
+}
+function drawWirds(){
+  const box = document.getElementById('wirds');
+  if(!box) return;
+  box.innerHTML = '<div class="wirds-head" id="wirdsHead"></div>' + WIRDS.map(w =>
+    '<div class="wird" data-id="' + w.id + '">' +
+      '<div class="wird-ring"><svg class="ring" viewBox="0 0 36 36" aria-hidden="true">' +
+        '<circle class="ring-bg" cx="18" cy="18" r="15"/>' +
+        '<circle class="ring-fg wfg" cx="18" cy="18" r="15" style="stroke-dashoffset:' + WIRD_RING + '"/></svg>' +
+        '<span class="wnum">0</span></div>' +
+      '<div class="wird-body"><div class="wird-name">' + w.name + '<small></small></div><div class="wird-hint"></div></div>' +
+      '<button class="wird-reset" aria-label="إعادة تعيين الورد" hidden>' + WIRD_RESET + '</button>' +
+    '</div>').join('');
+  WIRDS.forEach(updateWird);
+}
+document.addEventListener('click', (e) => {
+  if(mode !== 'tasbeeh') return;
+  const card = e.target.closest && e.target.closest('.wird');
+  if(!card) return;
+  const w = WIRDS.find(x => x.id === card.dataset.id);
+  if(!w) return;
+  if(e.target.closest('.wird-reset')){
+    delete wirdCounts[w.id];
+    saveWird(); updateWird(w);
+    return;
+  }
+  const c = wirdCounts[w.id] || 0;
+  if(c >= w.target) return;
+  wirdCounts[w.id] = c + 1;
+  saveWird();
+  haptic(c + 1 >= w.target ? 'done' : 'tap');
+  updateWird(w);
+});
+
 function render(){
   body.dataset.mode = mode;
   document.documentElement.style.setProperty('--accent', 'var(--accent-' + mode + ')');
@@ -1169,8 +1299,9 @@ function render(){
   btnEvening.classList.toggle('active', mode==='evening');
   btnTasbih.classList.toggle('active', mode==='tasbeeh');
   if(mode === 'tasbeeh'){
-    listEl.innerHTML = '<div class="tasbih"><div class="seg-row" id="segRow" role="img"></div><div class="tasbih-hint" id="tasbihHint">اضغط في أي مكان على الشاشة للبدء</div></div>';
+    listEl.innerHTML = '<div class="tasbih"><div class="seg-row" id="segRow" role="img"></div><div class="tasbih-hint" id="tasbihHint">اضغط في أي مكان على الشاشة للبدء</div></div><div class="wirds" id="wirds"></div>';
     drawTasbih(false);
+    drawWirds();
     return;
   }
 
