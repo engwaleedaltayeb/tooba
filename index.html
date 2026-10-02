@@ -785,6 +785,7 @@
     transition:background .5s ease, transform .15s ease;
   }
   .focus-btn:active{ transform:translateX(-50%) scale(0.9); }
+  .focus-btn.on{ color:var(--accent-text); border-color:color-mix(in srgb, var(--accent) 45%, transparent); background:color-mix(in srgb, var(--accent) 12%, var(--surface)); }
   body[data-mode="tasbeeh"] .focus-btn{ display:flex; }
   body.focus[data-mode="tasbeeh"] .top-actions,
   body.focus[data-mode="tasbeeh"] header,
@@ -855,12 +856,62 @@
   .about-mail{ direction:ltr; unicode-bidi:isolate; display:inline-block; margin-top:4px; font-family:system-ui, sans-serif; font-size:15px; font-weight:600; color:var(--accent-text); text-decoration:none; word-break:break-all; }
   .about-ver{ text-align:center; font-size:12.5px; color:var(--text-dim); margin-top:4px; }
   .about-share{ width:100%; margin:4px 0 6px; color:var(--accent-text); }
+  .battery-toast{
+    position:fixed;
+    top:calc(env(safe-area-inset-top,0px) + 58px);
+    left:50%;
+    z-index:70;
+    padding:10px 18px;
+    border-radius:999px;
+    background:color-mix(in srgb, var(--surface) 82%, transparent);
+    -webkit-backdrop-filter:blur(18px) saturate(170%);
+    backdrop-filter:blur(18px) saturate(170%);
+    border:1px solid var(--border);
+    box-shadow:0 10px 32px rgba(0,0,0,0.16);
+    color:var(--text);
+    font-size:14px;
+    font-weight:500;
+    white-space:nowrap;
+    max-width:calc(100% - 32px);
+    opacity:0;
+    pointer-events:none;
+    transform:translate(-50%, -46px) scale(.92);
+    transition:transform .45s cubic-bezier(.2,.9,.3,1.1), opacity .3s ease;
+  }
+  .battery-toast.show{ opacity:1; transform:translate(-50%, 0) scale(1); }
+  .battery-toast{ display:flex; align-items:center; gap:10px; }
+  .bt-icon{ position:relative; width:24px; height:24px; flex-shrink:0; color:var(--accent-text); }
+  .bt-icon svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .bt-logo{ opacity:0; transform:rotate(120deg) scale(.3); }
+  .bt-leaf{ transform-box:fill-box; transform-origin:50% 100%; }
+  .battery-toast.show .bt-logo{ animation:btLogo 1.7s ease both; }
+  .battery-toast.show .bt-bat{ animation:btBat 1.7s ease both; }
+  .battery-toast.show .bt-leaf{ animation:btLeaf 1.7s ease both; }
+  @keyframes btLogo{
+    0%{ opacity:0; transform:rotate(0) scale(.6); }
+    15%{ opacity:1; transform:rotate(0) scale(1.08); }
+    40%{ opacity:1; transform:rotate(0) scale(1); }
+    62%,100%{ opacity:0; transform:rotate(120deg) scale(.3); }
+  }
+  @keyframes btBat{
+    0%,42%{ opacity:0; transform:scale(.4); }
+    68%{ opacity:1; transform:scale(1.1); }
+    82%,100%{ opacity:1; transform:scale(1); }
+  }
+  @keyframes btLeaf{
+    0%,66%{ transform:scale(0); }
+    88%{ transform:scale(1.2); }
+    100%{ transform:scale(1); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .battery-toast.show .bt-logo, .battery-toast.show .bt-bat, .battery-toast.show .bt-leaf{ animation:none !important; }
+  }
 </style>
 </head>
 <body data-mode="morning">
 <button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع الليلي"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
 <button class="reset-btn" id="resetBtn" aria-label="إعادة التعيين"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
-<button class="focus-btn" id="focusBtn" aria-label="وضع التركيز" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+<button class="focus-btn" id="focusBtn" aria-label="وضع توفير البطارية" aria-pressed="false"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="4.5" width="11" height="17" rx="2.5"/><path d="M10.5 2.5h3"/><path d="M12 17.8c-3.1-1-3.3-4.8 0-6.8 3.3 2 3.1 5.8 0 6.8z" fill="currentColor" stroke="none"/><path d="M12 17.5v-3.5" stroke="var(--surface)" stroke-width="0.9"/></svg></button>
 <div class="wrap">
   <div class="top-actions">
     <button class="install-btn" id="installBtn">
@@ -922,6 +973,8 @@
   <button class="undo-btn" id="undoBtn">تراجع</button>
 </div>
 
+<div class="battery-toast" id="batteryToast" role="status" aria-live="polite"><span class="bt-icon" aria-hidden="true"><svg class="bt-logo" viewBox="0 0 336.42 336.42"><path fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><svg class="bt-bat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="4.5" width="11" height="17" rx="2.5"/><path d="M10.5 2.5h3"/><path class="bt-leaf" d="M12 17.8c-3.1-1-3.3-4.8 0-6.8 3.3 2 3.1 5.8 0 6.8z" fill="currentColor" stroke="none"/><path class="bt-leaf" d="M12 17.5v-3.5" stroke="var(--surface)" stroke-width="0.9"/></svg></span><span>تم تفعيل وضع توفير البطارية</span></div>
+
 <div class="sheet-overlay" id="aboutOverlay">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -936,7 +989,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر</span>
     </button>
-    <div class="about-ver">الإصدار 1.4</div>
+    <div class="about-ver">الإصدار 1.11</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1240,8 +1293,6 @@ document.addEventListener('click', (e) => {
 });
 
 const focusBtn = document.getElementById('focusBtn');
-const FOCUS_ON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h3a2 2 0 0 0 2-2V3M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M21 16h-3a2 2 0 0 0-2 2v3"/></svg>';
-const FOCUS_OFF = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
 function fsElement(){ return document.fullscreenElement || document.webkitFullscreenElement || null; }
 function enterFS(){
   const el = document.documentElement;
@@ -1254,11 +1305,37 @@ function exitFS(){
   if(!ex || !fsElement()) return;
   try{ const p = ex.call(document); if(p && p.catch) p.catch(() => {}); }catch(e){}
 }
+// وضع توفير البطارية: يقلب الداك مؤقتًا (من غير حفظ) ويرجّع الثيم القديم عند الخروج
+let batteryPrevTheme = null;
+const batteryToast = document.getElementById('batteryToast');
+let batteryToastT = null;
+function showBatteryToast(){
+  clearTimeout(batteryToastT);
+  batteryToast.classList.add('show');
+  batteryToastT = setTimeout(() => batteryToast.classList.remove('show'), 2800);
+}
+function hideBatteryToast(){
+  clearTimeout(batteryToastT);
+  batteryToast.classList.remove('show');
+}
 function setFocus(on){
+  const was = body.classList.contains('focus');
+  if(on === was) return;
+  const root = document.documentElement;
+  if(on){
+    batteryPrevTheme = root.getAttribute('data-theme');
+    root.setAttribute('data-theme', 'dark');
+  } else {
+    if(batteryPrevTheme) root.setAttribute('data-theme', batteryPrevTheme);
+    else root.removeAttribute('data-theme');
+    batteryPrevTheme = null;
+  }
   body.classList.toggle('focus', on);
-  focusBtn.innerHTML = on ? FOCUS_ON : FOCUS_OFF;
+  focusBtn.classList.toggle('on', on);
   focusBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
-  focusBtn.setAttribute('aria-label', on ? 'إنهاء وضع التركيز' : 'وضع التركيز');
+  focusBtn.setAttribute('aria-label', on ? 'إنهاء وضع توفير البطارية' : 'وضع توفير البطارية');
+  applyThemeIcon();
+  if(on) showBatteryToast(); else hideBatteryToast();
 }
 focusBtn.addEventListener('click', () => {
   const on = !body.classList.contains('focus');
@@ -1353,6 +1430,7 @@ document.addEventListener('click', (e) => {
 });
 
 function render(){
+  if(mode !== 'tasbeeh' && body.classList.contains('focus')){ setFocus(false); exitFS(); }
   body.dataset.mode = mode;
   document.documentElement.style.setProperty('--accent', 'var(--accent-' + mode + ')');
   title.textContent = MODE_TITLES[mode];
@@ -1709,7 +1787,7 @@ themeToggle.addEventListener('click', () => {
   const current = document.documentElement.getAttribute('data-theme') || (systemPrefersDark() ? 'dark' : 'light');
   const next = current === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
-  try{ localStorage.setItem(THEME_KEY, next); }catch(e){}
+  if(!body.classList.contains('focus')){ try{ localStorage.setItem(THEME_KEY, next); }catch(e){} }
   applyThemeIcon();
 });
 
