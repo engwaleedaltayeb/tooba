@@ -761,7 +761,11 @@
   .seg-row svg{ height:clamp(96px,26vw,150px); width:auto; overflow:visible; }
   .seg{ transition:fill .12s ease; }
   .seg.on{ fill:var(--accent-text); filter:drop-shadow(0 0 6px color-mix(in srgb, var(--accent-text) 45%, transparent)); }
-  .seg.off{ fill:color-mix(in srgb, var(--text) 7%, transparent); }
+  .seg.off{ fill:color-mix(in srgb, var(--text) 3%, transparent); }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .seg.off{ fill:color-mix(in srgb, var(--text) 7%, transparent); }
+  }
+  :root[data-theme="dark"] .seg.off{ fill:color-mix(in srgb, var(--text) 7%, transparent); }
   .tasbih-hint{ font-size:16px; color:var(--text-dim); }
   .focus-btn{
     display:none;
@@ -932,7 +936,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر</span>
     </button>
-    <div class="about-ver">الإصدار 1.3</div>
+    <div class="about-ver">الإصدار 1.4</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
