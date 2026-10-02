@@ -906,9 +906,51 @@
   @media (prefers-reduced-motion: reduce){
     .battery-toast.show .bt-logo, .battery-toast.show .bt-bat, .battery-toast.show .bt-leaf{ animation:none !important; }
   }
+  .splash{
+    position:fixed; inset:0; z-index:200;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px;
+    background:var(--bg);
+    overflow:hidden;
+    animation:splashOut .5s ease 1.55s forwards;
+  }
+  .splash-logo{ position:relative; width:128px; height:128px; animation:splashGrow 1.4s cubic-bezier(.2,.8,.3,1) both, splashZoom .6s cubic-bezier(.55,0,.85,.35) 1.5s forwards; }
+  .splash-logo svg{ position:relative; width:100%; height:100%; overflow:visible; }
+  .sp{
+    transform-origin:168.21px 168.21px;
+    opacity:0;
+    animation:splashPetal .8s cubic-bezier(.2,.9,.3,1.25) both;
+  }
+  .sp.p1{ animation-delay:.05s; } .sp.p2{ animation-delay:.17s; } .sp.p3{ animation-delay:.29s; }
+  .sp.p4{ animation-delay:.41s; } .sp.p5{ animation-delay:.53s; }
+  .splash-title{
+    font-family:'Amiri', serif; font-size:40px; font-weight:700; color:var(--text);
+    animation:splashTitle .6s ease .9s both;
+  }
+  @keyframes splashPetal{
+    0%{ opacity:0; transform:rotate(-110deg) scale(0); }
+    60%{ opacity:1; }
+    100%{ opacity:1; transform:rotate(0) scale(1); }
+  }
+  @keyframes splashTitle{
+    0%{ opacity:0; transform:translateY(10px); } 100%{ opacity:1; transform:translateY(0); }
+  }
+  @keyframes splashGrow{
+    0%{ transform:scale(.45) rotate(-80deg); }
+    100%{ transform:scale(1) rotate(0); }
+  }
+  @keyframes splashZoom{
+    0%{ transform:scale(1); opacity:1; }
+    60%{ opacity:1; }
+    100%{ transform:scale(18); opacity:0; }
+  }
+  @keyframes splashOut{
+    0%{ opacity:1; } 100%{ opacity:0; visibility:hidden; }
+  }
 </style>
 </head>
 <body data-mode="morning">
+<div class="splash" id="splash" aria-hidden="true"><div class="splash-logo"><svg viewBox="0 0 336.42 336.42"><path class="sp p1" fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path class="sp p2" fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path class="sp p3" fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path class="sp p4" fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path class="sp p5" fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg></div><div class="splash-title">طوبى</div></div>
+<script>(function(){var el=document.getElementById("splash");if(!el)return;var done=false;function rm(){if(done)return;done=true;el.remove();}var rm_=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(rm_){rm();return;}el.addEventListener("click",rm);setTimeout(rm,2400);})();</script>
 <button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع الليلي"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
 <button class="reset-btn" id="resetBtn" aria-label="إعادة التعيين"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
 <button class="focus-btn" id="focusBtn" aria-label="وضع توفير البطارية" aria-pressed="false"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="4.5" width="11" height="17" rx="2.5"/><path d="M10.5 2.5h3"/><path d="M12 17.8c-3.1-1-3.3-4.8 0-6.8 3.3 2 3.1 5.8 0 6.8z" fill="currentColor" stroke="none"/><path d="M12 17.5v-3.5" stroke="var(--surface)" stroke-width="0.9"/></svg></button>
@@ -989,7 +1031,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر</span>
     </button>
-    <div class="about-ver">الإصدار 1.11</div>
+    <div class="about-ver">الإصدار 1.13</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
