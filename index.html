@@ -932,7 +932,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر</span>
     </button>
-    <div class="about-ver">الإصدار 1.2</div>
+    <div class="about-ver">الإصدار 1.3</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1804,6 +1804,13 @@ document.getElementById('aboutShare').addEventListener('click', async () => {
     }
   }catch(err){ /* المستخدم لغى المشاركة */ }
 });
+
+// العمل بدون إنترنت (على الدومين الحقيقي بس)
+if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname)){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
