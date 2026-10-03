@@ -855,7 +855,7 @@
   .about-text p{ font-size:15px; line-height:1.9; color:var(--text); text-align:center; margin:0 0 10px; }
   .about-mail{ direction:ltr; unicode-bidi:isolate; display:inline-block; margin-top:4px; font-family:system-ui, sans-serif; font-size:15px; font-weight:600; color:var(--accent-text); text-decoration:none; word-break:break-all; }
   .about-ver{ text-align:center; font-size:12.5px; color:var(--text-dim); margin-top:4px; }
-  .about-share{ width:100%; margin:4px 0 6px; color:var(--accent-text); }
+  .about-share{ width:100%; height:auto; min-height:50px; padding:10px 18px; margin:4px 0 6px; color:var(--accent-text); line-height:1.5; text-align:center; }
   .battery-toast{
     position:fixed;
     top:calc(env(safe-area-inset-top,0px) + 58px);
@@ -1034,9 +1034,9 @@
     </div>
     <button class="done-btn about-share" id="aboutShare">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
-      <span id="aboutShareLabel">شارك الأجر</span>
+      <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.21</div>
+    <div class="about-ver">الإصدار 1.22</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -2013,7 +2013,7 @@ document.getElementById('aboutShare').addEventListener('click', async () => {
     } else {
       await navigator.clipboard.writeText('أذكار الصباح والمساء\n' + url);
       label.textContent = 'تم النسخ ✓';
-      setTimeout(() => label.textContent = 'شارك الأجر', 1600);
+      setTimeout(() => label.textContent = 'شارك الأجر واجعلها صدقة جارية عنك', 1600);
     }
   }catch(err){ /* المستخدم لغى المشاركة */ }
 });
