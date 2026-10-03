@@ -1036,7 +1036,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر</span>
     </button>
-    <div class="about-ver">الإصدار 1.19</div>
+    <div class="about-ver">الإصدار 1.20</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1801,10 +1801,9 @@ function megaCelebrate(){
       el.style.height = (sz * 0.6) + 'px';
     }
   }
-  wave(22, 90);
-  setTimeout(() => wave(16, 70), 350);
-  setTimeout(() => wave(12, 50), 750);
-  setTimeout(() => layer.remove(), 5800);
+  wave(10, 30);
+  setTimeout(() => wave(6, 20), 400);
+  setTimeout(() => layer.remove(), 5000);
 }
 
 function celebrate(prev, done, total, pct){
@@ -1818,7 +1817,7 @@ function celebrate(prev, done, total, pct){
   const hit = MILESTONES.find(([m]) => prevPct < m && pct >= m);
   if(hit) showCheer(hit[1]);
   if(done === total){
-    burst(50, 38, { spreadBar:true, rect:true, colors: pal.conf, size:[6,10], dx:90, up:[30,80], fall:170, dur:[1100,1700] });
+    burst(50, 16, { spreadBar:true, rect:true, colors: pal.conf, size:[6,10], dx:90, up:[30,80], fall:170, dur:[1100,1700] });
     megaCelebrate();
   }
 }
