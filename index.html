@@ -1049,7 +1049,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.27</div>
+    <div class="about-ver">الإصدار 1.28</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1197,7 +1197,7 @@ const META = [
 [null,"رواه أبو داود والترمذي"],
 ["من قالها ثلاثًا حين يمسي لم تضرّه حُمّة تلك الليلة","رواه أحمد والترمذي"],
 ["من صلّى عليّ واحدةً صلّى الله عليه عشرًا","رواه مسلم"],
-["يحمي من الشرك الخفي","رواه أحمد والبخاري في الأدب المفرد"],
+["يحميه الله من الشرك الخفي","رواه أحمد والبخاري في الأدب المفرد"],
 ["أذهب الله همّه وقضى دَينه","رواه أبو داود"],
 ["غُفر له وإن كان فرّ من الزحف","رواه أبو داود والترمذي"],
 null,
@@ -1516,7 +1516,7 @@ function render(){
     card.innerHTML = `
       ${item.note ? `<div class="card-title">${item.note}</div>` : ''}
       <div class="zikr-text">${item.text}</div>
-      ${m && m[0] ? `<div class="zikr-fadl"><b>الفضل:</b>${m[0]}</div>` : ''}
+      ${m && m[0] ? `<div class="zikr-fadl"><b>الفضل:</b>${/^من\s/.test(m[0]) ? m[0] : 'من قالها ' + m[0]}</div>` : ''}
       ${m && m[1] ? `<div class="zikr-src">${m[1]}</div>` : ''}
       <div class="card-bottom">
         <div class="count-chip">${remaining}</div>
