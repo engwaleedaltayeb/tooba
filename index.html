@@ -756,7 +756,7 @@
   .tasbih-btn:active{ transform:scale(0.95); }
   .tasbih-btn.active{ background:var(--accent-tasbeeh); border-color:var(--accent-tasbeeh); color:#fff; }
   body[data-mode="tasbeeh"] .toggle-thumb{ opacity:0; }
-  body[data-mode="tasbeeh"] .progress,
+  body[data-mode="tasbeeh"]:not(.has-wird) .progress,
   body[data-mode="tasbeeh"] .hint,
   body[data-mode="tasbeeh"] #fontMinus,
   body[data-mode="tasbeeh"] #fontPlus{ display:none; }
@@ -806,7 +806,9 @@
   body.focus[data-mode="tasbeeh"] .font-ctrl{ display:none; }
   body.focus[data-mode="tasbeeh"] .tasbih{ min-height:calc(100vh - 120px); }
   body:not(.focus) .tasbih{ min-height:42vh; }
-  body.focus[data-mode="tasbeeh"] .wirds{ display:none; }
+  body.focus[data-mode="tasbeeh"] .wsel,
+  body.focus[data-mode="tasbeeh"] .wedit,
+  body.focus[data-mode="tasbeeh"] .progress{ display:none; }
   .wirds{ display:flex; flex-direction:column; gap:12px; margin-top:6px; }
   .wirds-head{ text-align:center; font-size:15px; font-weight:600; color:var(--text-dim); margin:0 0 4px; }
   .wirds-head.all{ color:var(--accent-text); }
@@ -870,6 +872,7 @@
   }
   .wird-add:active{ transform:scale(0.985); background:color-mix(in srgb, var(--accent-tasbeeh) 8%, transparent); }
   .field{ display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+  .field[hidden]{ display:none; }
   .field span{ font-size:13.5px; color:var(--text-dim); font-weight:500; }
   .field input{
     height:48px; padding:0 14px; border-radius:14px;
@@ -878,8 +881,41 @@
     transition:border-color .2s ease;
   }
   .field input:focus{ border-color:var(--accent-tasbeeh); }
+  #wirdDefault{ width:100%; margin-top:10px; }
   .wird-del{ width:100%; margin-top:10px; color:#d8453a; }
   .wird-del[hidden]{ display:none; }
+  .wsel{
+    display:flex; gap:8px; align-items:center; justify-content:safe center;
+    overflow-x:auto; margin:0 -24px; padding:6px 24px 10px;
+    scrollbar-width:none; -webkit-overflow-scrolling:touch;
+  }
+  .wsel::-webkit-scrollbar{ display:none; }
+  .wchip{
+    flex-shrink:0; display:flex; align-items:center; justify-content:center; gap:6px;
+    height:40px; padding:0 16px; max-width:170px;
+    border-radius:999px; border:1px solid var(--border);
+    background:var(--surface); color:var(--text-dim);
+    font-family:inherit; font-size:14.5px; font-weight:500; white-space:nowrap;
+    cursor:pointer; box-shadow:0 1px 3px var(--shadow);
+    transition:background .3s ease, color .3s ease, border-color .3s ease, transform .15s ease;
+  }
+  .wchip span{ overflow:hidden; text-overflow:ellipsis; }
+  .wchip:active{ transform:scale(0.95); }
+  .wchip.on{ background:var(--accent-tasbeeh); border-color:var(--accent-tasbeeh); color:#fff; }
+  .wchip .wc-check{ display:none; }
+  .wchip.done .wc-check{ display:block; }
+  .wchip:not(.on).done{ color:var(--accent-text); border-color:color-mix(in srgb, var(--accent-tasbeeh) 45%, transparent); }
+  .wchip.wadd{ width:40px; padding:0; border-style:dashed; color:var(--accent-text); border-color:color-mix(in srgb, var(--accent-tasbeeh) 55%, transparent); box-shadow:none; background:transparent; }
+  .tasbih-hint.done{ color:var(--accent-text); font-weight:600; }
+  .wedit{
+    display:flex; align-items:center; gap:6px;
+    padding:8px 16px; border-radius:999px;
+    border:1px solid var(--border); background:var(--surface); color:var(--text-dim);
+    font-family:inherit; font-size:14px; font-weight:500; cursor:pointer;
+    box-shadow:0 1px 3px var(--shadow); transition:transform .15s ease;
+  }
+  .wedit:active{ transform:scale(0.95); }
+  .wedit[hidden]{ display:none; }
   .about-wrap{ text-align:center; margin:6px 0 0; }
   .about-link{
     border:none; background:transparent; font-family:inherit;
@@ -1076,7 +1112,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.29</div>
+    <div class="about-ver">الإصدار 1.31</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1085,9 +1121,10 @@
   <div class="sheet">
     <div class="sheet-handle"></div>
     <h2 id="wirdSheetTitle">إضافة ورد خاص</h2>
-    <label class="field"><span>اسم الورد</span><input id="wirdName" type="text" maxlength="40" autocomplete="off" placeholder="مثال: دعاء لوالديّ"></label>
+    <label class="field" id="wirdNameField"><span>اسم الورد</span><input id="wirdName" type="text" maxlength="40" autocomplete="off" placeholder="مثال: دعاء لوالديّ"></label>
     <label class="field"><span>العدد المطلوب يوميًا</span><input id="wirdTarget" type="text" inputmode="numeric" autocomplete="off" value="33"></label>
     <button class="sheet-close" id="wirdSave">حفظ</button>
+    <button class="done-btn" id="wirdDefault" hidden><span id="wirdDefLabel">العودة إلى 100</span></button>
     <button class="done-btn wird-del" id="wirdDel" hidden><span id="wirdDelLabel">حذف الورد</span></button>
   </div>
 </div>
@@ -1373,17 +1410,43 @@ function tasbihDigits(n){
 function drawTasbih(bump){
   const row = document.getElementById('segRow');
   if(!row) return;
-  row.setAttribute('aria-label', String(tasbihCount));
-  row.innerHTML = tasbihDigits(tasbihCount);
+  const w = selWirdObj();
+  const n = w ? Math.min(wirdCounts[w.id] || 0, w.target) : tasbihCount;
+  row.setAttribute('aria-label', String(n));
+  row.innerHTML = tasbihDigits(n);
   const hint = document.getElementById('tasbihHint');
-  if(hint) hint.style.visibility = tasbihCount > 0 ? 'hidden' : 'visible';
+  if(hint){
+    if(w){
+      hint.textContent = wirdHint(n, w.target);
+      hint.style.visibility = 'visible';
+      hint.classList.toggle('done', n >= w.target);
+    } else {
+      hint.textContent = 'اضغط في أي مكان على الشاشة للبدء';
+      hint.style.visibility = tasbihCount > 0 ? 'hidden' : 'visible';
+      hint.classList.remove('done');
+    }
+  }
+  const ed = document.getElementById('wedit');
+  if(ed){ ed.hidden = !w; if(w) ed.querySelector('span').textContent = w.custom ? 'تعديل الورد' : 'تعديل العدد'; }
   if(bump && !reduceMotion) row.animate([{transform:'scale(1)'},{transform:'scale(1.04)'},{transform:'scale(1)'}], {duration:140, easing:'ease-out'});
 }
 document.addEventListener('click', (e) => {
   if(mode !== 'tasbeeh') return;
   // composedPath يحفظ مسار الضغطة حتى لو العنصر اتشال من الصفحة أثناء المعالجة (زي أيقونة زر التركيز)
   const path = e.composedPath ? e.composedPath() : [e.target];
-  if(path.some(el => el.matches && el.matches('button, a, .sheet-overlay, .undo-toast, .wird'))) return;
+  if(path.some(el => el.matches && el.matches('button, a, .sheet-overlay, .undo-toast, .wsel'))) return;
+  const w = selWirdObj();
+  if(w){
+    const c = wirdCounts[w.id] || 0;
+    if(c >= w.target) return;
+    wirdCounts[w.id] = c + 1;
+    saveWird();
+    haptic(c + 1 >= w.target ? 'done' : 'tap');
+    drawTasbih(true);
+    paintChips();
+    paintWirdProgress(c);
+    return;
+  }
   tasbihCount++;
   try{ localStorage.setItem(TASBIH_KEY, tasbihCount); }catch(err){}
   haptic('tap');
@@ -1447,11 +1510,13 @@ focusBtn.addEventListener('click', () => {
 
 // ---------- الأوراد اليومية ----------
 const WIRDS = [
-  { id:'istighfar', name:'ورد الاستغفار', target:100 },
-  { id:'salah',     name:'ورد الصلاة على النبي', target:100 },
-  { id:'tasbih',    name:'ورد التسبيح والتحميد', target:100 },
-  { id:'hawqala',   name:'ورد الحوقلة', target:100 }
+  { id:'istighfar', name:'ورد الاستغفار', short:'الاستغفار', target:100 },
+  { id:'salah',     name:'ورد الصلاة على النبي', short:'الصلاة على النبي', target:100 },
+  { id:'tasbih',    name:'ورد التسبيح والتحميد', short:'التسبيح والتحميد', target:100 },
+  { id:'hawqala',   name:'ورد الحوقلة', short:'الحوقلة', target:100 }
 ];
+let selWird = null; // null = عدّ حر
+function selWirdObj(){ return selWird ? allWirds().find(x => x.id === selWird) || null : null; }
 const CUSTOM_KEY = 'tooba-custom-wirds';
 let customWirds = [];
 try{
@@ -1462,6 +1527,11 @@ function saveCustom(){
   try{ localStorage.setItem(CUSTOM_KEY, JSON.stringify(customWirds.map(w => ({ id:w.id, name:w.name, target:w.target })))); }catch(e){}
 }
 function allWirds(){ return WIRDS.concat(customWirds); }
+const WIRD_TGT_KEY = 'tooba-wird-targets';
+let wirdTargets = {};
+try{ wirdTargets = JSON.parse(localStorage.getItem(WIRD_TGT_KEY)) || {}; }catch(e){}
+WIRDS.forEach(w => { w.def = w.target; const t = +wirdTargets[w.id]; if(t > 0) w.target = Math.min(Math.round(t), 10000); });
+function saveTargets(){ try{ localStorage.setItem(WIRD_TGT_KEY, JSON.stringify(wirdTargets)); }catch(e){} }
 function esc(t){ return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 const WIRD_KEY = 'tooba-wird';
 let wirdCounts = {};
@@ -1486,60 +1556,49 @@ const WIRD_RING = 94.25;
 const WIRD_CHECK = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 const WIRD_EDIT = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
 const WIRD_RESET = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>';
-function updateWird(w){
-  const el = document.querySelector('.wird[data-id="' + w.id + '"]');
-  if(!el) return;
-  const c = Math.min(wirdCounts[w.id] || 0, w.target);
-  const done = c >= w.target;
-  el.classList.toggle('done', done);
-  el.querySelector('.wfg').style.strokeDashoffset = (WIRD_RING * (1 - c / w.target)).toFixed(2);
-  el.querySelector('.wnum').innerHTML = done ? WIRD_CHECK : c;
-  el.querySelector('.wird-name small').textContent = c + ' من ' + w.target;
-  el.querySelector('.wird-hint').textContent = wirdHint(c, w.target);
-  el.querySelector('.wird-reset').hidden = c === 0;
-  const head = document.getElementById('wirdsHead');
-  if(head){
-    const n = allWirds().filter(x => (wirdCounts[x.id] || 0) >= x.target).length;
-    head.classList.toggle('all', n === allWirds().length);
-    head.textContent = n === allWirds().length ? 'ما شاء الله! أتممت أوراد اليوم كلها'
-      : n > 0 ? 'أحسنت! أكملت ' + n + ' من ' + allWirds().length + ' أوراد'
-      : 'أوراد اليوم';
+// ---------- شريط الاختيار: عدّ حر / أوراد ----------
+const CHIP_CHECK = '<svg class="wc-check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+function chipsHTML(){
+  return '<button class="wchip" data-id=""><span>عدّ حر</span></button>' +
+    allWirds().map(w => '<button class="wchip" data-id="' + esc(w.id) + '">' + CHIP_CHECK + '<span>' + esc(w.short || w.name) + '</span></button>').join('') +
+    (customWirds.length < 10 ? '<button class="wchip wadd" id="wirdAdd" aria-label="إضافة ورد خاص"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg></button>' : '');
+}
+function paintChips(){
+  document.querySelectorAll('.wchip[data-id]').forEach(ch => {
+    const id = ch.dataset.id || null;
+    const w = id ? allWirds().find(x => x.id === id) : null;
+    ch.classList.toggle('on', id === selWird);
+    ch.classList.toggle('done', !!w && (wirdCounts[w.id] || 0) >= w.target);
+  });
+}
+function paintWirdProgress(prev){
+  const w = selWirdObj();
+  body.classList.toggle('has-wird', !!w);
+  if(!w) return;
+  const c = Math.min(wirdCounts[w.id] || 0, w.target), t = w.target;
+  progressText.innerHTML = '<b class="pnum">' + c + '</b> من ' + t;
+  barFill.style.width = (c / t * 100) + '%';
+  if(prev == null || c <= prev) return;
+  const prevPct = prev / t * 100, pct = c / t * 100;
+  if(MILESTONES.some(([m]) => prevPct < m && pct >= m) || c === t){
+    celebrate(prev, c, t, pct);
+    if(c === t) showCheer('ما شاء الله! أتممت الورد');
+  } else {
+    const num = progressText.querySelector('.pnum');
+    if(num){ num.classList.remove('bump'); void num.offsetWidth; num.classList.add('bump'); }
   }
 }
-function drawWirds(){
-  const box = document.getElementById('wirds');
-  if(!box) return;
-  box.innerHTML = '<div class="wirds-head" id="wirdsHead"></div>' + allWirds().map(w =>
-    '<div class="wird" data-id="' + w.id + '">' +
-      '<div class="wird-ring"><svg class="ring" viewBox="0 0 36 36" aria-hidden="true">' +
-        '<circle class="ring-bg" cx="18" cy="18" r="15"/>' +
-        '<circle class="ring-fg wfg" cx="18" cy="18" r="15" style="stroke-dashoffset:' + WIRD_RING + '"/></svg>' +
-        '<span class="wnum">0</span></div>' +
-      '<div class="wird-body"><div class="wird-name">' + esc(w.name) + '<small></small></div><div class="wird-hint"></div></div>' +
-      (w.custom ? '<button class="wird-edit" aria-label="تعديل الورد">' + WIRD_EDIT + '</button>' : '') +
-      '<button class="wird-reset" aria-label="إعادة تعيين الورد" hidden>' + WIRD_RESET + '</button>' +
-    '</div>').join('') +
-    (customWirds.length < 10 ? '<button class="wird-add" id="wirdAdd"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span>إضافة ورد خاص</span></button>' : '');
-  allWirds().forEach(updateWird);
+function selectWird(id){
+  selWird = id || null;
+  paintChips();
+  drawTasbih(false);
+  paintWirdProgress(null);
 }
 document.addEventListener('click', (e) => {
   if(mode !== 'tasbeeh') return;
-  const card = e.target.closest && e.target.closest('.wird');
-  if(!card) return;
-  const w = allWirds().find(x => x.id === card.dataset.id);
-  if(!w) return;
-  if(e.target.closest('.wird-edit')){ openWirdSheet(w.id); return; }
-  if(e.target.closest('.wird-reset')){
-    delete wirdCounts[w.id];
-    saveWird(); updateWird(w);
-    return;
-  }
-  const c = wirdCounts[w.id] || 0;
-  if(c >= w.target) return;
-  wirdCounts[w.id] = c + 1;
-  saveWird();
-  haptic(c + 1 >= w.target ? 'done' : 'tap');
-  updateWird(w);
+  const ch = e.target.closest && e.target.closest('.wchip[data-id]');
+  if(ch){ haptic('tap'); selectWird(ch.dataset.id); return; }
+  if(e.target.closest && e.target.closest('#wedit') && selWird) openWirdSheet(selWird);
 });
 
 // ---------- ورد خاص: إضافة وتعديل وحذف ----------
@@ -1549,13 +1608,18 @@ const wirdTargetEl = document.getElementById('wirdTarget');
 const wirdDelBtn = document.getElementById('wirdDel');
 let editingWird = null, delArmed = false;
 function toLatinDigits(t){ return String(t).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)); }
+const wirdDefBtn = document.getElementById('wirdDefault');
 function openWirdSheet(id){
   editingWird = id || null;
-  const w = id ? customWirds.find(x => x.id === id) : null;
-  document.getElementById('wirdSheetTitle').textContent = w ? 'تعديل الورد' : 'إضافة ورد خاص';
+  const w = id ? allWirds().find(x => x.id === id) : null;
+  const core = !!(w && !w.custom);
+  document.getElementById('wirdSheetTitle').textContent = core ? 'تعديل العدد المطلوب' : (w ? 'تعديل الورد' : 'إضافة ورد خاص');
+  document.getElementById('wirdNameField').hidden = core;
   wirdNameEl.value = w ? w.name : '';
   wirdTargetEl.value = w ? w.target : 33;
-  wirdDelBtn.hidden = !w;
+  wirdDelBtn.hidden = !w || core;
+  wirdDefBtn.hidden = !core || w.target === w.def;
+  if(core) document.getElementById('wirdDefLabel').textContent = 'العودة إلى ' + w.def;
   delArmed = false;
   document.getElementById('wirdDelLabel').textContent = 'حذف الورد';
   wirdOverlay.classList.add('open');
@@ -1567,20 +1631,35 @@ document.addEventListener('click', (e) => {
 });
 wirdOverlay.addEventListener('click', (e) => { if(e.target === wirdOverlay) closeWirdSheet(); });
 document.getElementById('wirdSave').addEventListener('click', () => {
+  const coreW = editingWird ? allWirds().find(x => x.id === editingWird) : null;
+  const core = !!(coreW && !coreW.custom);
   const name = wirdNameEl.value.trim().replace(/\s+/g, ' ');
-  if(!name){ wirdNameEl.focus(); wirdNameEl.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:220}); return; }
+  if(!core && !name){ wirdNameEl.focus(); wirdNameEl.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:220}); return; }
   let target = parseInt(toLatinDigits(wirdTargetEl.value), 10);
   if(!(target > 0)) target = 33;
   target = Math.min(target, 10000);
-  if(editingWird){
+  if(core){
+    coreW.target = target;
+    if(target === coreW.def) delete wirdTargets[coreW.id]; else wirdTargets[coreW.id] = target;
+    saveTargets();
+  } else if(editingWird){
     const w = customWirds.find(x => x.id === editingWird);
     if(w){ w.name = name; w.target = target; }
   } else if(customWirds.length < 10){
-    customWirds.push({ id:'c' + Date.now().toString(36), name, target, custom:true });
+    const nid = 'c' + Date.now().toString(36);
+    customWirds.push({ id:nid, name, target, custom:true });
+    selWird = nid;
   }
-  saveCustom();
+  if(!core) saveCustom();
   closeWirdSheet();
-  drawWirds();
+  if(mode === 'tasbeeh') render();
+});
+wirdDefBtn.addEventListener('click', () => {
+  const w = allWirds().find(x => x.id === editingWird);
+  if(!w || w.custom) return;
+  w.target = w.def; delete wirdTargets[w.id]; saveTargets();
+  closeWirdSheet();
+  if(mode === 'tasbeeh') render();
 });
 wirdDelBtn.addEventListener('click', () => {
   if(!delArmed){
@@ -1592,21 +1671,27 @@ wirdDelBtn.addEventListener('click', () => {
   delete wirdCounts[editingWird];
   saveCustom(); saveWird();
   closeWirdSheet();
-  drawWirds();
+  if(selWird === editingWird) selWird = null;
+  if(mode === 'tasbeeh') render();
 });
 
 function render(){
   if(mode !== 'tasbeeh' && body.classList.contains('focus')){ setFocus(false); exitFS(); }
   body.dataset.mode = mode;
+  if(mode !== 'tasbeeh') body.classList.remove('has-wird');
   document.documentElement.style.setProperty('--accent', 'var(--accent-' + mode + ')');
   title.textContent = MODE_TITLES[mode];
   btnMorning.classList.toggle('active', mode==='morning');
   btnEvening.classList.toggle('active', mode==='evening');
   btnTasbih.classList.toggle('active', mode==='tasbeeh');
   if(mode === 'tasbeeh'){
-    listEl.innerHTML = '<div class="tasbih"><div class="seg-row" id="segRow" role="img"></div><div class="tasbih-hint" id="tasbihHint">اضغط في أي مكان على الشاشة للبدء</div></div><div class="wirds" id="wirds"></div>';
+    if(selWird && !selWirdObj()) selWird = null;
+    listEl.innerHTML = '<div class="wsel" id="wsel">' + chipsHTML() + '</div><div class="tasbih"><div class="seg-row" id="segRow" role="img"></div><div class="tasbih-hint" id="tasbihHint">اضغط في أي مكان على الشاشة للبدء</div><button class="wedit" id="wedit" hidden><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><span>تعديل العدد</span></button></div>';
+    paintChips();
     drawTasbih(false);
-    drawWirds();
+    paintWirdProgress(null);
+    const onChip = listEl.querySelector('.wchip.on');
+    if(onChip && selWird){ const sc = document.getElementById('wsel'); sc.scrollLeft += onChip.getBoundingClientRect().left + onChip.offsetWidth / 2 - (sc.getBoundingClientRect().left + sc.clientWidth / 2); }
     return;
   }
 
@@ -1878,7 +1963,7 @@ const PALETTES = {
 function megaCelebrate(originEl){
   if(reduceMotion || document.querySelectorAll('.fx-layer').length >= 6) return;
   const logoHTML = (document.querySelector('.about-logo') || {}).innerHTML || '';
-  const conf = PALETTES[mode].conf;
+  const conf = (PALETTES[mode] || PALETTES.morning).conf;
   const brand = mode === 'evening' ? '#5872d4' : '#15ce57';
   const layer = document.createElement('div');
   layer.className = 'fx-layer';
@@ -1935,7 +2020,7 @@ function celebrate(prev, done, total, pct){
   barFill.classList.remove('shine'); void barFill.offsetWidth; barFill.classList.add('shine');
   const num = progressText.querySelector('.pnum');
   if(num) num.classList.add('bump');
-  const pal = PALETTES[mode];
+  const pal = PALETTES[mode] || PALETTES.morning;
   burst(pct, 10, { colors: pal.spark, size:[3,6], dx:30, up:[14,34], fall:6, dur:[550,950] });
   const prevPct = prev / total * 100;
   const hit = MILESTONES.find(([m]) => prevPct < m && pct >= m);
@@ -1966,8 +2051,12 @@ document.getElementById('resetBtn').addEventListener('click', ()=>{
   hideUndo();
   unlockScrollHeight();
   if(mode === 'tasbeeh'){
-    tasbihCount = 0;
-    try{ localStorage.setItem(TASBIH_KEY, 0); }catch(err){}
+    const sw = selWirdObj();
+    if(sw){ delete wirdCounts[sw.id]; saveWird(); }
+    else {
+      tasbihCount = 0;
+      try{ localStorage.setItem(TASBIH_KEY, 0); }catch(err){}
+    }
   } else {
     progress[mode] = {};
     saveProgress();
