@@ -1145,7 +1145,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.47</div>
+    <div class="about-ver">الإصدار 1.48</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1502,7 +1502,12 @@ document.addEventListener('click', (e) => {
 
 const focusBtn = document.getElementById('focusBtn');
 function fsElement(){ return document.fullscreenElement || document.webkitFullscreenElement || null; }
+// على الموبايل كروم بيعرض رسالة «للخروج من ملء الشاشة...» ومفيش طريقة نخفيها، فنكتفي بالوضع الهادئ من غير ملء الشاشة
+function isMobileDevice(){
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+}
 function enterFS(){
+  if(isMobileDevice()) return;
   const el = document.documentElement;
   const rq = el.requestFullscreen || el.webkitRequestFullscreen;
   if(!rq) return;

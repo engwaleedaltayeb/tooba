@@ -1,4 +1,4 @@
-const VERSION = 'tooba-v1.47';
+const VERSION = 'tooba-v1.48';
 const CORE = [
   '/', '/index.html', '/manifest.webmanifest',
   '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png',
