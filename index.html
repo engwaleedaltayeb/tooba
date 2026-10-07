@@ -121,6 +121,7 @@
     line-height:1.25;
     letter-spacing:0.3px;
   }
+  .t-sub{ font-size:.6em; font-weight:700; color:var(--accent-text); }
   .toggle{
     display:flex;
     justify-content:center;
@@ -807,7 +808,10 @@
   body.focus[data-mode="tasbeeh"] .wsel{ display:none; }
   body.focus[data-mode="tasbeeh"] .wrap{ padding-top:0; }
   body.focus[data-mode="tasbeeh"] .progress{ padding-top:58px; }
-  body.focus.has-wird[data-mode="tasbeeh"] .tasbih{ min-height:calc(100vh - 260px); }
+  .wird-title{ display:none; text-align:center; font-size:32px; font-weight:700; line-height:1.4; color:var(--accent-text); margin:0 0 4px; padding:0 8px; }
+  body.focus.has-wird[data-mode="tasbeeh"] .wird-title{ display:block; }
+  body.focus.has-wird[data-mode="tasbeeh"] .progress{ margin-bottom:12px; }
+  body.focus.has-wird[data-mode="tasbeeh"] .tasbih{ min-height:calc(100vh - 290px); }
   .wirds{ display:flex; flex-direction:column; gap:12px; margin-top:6px; }
   .wirds-head{ text-align:center; font-size:15px; font-weight:600; color:var(--text-dim); margin:0 0 4px; }
   .wirds-head.all{ color:var(--accent-text); }
@@ -881,6 +885,15 @@
   }
   .field input::placeholder{ font-size:13px; }
   .field input:focus{ border-color:var(--accent-tasbeeh); }
+  .qlabel{ font-size:13.5px; color:var(--text-dim); font-weight:500; margin:0 0 8px; }
+  .quick{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:16px; }
+  .quick button{
+    height:54px; border-radius:16px; border:1px solid var(--border); background:var(--bg); color:var(--text);
+    font-family:system-ui, sans-serif; font-size:20px; font-weight:700; font-variant-numeric:tabular-nums;
+    cursor:pointer; transition:background .25s ease, color .25s ease, border-color .25s ease, transform .15s ease;
+  }
+  .quick button:active{ transform:scale(0.95); }
+  .quick button.on{ background:var(--accent-tasbeeh); border-color:var(--accent-tasbeeh); color:#fff; }
   .wird-sheet-name{ text-align:center; font-size:24px; font-weight:700; line-height:1.5; color:var(--accent-text); margin:-8px 0 20px; word-break:break-word; }
   .wird-sheet-name[hidden]{ display:none; }
   body.has-wird .tasbih{ gap:20px; min-height:0; padding-top:14px; }
@@ -902,7 +915,7 @@
   .wsel::-webkit-scrollbar{ display:none; }
   .wchip{
     flex-shrink:0; display:flex; align-items:center; justify-content:center; gap:6px;
-    height:40px; padding:0 16px; max-width:170px;
+    height:40px; padding:0 16px; max-width:260px;
     border-radius:999px; border:1px solid var(--border);
     background:var(--surface); color:var(--text-dim);
     font-family:inherit; font-size:14.5px; font-weight:500; white-space:nowrap;
@@ -914,17 +927,15 @@
   .wchip.on{ background:var(--accent-tasbeeh); border-color:var(--accent-tasbeeh); color:#fff; }
   .wchip .wc-check{ display:none; }
   .wchip.done .wc-check{ display:block; }
-  .wc-badge{ display:none; position:relative; width:28px; height:28px; margin-inline-end:-6px; flex-shrink:0; align-items:center; justify-content:center; }
+  .wc-badge{ display:none; position:relative; width:28px; height:28px; transition:width .2s ease; margin-inline-end:-6px; flex-shrink:0; align-items:center; justify-content:center; }
   .wchip.started .wc-badge{ display:flex; }
   .wchip.done .wc-badge{ display:none; }
-  .wc-badge svg.wc-ring{ position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg); }
-  .wc-ring circle{ fill:none; stroke-width:2.6; }
+  .wc-badge svg.wc-ring{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .wc-ring path{ fill:none; stroke-width:2.6; }
   .wc-ring .wcb{ stroke:currentColor; opacity:.2; }
-  .wc-ring .wcf{ stroke:var(--accent-text); stroke-linecap:round; stroke-dasharray:72.26; stroke-dashoffset:72.26; transition:stroke-dashoffset .35s ease; }
+  .wc-ring .wcf{ stroke:var(--accent-text); stroke-linecap:round; stroke-dasharray:0 100; transition:stroke-dasharray .35s ease; }
   .wchip.on .wc-ring .wcf{ stroke:#fff; }
   .wcn{ position:relative; font-family:system-ui, sans-serif; font-size:11px; font-weight:700; font-style:normal; font-variant-numeric:tabular-nums; line-height:1; color:var(--text); }
-  .wcn.l4{ font-size:8.5px; }
-  .wcn.l5{ font-size:7px; }
   .wchip.on .wcn{ color:#fff; }
   .wchip.done .wcn{ display:none; }
   .wchip:not(.on).done{ color:var(--accent-text); border-color:color-mix(in srgb, var(--accent-tasbeeh) 45%, transparent); }
@@ -1111,6 +1122,8 @@
     </div>
   </div>
 
+  <div class="wird-title" id="wirdTitle" aria-hidden="true"></div>
+
   <div class="list" id="list"></div>
 
   <p class="hint">اضغط على الذكر لعدّ التكرار</p>
@@ -1145,7 +1158,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.49</div>
+    <div class="about-ver">الإصدار 1.51</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1156,7 +1169,9 @@
     <h2 id="wirdSheetTitle">إضافة ورد خاص</h2>
     <div class="wird-sheet-name" id="wirdSheetName" hidden></div>
     <label class="field" id="wirdNameField"><span>اسم الورد</span><input id="wirdName" type="text" maxlength="60" autocomplete="off" placeholder="مثال: لا إله إلا أنت سبحانك إني كنت من الظالمين"></label>
-    <label class="field"><span>العدد المطلوب يوميًا</span><input id="wirdTarget" type="text" inputmode="numeric" autocomplete="off" value="100"></label>
+    <div class="qlabel">العدد المطلوب يوميًا</div>
+    <div class="quick" id="quickCounts"><button type="button" data-v="100">100</button><button type="button" data-v="500">500</button><button type="button" data-v="1000">1000</button></div>
+    <label class="field"><span>أو أدخل عددًا آخر</span><input id="wirdTarget" type="text" inputmode="numeric" autocomplete="off" value="100"></label>
     <button class="sheet-close" id="wirdSave">حفظ</button>
     <button class="done-btn wird-del" id="wirdDel" hidden><span id="wirdDelLabel">حذف الورد</span></button>
   </div>
@@ -1642,7 +1657,7 @@ const WIRD_RESET = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" 
 const CHIP_CHECK = '<svg class="wc-check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 function chipsHTML(){
   return '<button class="wchip" data-id=""><span>عدّ حر</span></button>' +
-    allWirds().map(w => '<button class="wchip" data-id="' + esc(w.id) + '">' + CHIP_CHECK + '<span class="wc-name">' + esc(w.short || w.name) + '</span><span class="wc-badge" aria-hidden="true"><svg class="wc-ring" viewBox="0 0 28 28"><circle class="wcb" cx="14" cy="14" r="11.5"/><circle class="wcf" cx="14" cy="14" r="11.5"/></svg><b class="wcn"></b></span></button>').join('') +
+    allWirds().map(w => '<button class="wchip" data-id="' + esc(w.id) + '">' + CHIP_CHECK + '<span class="wc-name">' + esc(w.short || w.name) + '</span><span class="wc-badge" aria-hidden="true"><svg class="wc-ring" viewBox="0 0 28 28"><path class="wcb"/><path class="wcf" pathLength="100"/></svg><b class="wcn"></b></span></button>').join('') +
     (customWirds.length < 10 ? '<button class="wchip wadd" id="wirdAdd" aria-label="إضافة ورد خاص"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg></button>' : '');
 }
 function paintChips(){
@@ -1654,15 +1669,37 @@ function paintChips(){
     ch.classList.toggle('done', !!w && c >= w.target);
     ch.classList.toggle('started', !!w && c > 0);
     if(w){
-      const n = ch.querySelector('.wcn'), f = ch.querySelector('.wcf');
-      if(n){ const t = String(c); if(n.textContent !== t) n.textContent = t; n.className = 'wcn' + (t.length >= 5 ? ' l5' : t.length === 4 ? ' l4' : ''); }
-      if(f) f.style.strokeDashoffset = (72.26 * (1 - c / w.target)).toFixed(2);
+      const n = ch.querySelector('.wcn'), f = ch.querySelector('.wcf'), bd = ch.querySelector('.wc-badge');
+      const t = String(c);
+      if(n && n.textContent !== t) n.textContent = t;
+      const bw = Math.max(28, Math.round(t.length * 7 + 14));
+      if(bd && bd.dataset.w !== String(bw)){
+        bd.dataset.w = bw; bd.style.width = bw + 'px';
+        bd.querySelector('svg').setAttribute('viewBox', '0 0 ' + bw + ' 28');
+        const d = badgeGeom(bw);
+        bd.querySelectorAll('path').forEach(pp => pp.setAttribute('d', d));
+      }
+      if(f) f.style.strokeDasharray = (c / w.target * 100).toFixed(2) + ' 100';
     }
   });
+}
+// حلقة التاج: دائرة للأرقام الصغيرة وتتحول لبيضاوي (كبسولة) كل ما زادت خانات الرقم
+function badgeGeom(w){
+  const h = 28, sw = 2.6, r = (h - sw) / 2, x0 = sw / 2, y0 = sw / 2, x1 = w - sw / 2, y1 = h - sw / 2, cx = w / 2;
+  return 'M' + cx + ' ' + y0 + 'H' + (x1 - r) + 'A' + r + ' ' + r + ' 0 0 1 ' + (x1 - r) + ' ' + y1 +
+         'H' + (x0 + r) + 'A' + r + ' ' + r + ' 0 0 1 ' + (x0 + r) + ' ' + y0 + 'H' + cx;
 }
 function paintWirdProgress(prev){
   const w = selWirdObj();
   body.classList.toggle('has-wird', !!w);
+  const tkey = w ? w.id + '|' + (w.short || w.name) : '';
+  if(title.dataset.w !== tkey){
+    title.dataset.w = tkey;
+    if(w) title.innerHTML = 'السبحة<span class="t-sub"> - ' + esc(w.short || w.name) + '</span>';
+    else title.textContent = MODE_TITLES.tasbeeh;
+  }
+  const wt = document.getElementById('wirdTitle');
+  if(wt) wt.textContent = w ? (w.short || w.name) : '';
   if(!w) return;
   const c = Math.min(wirdCounts[w.id] || 0, w.target), t = w.target;
   progressText.innerHTML = '<b class="pnum">' + c + '</b> من ' + t;
@@ -1713,12 +1750,26 @@ function openWirdSheet(id){
   nm.hidden = !core; nm.textContent = core ? w.name : '';
   wirdNameEl.value = w ? w.name : '';
   wirdTargetEl.value = w ? w.target : 100;
+  syncQuick();
   wirdDelBtn.hidden = !w || core;
   delArmed = false;
   document.getElementById('wirdDelLabel').textContent = 'حذف الورد';
   wirdOverlay.classList.add('open');
   if(!w) setTimeout(() => wirdNameEl.focus(), 380);
 }
+const quickEl = document.getElementById('quickCounts');
+function syncQuick(){
+  const v = parseInt(toLatinDigits(wirdTargetEl.value), 10);
+  quickEl.querySelectorAll('button').forEach(b => b.classList.toggle('on', +b.dataset.v === v));
+}
+quickEl.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('button');
+  if(!b) return;
+  haptic('tap');
+  wirdTargetEl.value = b.dataset.v;
+  syncQuick();
+});
+wirdTargetEl.addEventListener('input', syncQuick);
 function closeWirdSheet(){ wirdOverlay.classList.remove('open'); wirdNameEl.blur(); wirdTargetEl.blur(); }
 document.addEventListener('click', (e) => {
   if(e.target.closest && e.target.closest('#wirdAdd')) openWirdSheet(null);
@@ -1767,7 +1818,7 @@ function render(){
   body.dataset.mode = mode;
   if(mode !== 'tasbeeh') body.classList.remove('has-wird');
   document.documentElement.style.setProperty('--accent', 'var(--accent-' + mode + ')');
-  title.textContent = MODE_TITLES[mode];
+  title.textContent = MODE_TITLES[mode]; delete title.dataset.w;
   btnMorning.classList.toggle('active', mode==='morning');
   btnEvening.classList.toggle('active', mode==='evening');
   btnTasbih.classList.toggle('active', mode==='tasbeeh');
