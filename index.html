@@ -879,6 +879,15 @@
     transition:border-color .2s ease;
   }
   .field input:focus{ border-color:var(--accent-tasbeeh); }
+  .wird-sheet-name{ text-align:center; font-size:24px; font-weight:700; line-height:1.5; color:var(--accent-text); margin:-8px 0 20px; word-break:break-word; }
+  .wird-sheet-name[hidden]{ display:none; }
+  body.has-wird .tasbih{ gap:20px; min-height:0; padding-top:14px; }
+  body.has-wird .seg-row svg{ height:clamp(84px,22vw,120px); }
+  .wird-info{ max-width:340px; margin:0 auto; text-align:center; }
+  .wird-info[hidden]{ display:none; }
+  .wi-z{ font-family:'Noto Naskh Arabic','Amiri',serif; font-size:16px; line-height:1.9; color:var(--text); }
+  .wi-f{ margin-top:6px; font-size:13px; line-height:1.8; color:var(--text-dim); }
+  body.focus[data-mode="tasbeeh"] .wird-info{ display:none; }
   .wird-del{ width:100%; margin-top:10px; color:#d8453a; }
   .wird-del[hidden]{ display:none; }
   .wsel{
@@ -1131,7 +1140,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.39</div>
+    <div class="about-ver">الإصدار 1.41</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1140,6 +1149,7 @@
   <div class="sheet">
     <div class="sheet-handle"></div>
     <h2 id="wirdSheetTitle">إضافة ورد خاص</h2>
+    <div class="wird-sheet-name" id="wirdSheetName" hidden></div>
     <label class="field" id="wirdNameField"><span>اسم الورد</span><input id="wirdName" type="text" maxlength="40" autocomplete="off" placeholder="مثال: دعاء لوالديّ"></label>
     <label class="field"><span>العدد المطلوب يوميًا</span><input id="wirdTarget" type="text" inputmode="numeric" autocomplete="off" value="33"></label>
     <button class="sheet-close" id="wirdSave">حفظ</button>
@@ -1444,6 +1454,11 @@ function drawTasbih(bump){
       hint.classList.remove('done');
     }
   }
+  const info = document.getElementById('wirdInfo');
+  if(info){
+    if(w && w.z){ info.hidden = false; info.querySelector('.wi-z').textContent = w.z; info.querySelector('.wi-f').textContent = w.f || ''; }
+    else info.hidden = true;
+  }
   const ed = document.getElementById('wedit');
   if(ed && w) ed.setAttribute('aria-label', w.custom ? 'تعديل الورد' : 'تعديل العدد');
   if(bump && !reduceMotion) row.animate([{transform:'scale(1)'},{transform:'scale(1.04)'},{transform:'scale(1)'}], {duration:140, easing:'ease-out'});
@@ -1528,10 +1543,27 @@ focusBtn.addEventListener('click', () => {
 
 // ---------- الأوراد اليومية ----------
 const WIRDS = [
-  { id:'istighfar', name:'ورد الاستغفار', short:'الاستغفار', target:100 },
-  { id:'salah',     name:'ورد الصلاة على النبي', short:'الصلاة على النبي', target:100 },
-  { id:'tasbih',    name:'ورد التسبيح والتحميد', short:'التسبيح والتحميد', target:100 },
-  { id:'hawqala',   name:'ورد الحوقلة', short:'الحوقلة', target:100 }
+  { id:'baqiyat',   name:'ورد الباقيات الصالحات', short:'الباقيات الصالحات', target:100,
+    z:'سبحان الله، والحمد لله، ولا إله إلا الله، والله أكبر',
+    f:'هي أفضل الكلام وأحبّه إلى الله تعالى' },
+  { id:'istighfar', name:'ورد الاستغفار', short:'الاستغفار', target:100,
+    z:'استغفر الله العظيم وأتوب إليه',
+    f:'كان النبي صلى الله عليه وسلم يُعد له في المجلس الواحد مئة مرة' },
+  { id:'salah',     name:'ورد الصلاة على النبي', short:'الصلاة على النبي', target:100,
+    z:'اللهم صل وسلم وبارك على نبينا محمد',
+    f:'كلما صليت عليه صلاة واحدة صلى الله عليك بها عشراً، وكُفيت همك وغُفر ذنبك' },
+  { id:'tasbih',    name:'ورد التسبيح والتحميد', short:'التسبيح والتحميد', target:100,
+    z:'سبحان الله وبحمده، سبحان الله العظيم',
+    f:'كلمتان ثقيلتان في الميزان، حبيبتان إلى الرحمن' },
+  { id:'hawqala',   name:'ورد الحوقلة', short:'الحوقلة', target:100,
+    z:'لا حول ولا قوة إلا بالله العلي العظيم',
+    f:'هي دواء لتسعة وتسعين داء أدناها الهم' },
+  { id:'tahlil',    name:'ورد التهليل والتوحيد', short:'التهليل والتوحيد', target:100,
+    z:'لا إله إلا الله وحده لا شريك له، له الملك وله الحمد، وهو على كل شيء قدير',
+    f:'الإكثار من قول لا إله إلا الله وحدها فهي أفضل الذكر المطلق' },
+  { id:'takbir',    name:'ورد التكبير والتحميد', short:'التكبير والتحميد', target:100,
+    z:'الحمد لله رب العالمين والله أكبر',
+    f:'ولئن شكرتم لأزيدنكم' }
 ];
 let selWird = null; // null = عدّ حر
 function selWirdObj(){ return selWird ? allWirds().find(x => x.id === selWird) || null : null; }
@@ -1639,6 +1671,8 @@ function openWirdSheet(id){
   const core = !!(w && !w.custom);
   document.getElementById('wirdSheetTitle').textContent = core ? 'تعديل العدد المطلوب' : (w ? 'تعديل الورد' : 'إضافة ورد خاص');
   document.getElementById('wirdNameField').hidden = core;
+  const nm = document.getElementById('wirdSheetName');
+  nm.hidden = !core; nm.textContent = core ? w.name : '';
   wirdNameEl.value = w ? w.name : '';
   wirdTargetEl.value = w ? w.target : 33;
   wirdDelBtn.hidden = !w || core;
@@ -1701,7 +1735,7 @@ function render(){
   btnTasbih.classList.toggle('active', mode==='tasbeeh');
   if(mode === 'tasbeeh'){
     if(selWird && !selWirdObj()) selWird = null;
-    listEl.innerHTML = '<div class="wsel" id="wsel">' + chipsHTML() + '</div><div class="tasbih"><div class="seg-row" id="segRow" role="img"></div><div class="tasbih-hint" id="tasbihHint">اضغط في أي مكان على الشاشة للبدء</div></div>';
+    listEl.innerHTML = '<div class="wsel" id="wsel">' + chipsHTML() + '</div><div class="tasbih"><div class="seg-row" id="segRow" role="img"></div><div class="tasbih-hint" id="tasbihHint">اضغط في أي مكان على الشاشة للبدء</div><div class="wird-info" id="wirdInfo" hidden><div class="wi-z"></div><div class="wi-f"></div></div></div>';
     paintChips();
     drawTasbih(false);
     paintWirdProgress(null);
