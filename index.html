@@ -804,9 +804,10 @@
   body.focus[data-mode="tasbeeh"] #hapticBtn{ display:none; }
   body.focus[data-mode="tasbeeh"] .tasbih{ min-height:calc(100vh - 120px); }
   body:not(.focus) .tasbih{ min-height:42vh; }
-  body.focus[data-mode="tasbeeh"] .wsel,
-  body.focus[data-mode="tasbeeh"] .wedit,
-  body.focus[data-mode="tasbeeh"] .progress{ display:none; }
+  body.focus[data-mode="tasbeeh"] .wsel{ display:none; }
+  body.focus[data-mode="tasbeeh"] .wrap{ padding-top:0; }
+  body.focus[data-mode="tasbeeh"] .progress{ padding-top:58px; }
+  body.focus.has-wird[data-mode="tasbeeh"] .tasbih{ min-height:calc(100vh - 260px); }
   .wirds{ display:flex; flex-direction:column; gap:12px; margin-top:6px; }
   .wirds-head{ text-align:center; font-size:15px; font-weight:600; color:var(--text-dim); margin:0 0 4px; }
   .wirds-head.all{ color:var(--accent-text); }
@@ -878,16 +879,19 @@
     font-family:inherit; font-size:16px; outline:none; width:100%;
     transition:border-color .2s ease;
   }
+  .field input::placeholder{ font-size:13px; }
   .field input:focus{ border-color:var(--accent-tasbeeh); }
   .wird-sheet-name{ text-align:center; font-size:24px; font-weight:700; line-height:1.5; color:var(--accent-text); margin:-8px 0 20px; word-break:break-word; }
   .wird-sheet-name[hidden]{ display:none; }
   body.has-wird .tasbih{ gap:20px; min-height:0; padding-top:14px; }
   body.has-wird .seg-row svg{ height:clamp(84px,22vw,120px); }
+  .wird-remind{ width:100%; max-width:300px; height:44px; font-size:14.5px; color:var(--accent-text); }
+  .wird-remind[hidden]{ display:none; }
+  body.focus[data-mode="tasbeeh"] .wird-remind{ display:none; }
   .wird-info{ max-width:340px; margin:0 auto; text-align:center; }
   .wird-info[hidden]{ display:none; }
   .wi-z{ font-family:'Noto Naskh Arabic','Amiri',serif; font-size:16px; line-height:1.9; color:var(--text); }
   .wi-f{ margin-top:6px; font-size:13px; line-height:1.8; color:var(--text-dim); }
-  body.focus[data-mode="tasbeeh"] .wird-info{ display:none; }
   .wird-del{ width:100%; margin-top:10px; color:#d8453a; }
   .wird-del[hidden]{ display:none; }
   .wsel{
@@ -946,6 +950,7 @@
     text-decoration-color:var(--border);
   }
   .about-link:active{ opacity:.6; }
+  body.has-wird .about-wrap{ margin-top:84px; }
   body.focus[data-mode="tasbeeh"] .about-wrap{ display:none; }
   .about-head{ display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:14px; }
   .about-head h2{ margin:0; }
@@ -1140,7 +1145,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.41</div>
+    <div class="about-ver">الإصدار 1.47</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1150,8 +1155,8 @@
     <div class="sheet-handle"></div>
     <h2 id="wirdSheetTitle">إضافة ورد خاص</h2>
     <div class="wird-sheet-name" id="wirdSheetName" hidden></div>
-    <label class="field" id="wirdNameField"><span>اسم الورد</span><input id="wirdName" type="text" maxlength="40" autocomplete="off" placeholder="مثال: دعاء لوالديّ"></label>
-    <label class="field"><span>العدد المطلوب يوميًا</span><input id="wirdTarget" type="text" inputmode="numeric" autocomplete="off" value="33"></label>
+    <label class="field" id="wirdNameField"><span>اسم الورد</span><input id="wirdName" type="text" maxlength="60" autocomplete="off" placeholder="مثال: لا إله إلا أنت سبحانك إني كنت من الظالمين"></label>
+    <label class="field"><span>العدد المطلوب يوميًا</span><input id="wirdTarget" type="text" inputmode="numeric" autocomplete="off" value="100"></label>
     <button class="sheet-close" id="wirdSave">حفظ</button>
     <button class="done-btn wird-del" id="wirdDel" hidden><span id="wirdDelLabel">حذف الورد</span></button>
   </div>
@@ -1443,15 +1448,24 @@ function drawTasbih(bump){
   row.setAttribute('aria-label', String(n));
   row.innerHTML = tasbihDigits(n);
   const hint = document.getElementById('tasbihHint');
+  const rb = document.getElementById('wirdRemind');
   if(hint){
     if(w){
-      hint.textContent = wirdHint(n, w.target);
+      const fin = n >= w.target;
+      hint.textContent = 'اكتمل الورد، تقبّل الله منك';
+      hint.style.display = fin ? '' : 'none';
       hint.style.visibility = 'visible';
-      hint.classList.toggle('done', n >= w.target);
+      hint.classList.toggle('done', fin);
+      if(rb){
+        rb.hidden = !(fin && w.z);
+        if(fin && w.z) rb.querySelector('span').textContent = 'ذكّر أحبابك ب' + w.short;
+      }
     } else {
       hint.textContent = 'اضغط في أي مكان على الشاشة للبدء';
+      hint.style.display = '';
       hint.style.visibility = tasbihCount > 0 ? 'hidden' : 'visible';
       hint.classList.remove('done');
+      if(rb) rb.hidden = true;
     }
   }
   const info = document.getElementById('wirdInfo');
@@ -1543,15 +1557,15 @@ focusBtn.addEventListener('click', () => {
 
 // ---------- الأوراد اليومية ----------
 const WIRDS = [
-  { id:'baqiyat',   name:'ورد الباقيات الصالحات', short:'الباقيات الصالحات', target:100,
-    z:'سبحان الله، والحمد لله، ولا إله إلا الله، والله أكبر',
-    f:'هي أفضل الكلام وأحبّه إلى الله تعالى' },
   { id:'istighfar', name:'ورد الاستغفار', short:'الاستغفار', target:100,
     z:'استغفر الله العظيم وأتوب إليه',
     f:'كان النبي صلى الله عليه وسلم يُعد له في المجلس الواحد مئة مرة' },
   { id:'salah',     name:'ورد الصلاة على النبي', short:'الصلاة على النبي', target:100,
     z:'اللهم صل وسلم وبارك على نبينا محمد',
     f:'كلما صليت عليه صلاة واحدة صلى الله عليك بها عشراً، وكُفيت همك وغُفر ذنبك' },
+  { id:'baqiyat',   name:'ورد الباقيات الصالحات', short:'الباقيات الصالحات', target:100,
+    z:'سبحان الله، والحمد لله، ولا إله إلا الله، والله أكبر',
+    f:'هي أفضل الكلام وأحبّه إلى الله تعالى' },
   { id:'tasbih',    name:'ورد التسبيح والتحميد', short:'التسبيح والتحميد', target:100,
     z:'سبحان الله وبحمده، سبحان الله العظيم',
     f:'كلمتان ثقيلتان في الميزان، حبيبتان إلى الرحمن' },
@@ -1653,6 +1667,12 @@ function selectWird(id){
 }
 document.addEventListener('click', (e) => {
   if(mode !== 'tasbeeh') return;
+  const rbtn = e.target.closest && e.target.closest('#wirdRemind');
+  if(rbtn){
+    const rw = selWirdObj();
+    if(rw && rw.z) shareOrCopy(rbtn, 'لا تنسَ ' + rw.short + ' 🤍\n' + rw.z + '\nذكّرتك به هنا:', rw.name);
+    return;
+  }
   const ch = e.target.closest && e.target.closest('.wchip[data-id]');
   if(ch){ haptic('tap'); selectWird(ch.dataset.id); return; }
   if(e.target.closest && e.target.closest('#wedit') && selWird) openWirdSheet(selWird);
@@ -1674,7 +1694,7 @@ function openWirdSheet(id){
   const nm = document.getElementById('wirdSheetName');
   nm.hidden = !core; nm.textContent = core ? w.name : '';
   wirdNameEl.value = w ? w.name : '';
-  wirdTargetEl.value = w ? w.target : 33;
+  wirdTargetEl.value = w ? w.target : 100;
   wirdDelBtn.hidden = !w || core;
   delArmed = false;
   document.getElementById('wirdDelLabel').textContent = 'حذف الورد';
@@ -1692,7 +1712,7 @@ document.getElementById('wirdSave').addEventListener('click', () => {
   const name = wirdNameEl.value.trim().replace(/\s+/g, ' ');
   if(!core && !name){ wirdNameEl.focus(); wirdNameEl.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:220}); return; }
   let target = parseInt(toLatinDigits(wirdTargetEl.value), 10);
-  if(!(target > 0)) target = 33;
+  if(!(target > 0)) target = 100;
   target = Math.min(target, 10000);
   if(core){
     coreW.target = target;
@@ -1735,7 +1755,7 @@ function render(){
   btnTasbih.classList.toggle('active', mode==='tasbeeh');
   if(mode === 'tasbeeh'){
     if(selWird && !selWirdObj()) selWird = null;
-    listEl.innerHTML = '<div class="wsel" id="wsel">' + chipsHTML() + '</div><div class="tasbih"><div class="seg-row" id="segRow" role="img"></div><div class="tasbih-hint" id="tasbihHint">اضغط في أي مكان على الشاشة للبدء</div><div class="wird-info" id="wirdInfo" hidden><div class="wi-z"></div><div class="wi-f"></div></div></div>';
+    listEl.innerHTML = '<div class="wsel" id="wsel">' + chipsHTML() + '</div><div class="tasbih"><div class="seg-row" id="segRow" role="img"></div><div class="tasbih-hint" id="tasbihHint">اضغط في أي مكان على الشاشة للبدء</div><button class="done-btn wird-remind" id="wirdRemind" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span></span></button><div class="wird-info" id="wirdInfo" hidden><div class="wi-z"></div><div class="wi-f"></div></div></div>';
     paintChips();
     drawTasbih(false);
     paintWirdProgress(null);
