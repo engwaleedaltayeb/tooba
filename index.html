@@ -1145,7 +1145,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.48</div>
+    <div class="about-ver">الإصدار 1.49</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1549,7 +1549,20 @@ function setFocus(on){
   focusBtn.setAttribute('aria-label', on ? 'إنهاء الوضع الهادئ' : 'الوضع الهادئ');
   applyThemeIcon();
   if(on) showBatteryToast(); else hideBatteryToast();
+  // زر الرجوع في الموبايل يقفل الوضع الهادئ بس بدل ما يقفل التطبيق
+  try{
+    if(on && !focusPushed){ history.pushState({ toobaFocus:true }, ''); focusPushed = true; }
+    else if(!on && focusPushed){ focusPushed = false; history.back(); }
+  }catch(e){ focusPushed = false; }
 }
+let focusPushed = false;
+window.addEventListener('popstate', () => {
+  if(body.classList.contains('focus')){
+    focusPushed = false;
+    setFocus(false);
+    exitFS();
+  }
+});
 focusBtn.addEventListener('click', () => {
   const on = !body.classList.contains('focus');
   setFocus(on);
