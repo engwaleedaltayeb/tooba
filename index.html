@@ -449,6 +449,11 @@
     :root:not([data-theme="light"]){ --bell-on:#15ce57; }
   }
   :root[data-theme="dark"]{ --bell-on:#15ce57; }
+  [data-mode="evening"] #bellBtn.on{ color:#6c85d6; border-color:color-mix(in srgb, #6c85d6 45%, transparent); background:color-mix(in srgb, #6c85d6 12%, var(--surface)); }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) [data-mode="evening"] #bellBtn.on{ color:#8ba0e8; border-color:color-mix(in srgb, #8ba0e8 45%, transparent); background:color-mix(in srgb, #8ba0e8 14%, var(--surface)); }
+  }
+  :root[data-theme="dark"] [data-mode="evening"] #bellBtn.on{ color:#8ba0e8; border-color:color-mix(in srgb, #8ba0e8 45%, transparent); background:color-mix(in srgb, #8ba0e8 14%, var(--surface)); }
   .remind-toast{ gap:12px; }
   #rOverlay .sheet{ position:relative; }
   .r-done{
@@ -1289,7 +1294,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.64</div>
+    <div class="about-ver">الإصدار 1.65</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1334,7 +1339,6 @@
     <div class="zsheet-note" id="rStatus" hidden style="margin:0 0 14px;"></div>
     <button class="sheet-close" id="rPush" style="margin-top:6px;">تفعيل التذكير بالإشعارات</button>
     <button class="done-btn wird-del" id="rOff" hidden><span>إيقاف التذكير</span></button>
-    <button class="done-btn" id="rIcs" style="width:100%;margin-top:10px;"><span>إضافة إلى التقويم</span></button>
     <div class="r-done" id="rDone" aria-hidden="true"><span class="rt-icon" id="rDoneIcon"></span><div class="rd-text" id="rDoneText"></div></div>
   </div>
 </div>
@@ -2653,12 +2657,12 @@ document.getElementById('aboutShare').addEventListener('click', async () => {
   }catch(err){ /* المستخدم لغى المشاركة */ }
 });
 
-// ---------- التذكير: إشعارات حقيقية (Cloudflare Worker) + بديل ملف التقويم ----------
+// ---------- التذكير: إشعارات حقيقية (Cloudflare Worker)  ----------
 const rOverlay = document.getElementById('rOverlay');
 const rMorning = document.getElementById('rMorning'), rEvening = document.getElementById('rEvening');
 const rMOn = document.getElementById('rMOn'), rEOn = document.getElementById('rEOn');
 const rStatus = document.getElementById('rStatus'), rPush = document.getElementById('rPush');
-const rOff = document.getElementById('rOff'), rIcs = document.getElementById('rIcs');
+const rOff = document.getElementById('rOff');
 const REMIND_KEY = 'tooba-remind';
 const SW_OK = /(^|\.)toobaapp\.com$/.test(location.hostname);
 let remindCfg = { m:'05:00', e:'15:00', mOn:true, eOn:true };
@@ -2781,9 +2785,8 @@ async function openRemind(){
   rOverlay.classList.add('open');
   const sup = pushSupport();
   rPush.hidden = sup !== 'ok';
-  rIcs.classList.toggle('primary', sup !== 'ok');
-  if(sup === 'ios-install') setRStatus('على آيفون: ثبّت طوبى على الشاشة الرئيسية أولًا (من زر المشاركة)، ثم افتحها من هناك وفعّل التذكير. أو استخدم التقويم الآن.');
-  else if(sup === 'none') setRStatus('الإشعارات غير متاحة في هذا المتصفح، يمكنك استخدام التقويم بدلًا منها.');
+  if(sup === 'ios-install') setRStatus('على آيفون: ثبّت طوبى على الشاشة الرئيسية أولًا (من زر المشاركة)، ثم افتحها من هناك وفعّل التذكير.');
+  else if(sup === 'none') setRStatus('الإشعارات غير متاحة في هذا المتصفح.');
   else {
     const sub = await getPushSub();
     const on = !!sub && Notification.permission === 'granted';
@@ -2810,7 +2813,7 @@ rPush.addEventListener('click', async () => {
     showRemindDone('تم حفظ الأوقات وتفعيل الإشعارات');
   }catch(err){
     if(err && err.message === 'denied') setRStatus('لم يتم السماح بالإشعارات. فعّلها من إعدادات المتصفح ثم أعد المحاولة.');
-    else setRStatus('تعذّر تفعيل التذكير الآن، حاول لاحقًا أو استخدم التقويم.');
+    else setRStatus('تعذّر تفعيل التذكير الآن، حاول لاحقًا.');
   }finally{ rPush.disabled = false; }
 });
 rOff.addEventListener('click', async () => {
@@ -2866,46 +2869,6 @@ rOff.addEventListener('click', async () => {
     }, true);
   }catch(e){}
 })();
-
-// ----- بديل: ملف تقويم (.ics) -----
-function buildICS(cfg){
-  const pad = n => String(n).padStart(2, '0');
-  const now = new Date();
-  const stamp = now.getUTCFullYear() + pad(now.getUTCMonth() + 1) + pad(now.getUTCDate()) + 'T' + pad(now.getUTCHours()) + pad(now.getUTCMinutes()) + pad(now.getUTCSeconds()) + 'Z';
-  function fmt(d){ return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00'; }
-  function ev(uid, t, title){
-    const p = t.split(':');
-    const st = new Date(now.getFullYear(), now.getMonth(), now.getDate(), +p[0], +p[1]);
-    const en = new Date(st.getTime() + 20 * 60000);
-    return ['BEGIN:VEVENT','UID:' + uid + '@toobaapp.com','DTSTAMP:' + stamp,'DTSTART:' + fmt(st),'DTEND:' + fmt(en),'RRULE:FREQ=DAILY',
-      'SUMMARY:' + title,'DESCRIPTION:https://toobaapp.com','URL:https://toobaapp.com',
-      'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:' + title,'TRIGGER:PT0S','END:VALARM','END:VEVENT'].join('\r\n');
-  }
-  const evs = [];
-  if(cfg.mOn) evs.push(ev('tooba-morning', cfg.m, 'أذكار الصباح — طوبى'));
-  if(cfg.eOn) evs.push(ev('tooba-evening', cfg.e, 'أذكار المساء — طوبى'));
-  return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Tooba//Adhkar//AR','CALSCALE:GREGORIAN'].concat(evs, ['END:VCALENDAR']).join('\r\n');
-}
-rIcs.addEventListener('click', async () => {
-  const cfg = readRemindUI();
-  if(!cfg.mOn && !cfg.eOn){ setRStatus('اختر وقتًا واحدًا على الأقل.'); return; }
-  remindCfg = cfg; saveRemindCfg();
-  const ics = buildICS(cfg);
-  rOverlay.classList.remove('open');
-  if(isIOS && navigator.canShare){
-    try{
-      const file = new File([ics], 'tooba-reminders.ics', { type:'text/calendar' });
-      if(navigator.canShare({ files:[file] })){ await navigator.share({ files:[file] }); return; }
-    }catch(err){ if(err && err.name === 'AbortError') return; }
-  }
-  try{
-    const url = URL.createObjectURL(new Blob([ics], { type:'text/calendar;charset=utf-8' }));
-    const a = document.createElement('a');
-    a.href = url; a.download = 'tooba-reminders.ics';
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 4000);
-  }catch(err){}
-});
 
 // العمل بدون إنترنت (على الدومين الحقيقي بس)
 if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname)){
