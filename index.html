@@ -436,8 +436,8 @@
     :root:not([data-theme="light"]) [data-mode="evening"] #hapticBtn.on{ color:#8ba0e8; border-color:color-mix(in srgb, #8ba0e8 45%, transparent); background:color-mix(in srgb, #8ba0e8 14%, var(--surface)); }
   }
   :root[data-theme="dark"] [data-mode="evening"] #hapticBtn.on{ color:#8ba0e8; border-color:color-mix(in srgb, #8ba0e8 45%, transparent); background:color-mix(in srgb, #8ba0e8 14%, var(--surface)); }
-  #remindBtn{ display:flex; align-items:center; justify-content:center; }
-  body.focus[data-mode="tasbeeh"] #remindBtn{ display:none; }
+  #bellBtn{ display:flex; align-items:center; justify-content:center; }
+  body.focus[data-mode="tasbeeh"] #bellBtn{ display:none; }
   #hapticBtn.buzz{ animation:hbuzz .35s linear; }
   @keyframes hbuzz{ 0%,100%{transform:translateX(0)} 20%{transform:translateX(-2px)} 40%{transform:translateX(2px)} 60%{transform:translateX(-2px)} 80%{transform:translateX(2px)} }
   #fontMinus{ font-size:15px; }
@@ -1097,6 +1097,18 @@
   .zscope button:active{ transform:scale(0.95); }
   .zscope button.on{ background:var(--accent-tasbeeh); border-color:var(--accent-tasbeeh); color:#fff; }
   .zsheet-note{ font-size:13px; line-height:1.7; color:var(--text-dim); text-align:center; margin:-8px 0 16px; }
+  .rrow{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+  .rchk{ display:flex; align-items:center; gap:10px; flex:1; font-size:15px; font-weight:600; cursor:pointer; }
+  .rchk input{ width:22px; height:22px; accent-color:var(--accent-tasbeeh); flex-shrink:0; }
+  .rrow input[type=time]{
+    height:48px; width:150px; padding:0 14px; border-radius:14px;
+    border:1px solid var(--border); background:var(--bg); color:var(--text);
+    font-family:inherit; font-size:16px; outline:none; direction:ltr; transition:opacity .2s ease, border-color .2s ease;
+  }
+  .rrow input[type=time]:focus{ border-color:var(--accent-tasbeeh); }
+  .rrow.off input[type=time]{ opacity:.4; }
+  #rPush:disabled{ opacity:.6; }
+  #rPush[hidden]{ display:none; }
 </style>
 </head>
 <body data-mode="morning">
@@ -1141,7 +1153,7 @@
     <button id="hapticBtn" aria-label="الاهتزاز" aria-pressed="false">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3.5" width="8" height="17" rx="2"/><path d="M4.5 8v8"/><path d="M19.5 8v8"/><path d="M2 10.5v3"/><path d="M22 10.5v3"/><path class="hslash" d="M3.5 3L20.5 21"/></svg>
     </button>
-    <button id="remindBtn" aria-label="تذكير بأوقات الأذكار"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>
+    <button id="bellBtn" aria-label="تذكير بأوقات الأذكار"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>
   </div>
 
   <div class="progress">
@@ -1184,6 +1196,7 @@
     <div class="about-text">
       <p>طوبى تطبيق بسيط لأذكار الصباح والمساء، مع عدّاد لكل ذكر، وفضله وسنده، وسبحة وأوراد يومية.</p>
       <p>تقدّمك وسبحتك محفوظان على جهازك فقط، بلا حسابات ولا إعلانات.</p>
+      <p>وإذا فعّلت التذكير بالإشعارات، يحفظ خادمنا رمز اشتراك جهازك وأوقات التذكير والمنطقة الزمنية فقط، بلا اسم ولا بريد، ويُحذف فور إيقاف التذكير.</p>
       <p>التطبيق مجاني، نسأل الله أن يتقبّله ويجعله خالصًا لوجهه الكريم.</p>
       <p>للملاحظات أو التبليغ عن خطأ في نص أو سند:<br><a class="about-mail" href="mailto:tooba.app.support@gmail.com">tooba.app.support@gmail.com</a></p>
     </div>
@@ -1191,7 +1204,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.57</div>
+    <div class="about-ver">الإصدار 1.58</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1227,13 +1240,16 @@
 </div>
 
 <div class="sheet-overlay" id="rOverlay">
-  <div class="sheet">
+  <div class="sheet" style="max-height:92vh;overflow-y:auto;">
     <div class="sheet-handle"></div>
     <h2>تذكير بأوقات الأذكار</h2>
-    <div class="zsheet-note">يضيف حدثين يوميين متكررين إلى تقويم جوالك، ويصلك التنبيه من تطبيق التقويم حتى لو كان طوبى مغلقًا. وتقدر تحذف أي حدث منهما من التقويم متى شئت.</div>
-    <label class="field"><span>وقت أذكار الصباح</span><input id="rMorning" type="time" value="06:00"></label>
-    <label class="field"><span>وقت أذكار المساء</span><input id="rEvening" type="time" value="17:00"></label>
-    <button class="sheet-close" id="rSave">إضافة إلى التقويم</button>
+    <div class="zsheet-note">يصلك إشعار من طوبى في الوقت الذي تختاره، حتى لو كان التطبيق مغلقًا.</div>
+    <div class="rrow" id="rowM"><label class="rchk"><input type="checkbox" id="rMOn" checked><span>أذكار الصباح</span></label><input id="rMorning" type="time" value="06:00"></div>
+    <div class="rrow" id="rowE"><label class="rchk"><input type="checkbox" id="rEOn" checked><span>أذكار المساء</span></label><input id="rEvening" type="time" value="17:00"></div>
+    <div class="zsheet-note" id="rStatus" hidden style="margin:0 0 14px;"></div>
+    <button class="sheet-close" id="rPush" style="margin-top:6px;">تفعيل التذكير بالإشعارات</button>
+    <button class="done-btn wird-del" id="rOff" hidden><span>إيقاف التذكير</span></button>
+    <button class="done-btn" id="rIcs" style="width:100%;margin-top:10px;"><span>إضافة إلى التقويم</span></button>
   </div>
 </div>
 
@@ -2383,6 +2399,7 @@ document.getElementById('resetBtn').addEventListener('click', ()=>{
   render();
 });
 
+{ const qm = new URLSearchParams(location.search).get('m'); if(qm === 'morning' || qm === 'evening') mode = qm; }
 render();
 
 // إبقاء الشاشة صاحية: Wake Lock، ويتحرر بعد 10 دقايق من غير أي لمس لتوفير البطارية
@@ -2550,17 +2567,143 @@ document.getElementById('aboutShare').addEventListener('click', async () => {
   }catch(err){ /* المستخدم لغى المشاركة */ }
 });
 
-// تذكير الأذكار عبر ملف تقويم (.ics)
+// ---------- التذكير: إشعارات حقيقية (Cloudflare Worker) + بديل ملف التقويم ----------
 const rOverlay = document.getElementById('rOverlay');
-const rMorning = document.getElementById('rMorning');
-const rEvening = document.getElementById('rEvening');
+const rMorning = document.getElementById('rMorning'), rEvening = document.getElementById('rEvening');
+const rMOn = document.getElementById('rMOn'), rEOn = document.getElementById('rEOn');
+const rStatus = document.getElementById('rStatus'), rPush = document.getElementById('rPush');
+const rOff = document.getElementById('rOff'), rIcs = document.getElementById('rIcs');
 const REMIND_KEY = 'tooba-remind';
+const SW_OK = /(^|\.)toobaapp\.com$/.test(location.hostname);
+let remindCfg = { m:'06:00', e:'17:00', mOn:true, eOn:true };
 try{
   const r = JSON.parse(localStorage.getItem(REMIND_KEY));
-  if(r && /^\d\d:\d\d$/.test(r.m)) rMorning.value = r.m;
-  if(r && /^\d\d:\d\d$/.test(r.e)) rEvening.value = r.e;
+  if(r){
+    if(/^\d\d:\d\d$/.test(r.m)) remindCfg.m = r.m;
+    if(/^\d\d:\d\d$/.test(r.e)) remindCfg.e = r.e;
+    if(r.mOn === false) remindCfg.mOn = false;
+    if(r.eOn === false) remindCfg.eOn = false;
+  }
 }catch(e){}
-function buildICS(mt, et){
+function saveRemindCfg(){ try{ localStorage.setItem(REMIND_KEY, JSON.stringify(remindCfg)); }catch(e){} }
+function paintRemindUI(){
+  rMorning.value = remindCfg.m; rEvening.value = remindCfg.e;
+  rMOn.checked = remindCfg.mOn; rEOn.checked = remindCfg.eOn;
+  syncRows();
+}
+function syncRows(){
+  document.getElementById('rowM').classList.toggle('off', !rMOn.checked);
+  document.getElementById('rowE').classList.toggle('off', !rEOn.checked);
+}
+rMOn.addEventListener('change', syncRows);
+rEOn.addEventListener('change', syncRows);
+function readRemindUI(){
+  return { m:rMorning.value || '06:00', e:rEvening.value || '17:00', mOn:rMOn.checked, eOn:rEOn.checked };
+}
+function setRStatus(t){ rStatus.hidden = !t; rStatus.textContent = t || ''; }
+function isStandalone(){
+  return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+}
+function pushSupport(){
+  if(isIOS && !isStandalone()) return 'ios-install';
+  if(!SW_OK || !('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return 'none';
+  return 'ok';
+}
+async function getPushSub(){
+  try{ const reg = await navigator.serviceWorker.ready; return await reg.pushManager.getSubscription(); }
+  catch(e){ return null; }
+}
+function b64uToU8(str){
+  const p = '='.repeat((4 - str.length % 4) % 4);
+  const bin = atob((str + p).replace(/-/g, '+').replace(/_/g, '/'));
+  return Uint8Array.from(bin, c => c.charCodeAt(0));
+}
+async function postJSON(url, body){
+  const r = await fetch(url, { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify(body) });
+  if(!r.ok) throw new Error('http ' + r.status);
+  return r;
+}
+function syncBody(sub, cfg){
+  return { endpoint:sub.endpoint, m:cfg.mOn ? cfg.m : null, e:cfg.eOn ? cfg.e : null, tz:Intl.DateTimeFormat().resolvedOptions().timeZone };
+}
+async function enablePush(cfg){
+  const reg = await navigator.serviceWorker.ready;
+  if(Notification.permission === 'denied') throw new Error('denied');
+  const perm = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
+  if(perm !== 'granted') throw new Error('denied');
+  let sub = await reg.pushManager.getSubscription();
+  if(!sub){
+    const key = (await (await fetch('/api/key')).text()).trim();
+    sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:b64uToU8(key) });
+  }
+  await postJSON('/api/subscribe', syncBody(sub, cfg));
+}
+async function disablePush(){
+  const sub = await getPushSub();
+  if(!sub) return;
+  try{ await postJSON('/api/unsubscribe', { endpoint:sub.endpoint }); }catch(e){}
+  try{ await sub.unsubscribe(); }catch(e){}
+}
+async function openRemind(){
+  paintRemindUI();
+  setRStatus('');
+  rOff.hidden = true;
+  rOverlay.classList.add('open');
+  const sup = pushSupport();
+  rPush.hidden = sup !== 'ok';
+  rIcs.classList.toggle('primary', sup !== 'ok');
+  if(sup === 'ios-install') setRStatus('على آيفون: ثبّت طوبى على الشاشة الرئيسية أولًا (من زر المشاركة)، ثم افتحها من هناك وفعّل التذكير. أو استخدم التقويم الآن.');
+  else if(sup === 'none') setRStatus('الإشعارات غير متاحة في هذا المتصفح، يمكنك استخدام التقويم بدلًا منها.');
+  else {
+    const sub = await getPushSub();
+    const on = !!sub && Notification.permission === 'granted';
+    rPush.textContent = on ? 'حفظ الأوقات' : 'تفعيل التذكير بالإشعارات';
+    rOff.hidden = !on;
+    if(on) setRStatus('التذكير مفعّل على هذا الجهاز.');
+    else if(Notification.permission === 'denied') setRStatus('الإشعارات محظورة لهذا الموقع. فعّلها من إعدادات المتصفح ثم أعد المحاولة.');
+  }
+}
+document.getElementById('bellBtn').addEventListener('click', () => { haptic('tap'); openRemind(); });
+rOverlay.addEventListener('click', (e) => { if(e.target === rOverlay) rOverlay.classList.remove('open'); });
+rPush.addEventListener('click', async () => {
+  const cfg = readRemindUI();
+  if(!cfg.mOn && !cfg.eOn){ setRStatus('اختر وقتًا واحدًا على الأقل.'); return; }
+  rPush.disabled = true;
+  try{
+    await enablePush(cfg);
+    remindCfg = cfg; saveRemindCfg();
+    try{ localStorage.setItem('tooba-push', '1'); localStorage.setItem('tooba-push-sync', new Date().toDateString()); }catch(e){}
+    rPush.textContent = 'حفظ الأوقات';
+    rOff.hidden = false;
+    setRStatus('تم تفعيل التذكير، تقبّل الله منك.');
+  }catch(err){
+    if(err && err.message === 'denied') setRStatus('لم يتم السماح بالإشعارات. فعّلها من إعدادات المتصفح ثم أعد المحاولة.');
+    else setRStatus('تعذّر تفعيل التذكير الآن، حاول لاحقًا أو استخدم التقويم.');
+  }finally{ rPush.disabled = false; }
+});
+rOff.addEventListener('click', async () => {
+  rOff.disabled = true;
+  await disablePush();
+  try{ localStorage.removeItem('tooba-push'); }catch(e){}
+  rOff.disabled = false;
+  rOff.hidden = true;
+  rPush.textContent = 'تفعيل التذكير بالإشعارات';
+  setRStatus('تم إيقاف التذكير.');
+});
+// مزامنة هادئة مرة يوميًا (لو تغيّرت المنطقة الزمنية أو رمز الاشتراك)
+(async function resyncPush(){
+  try{
+    if(localStorage.getItem('tooba-push') !== '1' || pushSupport() !== 'ok' || Notification.permission !== 'granted') return;
+    if(localStorage.getItem('tooba-push-sync') === new Date().toDateString()) return;
+    const sub = await getPushSub();
+    if(!sub){ localStorage.removeItem('tooba-push'); return; }
+    await postJSON('/api/subscribe', syncBody(sub, remindCfg));
+    localStorage.setItem('tooba-push-sync', new Date().toDateString());
+  }catch(e){}
+})();
+
+// ----- بديل: ملف تقويم (.ics) -----
+function buildICS(cfg){
   const pad = n => String(n).padStart(2, '0');
   const now = new Date();
   const stamp = now.getUTCFullYear() + pad(now.getUTCMonth() + 1) + pad(now.getUTCDate()) + 'T' + pad(now.getUTCHours()) + pad(now.getUTCMinutes()) + pad(now.getUTCSeconds()) + 'Z';
@@ -2573,16 +2716,16 @@ function buildICS(mt, et){
       'SUMMARY:' + title,'DESCRIPTION:https://toobaapp.com','URL:https://toobaapp.com',
       'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:' + title,'TRIGGER:PT0S','END:VALARM','END:VEVENT'].join('\r\n');
   }
-  return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Tooba//Adhkar//AR','CALSCALE:GREGORIAN',
-    ev('tooba-morning', mt, 'أذكار الصباح — طوبى'), ev('tooba-evening', et, 'أذكار المساء — طوبى'),
-    'END:VCALENDAR'].join('\r\n');
+  const evs = [];
+  if(cfg.mOn) evs.push(ev('tooba-morning', cfg.m, 'أذكار الصباح — طوبى'));
+  if(cfg.eOn) evs.push(ev('tooba-evening', cfg.e, 'أذكار المساء — طوبى'));
+  return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Tooba//Adhkar//AR','CALSCALE:GREGORIAN'].concat(evs, ['END:VCALENDAR']).join('\r\n');
 }
-document.getElementById('remindBtn').addEventListener('click', () => { haptic('tap'); rOverlay.classList.add('open'); });
-rOverlay.addEventListener('click', (e) => { if(e.target === rOverlay) rOverlay.classList.remove('open'); });
-document.getElementById('rSave').addEventListener('click', async () => {
-  const mt = rMorning.value || '06:00', et = rEvening.value || '17:00';
-  try{ localStorage.setItem(REMIND_KEY, JSON.stringify({ m:mt, e:et })); }catch(e){}
-  const ics = buildICS(mt, et);
+rIcs.addEventListener('click', async () => {
+  const cfg = readRemindUI();
+  if(!cfg.mOn && !cfg.eOn){ setRStatus('اختر وقتًا واحدًا على الأقل.'); return; }
+  remindCfg = cfg; saveRemindCfg();
+  const ics = buildICS(cfg);
   rOverlay.classList.remove('open');
   if(isIOS && navigator.canShare){
     try{

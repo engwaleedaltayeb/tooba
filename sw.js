@@ -1,4 +1,4 @@
-const VERSION = 'tooba-v1.57';
+const VERSION = 'tooba-v1.58';
 const CORE = [
   '/', '/index.html', '/manifest.webmanifest',
   '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png',
@@ -58,4 +58,34 @@ self.addEventListener('fetch', (e) => {
       })
     );
   }
+});
+
+// ---------- إشعارات التذكير (Web Push بدون نص: الصباح قبل 3 عصرًا بتوقيت الجهاز) ----------
+self.addEventListener('push', (e) => {
+  const morning = new Date().getHours() < 15;
+  e.waitUntil(self.registration.showNotification(morning ? 'أذكار الصباح' : 'أذكار المساء', {
+    body: morning ? 'حان وقت أذكار الصباح، اضغط للبدء.' : 'حان وقت أذكار المساء، اضغط للبدء.',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    tag: 'tooba-reminder',
+    lang: 'ar',
+    dir: 'rtl',
+    data: { m: morning ? 'morning' : 'evening' }
+  }));
+});
+
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  const m = (e.notification.data && e.notification.data.m) || 'morning';
+  const target = '/?m=' + m;
+  e.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (const c of list) {
+        if ('focus' in c) {
+          return c.focus().then((w) => (w && w.navigate ? w.navigate(target) : null));
+        }
+      }
+      return self.clients.openWindow(target);
+    })
+  );
 });

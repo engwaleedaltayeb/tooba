@@ -1,0 +1,14 @@
+name = "tooba-push"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+# الـ API على نفس دومين الموقع، فلا حاجة لـ CORS
+routes = [{ pattern = "toobaapp.com/api/*", zone_name = "toobaapp.com" }]
+
+[triggers]
+crons = ["* * * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tooba-push"
+database_id = "ضع_المعرّف_هنا"
