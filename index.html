@@ -460,7 +460,7 @@
   .r-done.show{ opacity:1; pointer-events:auto; }
   .r-done .rt-icon{ width:128px; height:128px; }
   .rd-text{ font-size:20px; font-weight:600; color:var(--text); text-align:center; padding:0 24px; line-height:1.6; }
-  .r-done.show .rd-text{ animation:rdText .5s ease 1.4s both; }
+  .r-done.show .rd-text{ animation:rdText .3s ease .85s both; }
   @keyframes rdText{ 0%{ opacity:0; transform:translateY(10px); } 100%{ opacity:1; transform:translateY(0); } }
   @media (prefers-reduced-motion: reduce){ .r-done.show .rd-text{ animation:none !important; } }
   .rt-icon{ position:relative; width:30px; height:30px; flex-shrink:0; color:#15ce57; }
@@ -470,13 +470,13 @@
   .rt-bellwrap{ transform-origin:50% 50%; }
   .rt-bell{ transform-origin:50% 8%; }
   .rt-check{ transform-box:fill-box; transform-origin:50% 50%; }
-  :is(.remind-toast,.r-done).show .rt-logo{ animation:rtLogo 2.3s ease both; }
-  :is(.remind-toast,.r-done).show .rt-p{ animation:rtPetal .55s cubic-bezier(.2,.9,.3,1.25) both; }
-  :is(.remind-toast,.r-done).show .rt-p.p2{ animation-delay:.1s; } :is(.remind-toast,.r-done).show .rt-p.p3{ animation-delay:.2s; }
-  :is(.remind-toast,.r-done).show .rt-p.p4{ animation-delay:.3s; } :is(.remind-toast,.r-done).show .rt-p.p5{ animation-delay:.4s; }
-  :is(.remind-toast,.r-done).show .rt-bellwrap{ animation:rtBellIn 2.3s ease both; }
-  :is(.remind-toast,.r-done).show .rt-bell{ animation:rtRing .8s ease 1.55s both; }
-  :is(.remind-toast,.r-done).show .rt-check{ animation:rtCheck .5s cubic-bezier(.2,.9,.3,1.4) 1.85s both; }
+  :is(.remind-toast,.r-done).show .rt-logo{ animation:rtLogo 1.5s ease both; }
+  :is(.remind-toast,.r-done).show .rt-p{ animation:rtPetal .35s cubic-bezier(.2,.9,.3,1.25) both; }
+  :is(.remind-toast,.r-done).show .rt-p.p2{ animation-delay:.06s; } :is(.remind-toast,.r-done).show .rt-p.p3{ animation-delay:.12s; }
+  :is(.remind-toast,.r-done).show .rt-p.p4{ animation-delay:.18s; } :is(.remind-toast,.r-done).show .rt-p.p5{ animation-delay:.24s; }
+  :is(.remind-toast,.r-done).show .rt-bellwrap{ animation:rtBellIn 1.5s ease both; }
+  :is(.remind-toast,.r-done).show .rt-bell{ animation:rtRing .5s ease 1.05s both; }
+  :is(.remind-toast,.r-done).show .rt-check{ animation:rtCheck .3s cubic-bezier(.2,.9,.3,1.4) 1.15s both; }
   @keyframes rtPetal{ 0%{ opacity:0; transform:rotate(-110deg) scale(0); } 60%{ opacity:1; } 100%{ opacity:1; transform:rotate(0) scale(1); } }
   @keyframes rtLogo{
     0%{ opacity:1; transform:scale(.6) rotate(-60deg); }
@@ -496,8 +496,8 @@
   .rt-slash{ opacity:0; stroke-dasharray:100; stroke-dashoffset:100; }
   :is(.remind-toast,.r-done).off .rt-icon{ color:var(--text-dim); }
   :is(.remind-toast,.r-done).off .rt-check{ display:none; }
-  :is(.remind-toast,.r-done).off.show .rt-slash{ animation:rtSlash .45s ease 1.6s both; }
-  :is(.remind-toast,.r-done).off.show .rt-bell{ animation:rtRingOff .6s ease 1.5s both; }
+  :is(.remind-toast,.r-done).off.show .rt-slash{ animation:rtSlash .3s ease .95s both; }
+  :is(.remind-toast,.r-done).off.show .rt-bell{ animation:rtRingOff .4s ease .9s both; }
   @keyframes rtSlash{ 0%{ opacity:1; stroke-dashoffset:100; } 100%{ opacity:1; stroke-dashoffset:0; } }
   @keyframes rtRingOff{ 0%{ transform:rotate(0); } 30%{ transform:rotate(-12deg); } 60%{ transform:rotate(8deg); } 100%{ transform:rotate(0); } }
   @keyframes rtCheck{ 0%{ transform:scale(0); } 100%{ transform:scale(1); } }
@@ -1273,7 +1273,7 @@
 
 <div class="battery-toast" id="batteryToast" role="status" aria-live="polite"><span class="bt-icon" aria-hidden="true"><svg class="bt-logo" viewBox="0 0 336.42 336.42"><path fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><svg class="bt-bat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="4.5" width="11" height="17" rx="2.5"/><path d="M10.5 2.5h3"/><path class="bt-leaf" d="M12 17.8c-3.1-1-3.3-4.8 0-6.8 3.3 2 3.1 5.8 0 6.8z" fill="currentColor" stroke="none"/><path class="bt-leaf" d="M12 17.5v-3.5" stroke="var(--surface)" stroke-width="0.9"/></svg></span><span>تم تفعيل الوضع الهادئ وتوفير البطارية</span></div>
 
-<div class="battery-toast remind-toast" id="remindToast" role="status" aria-live="polite"><span class="rt-icon" aria-hidden="true"><svg class="rt-logo" viewBox="0 0 336.42 336.42"><path class="rt-p p1" fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path class="rt-p p2" fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path class="rt-p p3" fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path class="rt-p p4" fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path class="rt-p p5" fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><svg class="rt-bellwrap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g class="rt-bell"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g><path class="rt-slash" d="M3.5 3L20.5 21" pathLength="100"/><g class="rt-check"><circle cx="19" cy="18.5" r="4.6" fill="#15ce57" stroke="var(--surface)" stroke-width="1.4"/><path d="M16.9 18.6l1.6 1.6 2.8-3.2" stroke="#fff" stroke-width="1.6"/></g></svg></span><span id="remindToastText">تم حفظ الأوقات وتفعيل الإشعارات</span></div>
+<div class="battery-toast remind-toast" id="remindToast" role="status" aria-live="polite"><span class="rt-icon" aria-hidden="true"><svg class="rt-logo" viewBox="0 0 336.42 336.42"><path class="rt-p p1" fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path class="rt-p p2" fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path class="rt-p p3" fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path class="rt-p p4" fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path class="rt-p p5" fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><svg class="rt-bellwrap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g class="rt-bell"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g><path class="rt-slash" d="M3.5 3L20.5 21" pathLength="100"/><g class="rt-check"><circle cx="19" cy="18.6" r="3.7" fill="#15ce57" stroke="var(--surface)" stroke-width="1"/><path d="M17.5 18.7l1.1 1.1 2-2.3" stroke="#fff" stroke-width="1.1"/></g></svg></span><span id="remindToastText">تم حفظ الأوقات وتفعيل الإشعارات</span></div>
 
 <div class="sheet-overlay" id="aboutOverlay">
   <div class="sheet">
@@ -1290,7 +1290,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.62</div>
+    <div class="about-ver">الإصدار 1.63</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -2728,7 +2728,7 @@ function showRemindDone(text, off){
   void rDone.offsetWidth;
   rDone.classList.add('show');
   clearTimeout(rDoneT);
-  rDoneT = setTimeout(() => { rOverlay.classList.remove('open'); setTimeout(() => rDone.classList.remove('show'), 450); }, 3000);
+  rDoneT = setTimeout(() => { rOverlay.classList.remove('open'); setTimeout(() => rDone.classList.remove('show'), 450); }, 2100);
 }
 let remindToastT = null;
 function showRemindToast(text, off){
@@ -2737,7 +2737,7 @@ function showRemindToast(text, off){
   clearTimeout(remindToastT);
   remindToast.classList.remove('show'); void remindToast.offsetWidth;
   remindToast.classList.add('show');
-  remindToastT = setTimeout(() => remindToast.classList.remove('show'), 3400);
+  remindToastT = setTimeout(() => remindToast.classList.remove('show'), 2400);
 }
 async function getPushSub(){
   try{ const reg = await navigator.serviceWorker.ready; return await reg.pushManager.getSubscription(); }
