@@ -53,6 +53,7 @@
     --accent-morning:#15ce57;
     --accent-evening:#3a4a7a;
     --accent-tasbeeh:#15ce57;
+    --bell-on:#0d9a43;
     --accent: var(--accent-morning);
     box-sizing:border-box;
     padding-top: env(safe-area-inset-top,0px);
@@ -437,6 +438,52 @@
   }
   :root[data-theme="dark"] [data-mode="evening"] #hapticBtn.on{ color:#8ba0e8; border-color:color-mix(in srgb, #8ba0e8 45%, transparent); background:color-mix(in srgb, #8ba0e8 14%, var(--surface)); }
   #bellBtn{ display:flex; align-items:center; justify-content:center; }
+  #bellBtn .hslash{ transition:opacity .2s ease; }
+  #bellBtn.on{
+    color:var(--bell-on);
+    border-color:color-mix(in srgb, var(--bell-on) 45%, transparent);
+    background:color-mix(in srgb, var(--bell-on) 12%, var(--surface));
+  }
+  #bellBtn.on .hslash{ opacity:0; }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --bell-on:#15ce57; }
+  }
+  :root[data-theme="dark"]{ --bell-on:#15ce57; }
+  .remind-toast{ gap:12px; }
+  .rt-icon{ position:relative; width:30px; height:30px; flex-shrink:0; color:#15ce57; }
+  .rt-icon > svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .rt-logo{ opacity:0; }
+  .rt-p{ transform-origin:168.21px 168.21px; }
+  .rt-bellwrap{ transform-origin:50% 50%; }
+  .rt-bell{ transform-origin:50% 8%; }
+  .rt-check{ transform-box:fill-box; transform-origin:50% 50%; }
+  .remind-toast.show .rt-logo{ animation:rtLogo 2.3s ease both; }
+  .remind-toast.show .rt-p{ animation:rtPetal .55s cubic-bezier(.2,.9,.3,1.25) both; }
+  .remind-toast.show .rt-p.p2{ animation-delay:.1s; } .remind-toast.show .rt-p.p3{ animation-delay:.2s; }
+  .remind-toast.show .rt-p.p4{ animation-delay:.3s; } .remind-toast.show .rt-p.p5{ animation-delay:.4s; }
+  .remind-toast.show .rt-bellwrap{ animation:rtBellIn 2.3s ease both; }
+  .remind-toast.show .rt-bell{ animation:rtRing .8s ease 1.55s both; }
+  .remind-toast.show .rt-check{ animation:rtCheck .5s cubic-bezier(.2,.9,.3,1.4) 1.85s both; }
+  @keyframes rtPetal{ 0%{ opacity:0; transform:rotate(-110deg) scale(0); } 60%{ opacity:1; } 100%{ opacity:1; transform:rotate(0) scale(1); } }
+  @keyframes rtLogo{
+    0%{ opacity:1; transform:scale(.6) rotate(-60deg); }
+    14%{ opacity:1; transform:scale(1.05) rotate(0); }
+    52%{ opacity:1; transform:scale(1) rotate(0); }
+    68%,100%{ opacity:0; transform:scale(.3) rotate(120deg); }
+  }
+  @keyframes rtBellIn{
+    0%,56%{ opacity:0; transform:scale(.3); }
+    72%{ opacity:1; transform:scale(1.15); }
+    82%,100%{ opacity:1; transform:scale(1); }
+  }
+  @keyframes rtRing{
+    0%{ transform:rotate(0); } 20%{ transform:rotate(18deg); } 40%{ transform:rotate(-15deg); }
+    60%{ transform:rotate(10deg); } 80%{ transform:rotate(-5deg); } 100%{ transform:rotate(0); }
+  }
+  @keyframes rtCheck{ 0%{ transform:scale(0); } 100%{ transform:scale(1); } }
+  @media (prefers-reduced-motion: reduce){
+    .remind-toast.show .rt-logo, .remind-toast.show .rt-p, .remind-toast.show .rt-bellwrap, .remind-toast.show .rt-bell, .remind-toast.show .rt-check{ animation:none !important; }
+  }
   body.focus[data-mode="tasbeeh"] #bellBtn{ display:none; }
   #hapticBtn.buzz{ animation:hbuzz .35s linear; }
   @keyframes hbuzz{ 0%,100%{transform:translateX(0)} 20%{transform:translateX(-2px)} 40%{transform:translateX(2px)} 60%{transform:translateX(-2px)} 80%{transform:translateX(2px)} }
@@ -1153,7 +1200,7 @@
     <button id="hapticBtn" aria-label="الاهتزاز" aria-pressed="false">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3.5" width="8" height="17" rx="2"/><path d="M4.5 8v8"/><path d="M19.5 8v8"/><path d="M2 10.5v3"/><path d="M22 10.5v3"/><path class="hslash" d="M3.5 3L20.5 21"/></svg>
     </button>
-    <button id="bellBtn" aria-label="تذكير بأوقات الأذكار"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>
+    <button id="bellBtn" aria-label="تذكير بأوقات الأذكار" aria-pressed="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><path class="hslash" d="M3.5 3L20.5 21"/></svg></button>
   </div>
 
   <div class="progress">
@@ -1189,6 +1236,8 @@
 
 <div class="battery-toast" id="batteryToast" role="status" aria-live="polite"><span class="bt-icon" aria-hidden="true"><svg class="bt-logo" viewBox="0 0 336.42 336.42"><path fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><svg class="bt-bat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="4.5" width="11" height="17" rx="2.5"/><path d="M10.5 2.5h3"/><path class="bt-leaf" d="M12 17.8c-3.1-1-3.3-4.8 0-6.8 3.3 2 3.1 5.8 0 6.8z" fill="currentColor" stroke="none"/><path class="bt-leaf" d="M12 17.5v-3.5" stroke="var(--surface)" stroke-width="0.9"/></svg></span><span>تم تفعيل الوضع الهادئ وتوفير البطارية</span></div>
 
+<div class="battery-toast remind-toast" id="remindToast" role="status" aria-live="polite"><span class="rt-icon" aria-hidden="true"><svg class="rt-logo" viewBox="0 0 336.42 336.42"><path class="rt-p p1" fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path class="rt-p p2" fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path class="rt-p p3" fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path class="rt-p p4" fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path class="rt-p p5" fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><svg class="rt-bellwrap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g class="rt-bell"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g><g class="rt-check"><circle cx="19" cy="18.5" r="4.6" fill="#15ce57" stroke="var(--surface)" stroke-width="1.4"/><path d="M16.9 18.6l1.6 1.6 2.8-3.2" stroke="#fff" stroke-width="1.6"/></g></svg></span><span id="remindToastText">تم حفظ الأوقات وتفعيل الإشعارات</span></div>
+
 <div class="sheet-overlay" id="aboutOverlay">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -1204,7 +1253,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.58</div>
+    <div class="about-ver">الإصدار 1.59</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1244,8 +1293,8 @@
     <div class="sheet-handle"></div>
     <h2>تذكير بأوقات الأذكار</h2>
     <div class="zsheet-note">يصلك إشعار من طوبى في الوقت الذي تختاره، حتى لو كان التطبيق مغلقًا.</div>
-    <div class="rrow" id="rowM"><label class="rchk"><input type="checkbox" id="rMOn" checked><span>أذكار الصباح</span></label><input id="rMorning" type="time" value="06:00"></div>
-    <div class="rrow" id="rowE"><label class="rchk"><input type="checkbox" id="rEOn" checked><span>أذكار المساء</span></label><input id="rEvening" type="time" value="17:00"></div>
+    <div class="rrow" id="rowM"><label class="rchk"><input type="checkbox" id="rMOn" checked><span>أذكار الصباح</span></label><input id="rMorning" type="time" value="05:00"></div>
+    <div class="rrow" id="rowE"><label class="rchk"><input type="checkbox" id="rEOn" checked><span>أذكار المساء</span></label><input id="rEvening" type="time" value="15:00"></div>
     <div class="zsheet-note" id="rStatus" hidden style="margin:0 0 14px;"></div>
     <button class="sheet-close" id="rPush" style="margin-top:6px;">تفعيل التذكير بالإشعارات</button>
     <button class="done-btn wird-del" id="rOff" hidden><span>إيقاف التذكير</span></button>
@@ -2575,12 +2624,14 @@ const rStatus = document.getElementById('rStatus'), rPush = document.getElementB
 const rOff = document.getElementById('rOff'), rIcs = document.getElementById('rIcs');
 const REMIND_KEY = 'tooba-remind';
 const SW_OK = /(^|\.)toobaapp\.com$/.test(location.hostname);
-let remindCfg = { m:'06:00', e:'17:00', mOn:true, eOn:true };
+let remindCfg = { m:'05:00', e:'15:00', mOn:true, eOn:true };
 try{
   const r = JSON.parse(localStorage.getItem(REMIND_KEY));
   if(r){
-    if(/^\d\d:\d\d$/.test(r.m)) remindCfg.m = r.m;
-    if(/^\d\d:\d\d$/.test(r.e)) remindCfg.e = r.e;
+    // الأوقات القديمة الافتراضية (6 و5) تتحول للجديدة (5 و3)، وأي وقت اختاره المستخدم بنفسه يبقى
+    const oldDef = r.m === '06:00' && r.e === '17:00';
+    if(!oldDef && /^\d\d:\d\d$/.test(r.m)) remindCfg.m = r.m;
+    if(!oldDef && /^\d\d:\d\d$/.test(r.e)) remindCfg.e = r.e;
     if(r.mOn === false) remindCfg.mOn = false;
     if(r.eOn === false) remindCfg.eOn = false;
   }
@@ -2598,7 +2649,7 @@ function syncRows(){
 rMOn.addEventListener('change', syncRows);
 rEOn.addEventListener('change', syncRows);
 function readRemindUI(){
-  return { m:rMorning.value || '06:00', e:rEvening.value || '17:00', mOn:rMOn.checked, eOn:rEOn.checked };
+  return { m:rMorning.value || '05:00', e:rEvening.value || '15:00', mOn:rMOn.checked, eOn:rEOn.checked };
 }
 function setRStatus(t){ rStatus.hidden = !t; rStatus.textContent = t || ''; }
 function isStandalone(){
@@ -2608,6 +2659,33 @@ function pushSupport(){
   if(isIOS && !isStandalone()) return 'ios-install';
   if(!SW_OK || !('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return 'none';
   return 'ok';
+}
+const PUSH_OFF_KEY = 'tooba-push-off';   // المستخدم أوقف التذكير بنفسه: لا نفعّله تلقائيًا بعدها
+const PUSH_AUTO_KEY = 'tooba-push-auto'; // حاولنا التفعيل التلقائي مرة على هذا الجهاز
+const bellBtn = document.getElementById('bellBtn');
+function pushFlag(){ try{ return localStorage.getItem('tooba-push') === '1'; }catch(e){ return false; } }
+function setPushFlag(on){
+  try{
+    if(on){ localStorage.setItem('tooba-push', '1'); localStorage.removeItem(PUSH_OFF_KEY); localStorage.setItem('tooba-push-sync', new Date().toDateString()); }
+    else localStorage.removeItem('tooba-push');
+  }catch(e){}
+  paintBell();
+}
+function paintBell(){
+  const on = pushFlag();
+  bellBtn.classList.toggle('on', on);
+  bellBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  bellBtn.setAttribute('aria-label', on ? 'التذكير مفعّل، اضغط للتعديل' : 'تذكير بأوقات الأذكار');
+}
+paintBell();
+const remindToast = document.getElementById('remindToast');
+let remindToastT = null;
+function showRemindToast(text){
+  document.getElementById('remindToastText').textContent = text || 'تم حفظ الأوقات وتفعيل الإشعارات';
+  clearTimeout(remindToastT);
+  remindToast.classList.remove('show'); void remindToast.offsetWidth;
+  remindToast.classList.add('show');
+  remindToastT = setTimeout(() => remindToast.classList.remove('show'), 3400);
 }
 async function getPushSub(){
   try{ const reg = await navigator.serviceWorker.ready; return await reg.pushManager.getSubscription(); }
@@ -2657,6 +2735,7 @@ async function openRemind(){
   else {
     const sub = await getPushSub();
     const on = !!sub && Notification.permission === 'granted';
+    setPushFlag(on);
     rPush.textContent = on ? 'حفظ الأوقات' : 'تفعيل التذكير بالإشعارات';
     rOff.hidden = !on;
     if(on) setRStatus('التذكير مفعّل على هذا الجهاز.');
@@ -2672,10 +2751,12 @@ rPush.addEventListener('click', async () => {
   try{
     await enablePush(cfg);
     remindCfg = cfg; saveRemindCfg();
-    try{ localStorage.setItem('tooba-push', '1'); localStorage.setItem('tooba-push-sync', new Date().toDateString()); }catch(e){}
+    setPushFlag(true);
     rPush.textContent = 'حفظ الأوقات';
     rOff.hidden = false;
-    setRStatus('تم تفعيل التذكير، تقبّل الله منك.');
+    rOverlay.classList.remove('open');
+    haptic('done');
+    showRemindToast('تم حفظ الأوقات وتفعيل الإشعارات');
   }catch(err){
     if(err && err.message === 'denied') setRStatus('لم يتم السماح بالإشعارات. فعّلها من إعدادات المتصفح ثم أعد المحاولة.');
     else setRStatus('تعذّر تفعيل التذكير الآن، حاول لاحقًا أو استخدم التقويم.');
@@ -2684,7 +2765,8 @@ rPush.addEventListener('click', async () => {
 rOff.addEventListener('click', async () => {
   rOff.disabled = true;
   await disablePush();
-  try{ localStorage.removeItem('tooba-push'); }catch(e){}
+  try{ localStorage.setItem(PUSH_OFF_KEY, '1'); }catch(e){}
+  setPushFlag(false);
   rOff.disabled = false;
   rOff.hidden = true;
   rPush.textContent = 'تفعيل التذكير بالإشعارات';
@@ -2696,9 +2778,39 @@ rOff.addEventListener('click', async () => {
     if(localStorage.getItem('tooba-push') !== '1' || pushSupport() !== 'ok' || Notification.permission !== 'granted') return;
     if(localStorage.getItem('tooba-push-sync') === new Date().toDateString()) return;
     const sub = await getPushSub();
-    if(!sub){ localStorage.removeItem('tooba-push'); return; }
+    if(!sub){ setPushFlag(false); return; }
     await postJSON('/api/subscribe', syncBody(sub, remindCfg));
     localStorage.setItem('tooba-push-sync', new Date().toDateString());
+  }catch(e){}
+})();
+
+// تفعيل تلقائي: الصباح 5 ص والمساء 3 م. المتصفح لا يسمح بطلب إذن الإشعارات إلا بعد لمسة من المستخدم،
+// فإن كان الإذن ممنوحًا مسبقًا يتفعّل بصمت، وإلا نطلبه عند أول لمسة (مرة واحدة فقط على كل جهاز).
+(function autoPush(){
+  try{
+    if(pushSupport() !== 'ok') return;
+    if(localStorage.getItem(PUSH_OFF_KEY) === '1') return;
+    if(Notification.permission === 'denied'){ setPushFlag(false); return; }
+    async function go(){
+      try{
+        await enablePush(remindCfg);
+        saveRemindCfg();
+        const was = pushFlag();
+        setPushFlag(true);
+        if(!was) showRemindToast('تم تفعيل إشعارات الأذكار');
+      }catch(e){ setPushFlag(false); }
+    }
+    if(Notification.permission === 'granted'){
+      if(!pushFlag()) go();
+      return;
+    }
+    if(localStorage.getItem(PUSH_AUTO_KEY) === '1') return;
+    document.addEventListener('click', function once(){
+      document.removeEventListener('click', once, true);
+      try{ localStorage.setItem(PUSH_AUTO_KEY, '1'); }catch(e){}
+      if(localStorage.getItem(PUSH_OFF_KEY) === '1') return;
+      go();
+    }, true);
   }catch(e){}
 })();
 

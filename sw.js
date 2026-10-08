@@ -1,7 +1,7 @@
-const VERSION = 'tooba-v1.58';
+const VERSION = 'tooba-v1.59';
 const CORE = [
   '/', '/index.html', '/manifest.webmanifest',
-  '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png',
+  '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png', '/badge-96.png',
   '/apple-touch-icon.png', '/favicon.ico', '/favicon-32.png', '/favicon-64.png'
 ];
 
@@ -60,13 +60,14 @@ self.addEventListener('fetch', (e) => {
   }
 });
 
-// ---------- إشعارات التذكير (Web Push بدون نص: الصباح قبل 3 عصرًا بتوقيت الجهاز) ----------
+// ---------- إشعارات التذكير (Web Push بدون نص: الصباح قبل 1 ظهرًا بتوقيت الجهاز) ----------
 self.addEventListener('push', (e) => {
-  const morning = new Date().getHours() < 15;
+  const morning = new Date().getHours() < 13;
   e.waitUntil(self.registration.showNotification(morning ? 'أذكار الصباح' : 'أذكار المساء', {
     body: morning ? 'حان وقت أذكار الصباح، اضغط للبدء.' : 'حان وقت أذكار المساء، اضغط للبدء.',
     icon: '/icon-192.png',
-    badge: '/icon-192.png',
+    // أيقونة شريط الحالة في أندرويد: لازم تكون أحادية اللون بخلفية شفافة وإلا تظهر مربعًا أبيض
+    badge: '/badge-96.png',
     tag: 'tooba-reminder',
     lang: 'ar',
     dir: 'rtl',
