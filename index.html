@@ -460,12 +460,12 @@
   .r-done.show{ opacity:1; pointer-events:auto; }
   .r-done .rt-icon{ width:128px; height:128px; }
   .rd-text{ font-size:20px; font-weight:600; color:var(--text); text-align:center; padding:0 24px; line-height:1.6; }
-  .r-done.show .rd-text{ animation:rdText .3s ease .85s both; }
+  .r-done.show .rd-text{ animation:rdText .3s ease .25s both; }
   @keyframes rdText{ 0%{ opacity:0; transform:translateY(10px); } 100%{ opacity:1; transform:translateY(0); } }
   @media (prefers-reduced-motion: reduce){ .r-done.show .rd-text{ animation:none !important; } }
   .rt-icon{ position:relative; width:30px; height:30px; flex-shrink:0; color:#15ce57; }
   .rt-icon > svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
-  .rt-logo{ opacity:0; }
+  .rt-logo{ display:none; }
   .rt-p{ transform-origin:168.21px 168.21px; }
   .rt-bellwrap{ transform-origin:50% 50%; }
   .rt-bell{ transform-origin:50% 8%; }
@@ -474,9 +474,9 @@
   :is(.remind-toast,.r-done).show .rt-p{ animation:rtPetal .35s cubic-bezier(.2,.9,.3,1.25) both; }
   :is(.remind-toast,.r-done).show .rt-p.p2{ animation-delay:.06s; } :is(.remind-toast,.r-done).show .rt-p.p3{ animation-delay:.12s; }
   :is(.remind-toast,.r-done).show .rt-p.p4{ animation-delay:.18s; } :is(.remind-toast,.r-done).show .rt-p.p5{ animation-delay:.24s; }
-  :is(.remind-toast,.r-done).show .rt-bellwrap{ animation:rtBellIn 1.5s ease both; }
-  :is(.remind-toast,.r-done).show .rt-bell{ animation:rtRing .5s ease 1.05s both; }
-  :is(.remind-toast,.r-done).show .rt-check{ animation:rtCheck .3s cubic-bezier(.2,.9,.3,1.4) 1.15s both; }
+  :is(.remind-toast,.r-done).show .rt-bellwrap{ animation:rtBellIn .4s cubic-bezier(.2,.9,.3,1.3) both; }
+  :is(.remind-toast,.r-done).show .rt-bell{ animation:rtRing .5s ease .3s both; }
+  :is(.remind-toast,.r-done).show .rt-check{ animation:rtCheck .3s cubic-bezier(.2,.9,.3,1.4) .4s both; }
   @keyframes rtPetal{ 0%{ opacity:0; transform:rotate(-110deg) scale(0); } 60%{ opacity:1; } 100%{ opacity:1; transform:rotate(0) scale(1); } }
   @keyframes rtLogo{
     0%{ opacity:1; transform:scale(.6) rotate(-60deg); }
@@ -485,9 +485,8 @@
     68%,100%{ opacity:0; transform:scale(.3) rotate(120deg); }
   }
   @keyframes rtBellIn{
-    0%,56%{ opacity:0; transform:scale(.3); }
-    72%{ opacity:1; transform:scale(1.15); }
-    82%,100%{ opacity:1; transform:scale(1); }
+    0%{ opacity:0; transform:scale(.3); }
+    100%{ opacity:1; transform:scale(1); }
   }
   @keyframes rtRing{
     0%{ transform:rotate(0); } 20%{ transform:rotate(18deg); } 40%{ transform:rotate(-15deg); }
@@ -496,8 +495,8 @@
   .rt-slash{ opacity:0; stroke-dasharray:100; stroke-dashoffset:100; }
   :is(.remind-toast,.r-done).off .rt-icon{ color:var(--text-dim); }
   :is(.remind-toast,.r-done).off .rt-check{ display:none; }
-  :is(.remind-toast,.r-done).off.show .rt-slash{ animation:rtSlash .3s ease .95s both; }
-  :is(.remind-toast,.r-done).off.show .rt-bell{ animation:rtRingOff .4s ease .9s both; }
+  :is(.remind-toast,.r-done).off.show .rt-slash{ animation:rtSlash .3s ease .4s both; }
+  :is(.remind-toast,.r-done).off.show .rt-bell{ animation:rtRingOff .4s ease .3s both; }
   @keyframes rtSlash{ 0%{ opacity:1; stroke-dashoffset:100; } 100%{ opacity:1; stroke-dashoffset:0; } }
   @keyframes rtRingOff{ 0%{ transform:rotate(0); } 30%{ transform:rotate(-12deg); } 60%{ transform:rotate(8deg); } 100%{ transform:rotate(0); } }
   @keyframes rtCheck{ 0%{ transform:scale(0); } 100%{ transform:scale(1); } }
@@ -1290,7 +1289,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.63</div>
+    <div class="about-ver">الإصدار 1.64</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -2728,7 +2727,7 @@ function showRemindDone(text, off){
   void rDone.offsetWidth;
   rDone.classList.add('show');
   clearTimeout(rDoneT);
-  rDoneT = setTimeout(() => { rOverlay.classList.remove('open'); setTimeout(() => rDone.classList.remove('show'), 450); }, 2100);
+  rDoneT = setTimeout(() => { rOverlay.classList.remove('open'); setTimeout(() => rDone.classList.remove('show'), 450); }, 1500);
 }
 let remindToastT = null;
 function showRemindToast(text, off){
@@ -2737,7 +2736,7 @@ function showRemindToast(text, off){
   clearTimeout(remindToastT);
   remindToast.classList.remove('show'); void remindToast.offsetWidth;
   remindToast.classList.add('show');
-  remindToastT = setTimeout(() => remindToast.classList.remove('show'), 2400);
+  remindToastT = setTimeout(() => remindToast.classList.remove('show'), 2000);
 }
 async function getPushSub(){
   try{ const reg = await navigator.serviceWorker.ready; return await reg.pushManager.getSubscription(); }
