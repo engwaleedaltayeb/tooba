@@ -436,6 +436,8 @@
     :root:not([data-theme="light"]) [data-mode="evening"] #hapticBtn.on{ color:#8ba0e8; border-color:color-mix(in srgb, #8ba0e8 45%, transparent); background:color-mix(in srgb, #8ba0e8 14%, var(--surface)); }
   }
   :root[data-theme="dark"] [data-mode="evening"] #hapticBtn.on{ color:#8ba0e8; border-color:color-mix(in srgb, #8ba0e8 45%, transparent); background:color-mix(in srgb, #8ba0e8 14%, var(--surface)); }
+  #remindBtn{ display:flex; align-items:center; justify-content:center; }
+  body.focus[data-mode="tasbeeh"] #remindBtn{ display:none; }
   #hapticBtn.buzz{ animation:hbuzz .35s linear; }
   @keyframes hbuzz{ 0%,100%{transform:translateX(0)} 20%{transform:translateX(-2px)} 40%{transform:translateX(2px)} 60%{transform:translateX(-2px)} 80%{transform:translateX(2px)} }
   #fontMinus{ font-size:15px; }
@@ -1139,6 +1141,7 @@
     <button id="hapticBtn" aria-label="الاهتزاز" aria-pressed="false">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3.5" width="8" height="17" rx="2"/><path d="M4.5 8v8"/><path d="M19.5 8v8"/><path d="M2 10.5v3"/><path d="M22 10.5v3"/><path class="hslash" d="M3.5 3L20.5 21"/></svg>
     </button>
+    <button id="remindBtn" aria-label="تذكير بأوقات الأذكار"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>
   </div>
 
   <div class="progress">
@@ -1184,15 +1187,11 @@
       <p>التطبيق مجاني، نسأل الله أن يتقبّله ويجعله خالصًا لوجهه الكريم.</p>
       <p>للملاحظات أو التبليغ عن خطأ في نص أو سند:<br><a class="about-mail" href="mailto:tooba.app.support@gmail.com">tooba.app.support@gmail.com</a></p>
     </div>
-    <button class="done-btn about-share" id="aboutRemind" style="margin-bottom:0;">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-      <span>ذكّرني بأوقات الأذكار</span>
-    </button>
     <button class="done-btn about-share" id="aboutShare">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.56</div>
+    <div class="about-ver">الإصدار 1.57</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -2578,10 +2577,7 @@ function buildICS(mt, et){
     ev('tooba-morning', mt, 'أذكار الصباح — طوبى'), ev('tooba-evening', et, 'أذكار المساء — طوبى'),
     'END:VCALENDAR'].join('\r\n');
 }
-document.getElementById('aboutRemind').addEventListener('click', () => {
-  aboutOverlay.classList.remove('open');
-  rOverlay.classList.add('open');
-});
+document.getElementById('remindBtn').addEventListener('click', () => { haptic('tap'); rOverlay.classList.add('open'); });
 rOverlay.addEventListener('click', (e) => { if(e.target === rOverlay) rOverlay.classList.remove('open'); });
 document.getElementById('rSave').addEventListener('click', async () => {
   const mt = rMorning.value || '06:00', et = rEvening.value || '17:00';
