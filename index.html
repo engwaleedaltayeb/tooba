@@ -454,6 +454,12 @@
     :root:not([data-theme="light"]) [data-mode="evening"] #bellBtn.on{ color:#8ba0e8; border-color:color-mix(in srgb, #8ba0e8 45%, transparent); background:color-mix(in srgb, #8ba0e8 14%, var(--surface)); }
   }
   :root[data-theme="dark"] [data-mode="evening"] #bellBtn.on{ color:#8ba0e8; border-color:color-mix(in srgb, #8ba0e8 45%, transparent); background:color-mix(in srgb, #8ba0e8 14%, var(--surface)); }
+  .r-unavail{ display:none; flex-direction:column; align-items:center; text-align:center; gap:14px; padding:18px 4px 4px; color:var(--text-dim); }
+  .r-unavail .ru-title{ font-size:21px; font-weight:700; color:var(--text); }
+  .r-unavail .ru-text{ font-size:15px; line-height:1.9; color:var(--text-dim); max-width:320px; }
+  .r-unavail .sheet-close{ margin-top:14px; }
+  #rOverlay .sheet.unavail > :not(.r-unavail):not(.sheet-handle):not(.r-done){ display:none; }
+  #rOverlay .sheet.unavail .r-unavail{ display:flex; }
   .remind-toast{ gap:12px; }
   #rOverlay .sheet{ position:relative; }
   .r-done{
@@ -1294,7 +1300,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.65</div>
+    <div class="about-ver">الإصدار 1.66</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1339,6 +1345,7 @@
     <div class="zsheet-note" id="rStatus" hidden style="margin:0 0 14px;"></div>
     <button class="sheet-close" id="rPush" style="margin-top:6px;">تفعيل التذكير بالإشعارات</button>
     <button class="done-btn wird-del" id="rOff" hidden><span>إيقاف التذكير</span></button>
+    <div class="r-unavail" id="rUnavail"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><path d="M3.5 3L20.5 21"/></svg><div class="ru-title" id="ruTitle"></div><div class="ru-text" id="ruText"></div><button class="sheet-close" id="ruClose">تمام</button></div>
     <div class="r-done" id="rDone" aria-hidden="true"><span class="rt-icon" id="rDoneIcon"></span><div class="rd-text" id="rDoneText"></div></div>
   </div>
 </div>
@@ -2785,9 +2792,15 @@ async function openRemind(){
   rOverlay.classList.add('open');
   const sup = pushSupport();
   rPush.hidden = sup !== 'ok';
-  if(sup === 'ios-install') setRStatus('على آيفون: ثبّت طوبى على الشاشة الرئيسية أولًا (من زر المشاركة)، ثم افتحها من هناك وفعّل التذكير.');
-  else if(sup === 'none') setRStatus('الإشعارات غير متاحة في هذا المتصفح.');
-  else {
+  const sheet = rOverlay.querySelector('.sheet');
+  sheet.classList.toggle('unavail', sup !== 'ok');
+  if(sup === 'ios-install'){
+    document.getElementById('ruTitle').textContent = 'ثبّت طوبى أولًا';
+    document.getElementById('ruText').textContent = 'على آيفون تعمل الإشعارات بعد إضافة طوبى إلى الشاشة الرئيسية من زر المشاركة، ثم افتحها من هناك.';
+  } else if(sup === 'none'){
+    document.getElementById('ruTitle').textContent = 'الإشعارات غير متاحة';
+    document.getElementById('ruText').textContent = 'هذا المتصفح لا يدعم إشعارات التذكير. جرّب فتح طوبى من متصفح آخر.';
+  } else {
     const sub = await getPushSub();
     const on = !!sub && Notification.permission === 'granted';
     setPushFlag(on);
@@ -2798,6 +2811,7 @@ async function openRemind(){
   }
 }
 document.getElementById('bellBtn').addEventListener('click', () => { haptic('tap'); openRemind(); });
+document.getElementById('ruClose').addEventListener('click', () => rOverlay.classList.remove('open'));
 rOverlay.addEventListener('click', (e) => { if(e.target === rOverlay) rOverlay.classList.remove('open'); });
 rPush.addEventListener('click', async () => {
   const cfg = readRemindUI();
