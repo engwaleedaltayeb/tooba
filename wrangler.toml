@@ -11,4 +11,4 @@ crons = ["* * * * *"]
 [[d1_databases]]
 binding = "DB"
 database_name = "tooba-push"
-database_id = "ضع_المعرّف_هنا"
+database_id = "9883eafc-c37e-48da-a961-e10feaf4bf07"
