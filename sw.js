@@ -1,4 +1,4 @@
-const VERSION = 'tooba-v1.66';
+const VERSION = 'tooba-v1.68';
 const CORE = [
   '/', '/index.html', '/manifest.webmanifest',
   '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png', '/badge-96.png',
@@ -28,14 +28,18 @@ self.addEventListener('fetch', (e) => {
 
   // الصفحة نفسها: الشبكة أولًا، ولو مفيش نت من الكاش
   if (req.mode === 'navigate') {
+    // نخزّن الصفحة الرئيسية فقط كنسخة /index.html، فلا تحلّ صفحة الخصوصية مكانها في الكاش
+    const isApp = url.origin === location.origin && (url.pathname === '/' || url.pathname === '/index.html');
     e.respondWith(
       fetch(req)
         .then((res) => {
-          const copy = res.clone();
-          caches.open(VERSION).then((c) => c.put('/index.html', copy));
+          if (isApp) {
+            const copy = res.clone();
+            caches.open(VERSION).then((c) => c.put('/index.html', copy));
+          }
           return res;
         })
-        .catch(() => caches.match('/index.html').then((r) => r || caches.match('/')))
+        .catch(() => caches.match(req).then((r) => r || caches.match('/index.html') || caches.match('/')))
     );
     return;
   }

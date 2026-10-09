@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>سياسة الخصوصية — طوبى</title>
+<meta name="description" content="سياسة الخصوصية لتطبيق طوبى لأذكار الصباح والمساء: ما نحفظه على جهازك، وما يصل إلى الخادم، وكيف تتحكم في بياناتك.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#fbfbfa">
+<link rel="canonical" href="https://toobaapp.com/privacy.html">
+<link rel="icon" type="image/png" href="/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fbfbfa; --surface:#ffffff; --text:#1d1d1f; --text-dim:#6e6e73;
+    --border:rgba(0,0,0,0.08); --green:#15ce57; --green-text:#0d9a43;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#000; --surface:#111113; --text:#f5f5f7; --text-dim:#98989d; --border:rgba(255,255,255,0.1); --green-text:#15ce57; }
+  }
+  *{ box-sizing:border-box; margin:0; }
+  html{ background:var(--bg); color-scheme:light dark; scroll-padding-top:16px; }
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans Arabic', system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif;
+    font-size:17px; line-height:2; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{ max-width:720px; margin:0 auto; padding:48px 24px 72px; }
+  header{ text-align:center; margin-bottom:36px; }
+  .logo{ width:64px; height:64px; margin:0 auto 14px; display:block; }
+  h1{ font-family:'Amiri', serif; font-size:38px; font-weight:700; line-height:1.4; }
+  .meta{ color:var(--text-dim); font-size:15px; margin-top:6px; }
+  .langs{ display:flex; justify-content:center; gap:10px; margin-top:18px; }
+  .langs a{
+    padding:8px 18px; border-radius:999px; border:1px solid var(--border);
+    background:var(--surface); color:var(--text-dim); text-decoration:none; font-size:14.5px; font-weight:500;
+  }
+  .langs a:hover{ color:var(--green-text); border-color:var(--green); }
+  a:focus-visible{ outline:2px solid var(--green); outline-offset:3px; border-radius:6px; }
+  .summary{
+    background:var(--surface); border:1px solid var(--border);
+    border-inline-start:4px solid var(--green);
+    border-radius:16px; padding:20px 24px; margin-bottom:12px;
+  }
+  .summary h2{ margin-top:0; font-size:19px; }
+  .summary ul{ margin:8px 0 0; }
+  h2{ font-size:22px; font-weight:600; line-height:1.6; margin:40px 0 8px; }
+  p{ margin:0 0 12px; }
+  ul{ padding-inline-start:22px; margin:0 0 12px; }
+  li{ margin-bottom:6px; }
+  li::marker{ color:var(--green); }
+  .tbl{ border:1px solid var(--border); border-radius:14px; overflow:hidden; background:var(--surface); margin:10px 0 14px; }
+  .tbl div{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,2fr); gap:16px; padding:12px 18px; font-size:16px; line-height:1.8; }
+  .tbl div + div{ border-top:1px solid var(--border); }
+  .tbl b{ font-weight:600; }
+  .tbl span{ color:var(--text-dim); }
+  .mail{ direction:ltr; unicode-bidi:isolate; display:inline-block; color:var(--green-text); font-weight:600; text-decoration:none; word-break:break-all; }
+  .en-sec{ direction:ltr; text-align:left; margin-top:64px; padding-top:40px; border-top:1px solid var(--border); font-family:system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; line-height:1.8; }
+  .en-sec h1{ font-family:system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size:30px; font-weight:700; text-align:center; margin-bottom:6px; }
+  .en-sec .meta{ text-align:center; margin-bottom:24px; }
+  .en-sec h2{ font-size:20px; }
+  .en-sec .tbl div{ grid-template-columns:minmax(0,1fr) minmax(0,2fr); }
+  footer{ margin-top:48px; text-align:center; color:var(--text-dim); font-size:14px; }
+  @media (max-width:520px){
+    body{ font-size:16.5px; }
+    h1{ font-size:32px; }
+    .tbl div{ grid-template-columns:1fr; gap:2px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <svg class="logo" viewBox="0 0 336.42 336.42" aria-hidden="true"><path fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg>
+  <h1>سياسة الخصوصية</h1>
+  <div class="meta">تطبيق طوبى — أذكار الصباح والمساء<br>آخر تحديث: ٩ أكتوبر ٢٠٢٦</div>
+  <nav class="langs" aria-label="اللغة"><a href="#en" lang="en" hreflang="en">English</a></nav>
+</header>
+
+<section class="summary" aria-label="ملخص">
+  <h2>باختصار</h2>
+  <ul>
+    <li>لا حسابات، ولا إعلانات، ولا أدوات تتبّع أو تحليلات.</li>
+    <li>تقدّمك وسبحتك وأورادك وأذكارك الخاصة تُحفظ على جهازك فقط.</li>
+    <li>لا يصل إلى خادمنا شيء إلا إذا فعّلت التذكير بالإشعارات، وحينها نحفظ رمز اشتراك جهازك وأوقات التذكير والمنطقة الزمنية فقط، بلا اسم ولا بريد.</li>
+  </ul>
+</section>
+
+<h2>١. ما يُحفظ على جهازك فقط</h2>
+<p>يحفظ طوبى هذه البيانات في تخزين المتصفح أو التطبيق على جهازك، ولا نرسلها إلينا ولا إلى أي جهة:</p>
+<ul>
+  <li>تقدّمك اليومي في أذكار الصباح والمساء.</li>
+  <li>عدّاد السبحة والأوراد اليومية وأهدافها، والأوراد التي أضفتها بنفسك.</li>
+  <li>الأذكار والأدعية الخاصة التي كتبتها بنفسك.</li>
+  <li>إعدادات العرض: حجم الخط، والوضع الليلي، وتفعيل الاهتزاز.</li>
+  <li>أوقات التذكير التي اخترتها.</li>
+</ul>
+<p>تُحذف هذه البيانات عند مسح بيانات التطبيق أو الموقع من إعدادات جهازك، أو عند حذف التطبيق.</p>
+
+<h2>٢. ما يصل إلى خادمنا</h2>
+<p>يحدث هذا فقط إذا فعّلت «التذكير بالإشعارات». نحفظ في هذه الحالة ثلاثة أشياء، ولا شيء غيرها:</p>
+<div class="tbl">
+  <div><b>رمز اشتراك الجهاز</b><span>رابط تقني تصدره خدمة الإشعارات في متصفحك، ونستخدمه لإرسال الإشعار إلى جهازك فقط.</span></div>
+  <div><b>وقتا التذكير</b><span>وقت أذكار الصباح ووقت أذكار المساء اللذان اخترتهما.</span></div>
+  <div><b>المنطقة الزمنية</b><span>اسم المنطقة الزمنية لجهازك، لنرسل الإشعار في الوقت الصحيح بتوقيتك. لا تحدد موقعك الدقيق.</span></div>
+</div>
+<p>لا نربط هذه البيانات باسمك أو بريدك أو رقم هاتفك أو أي هوية أخرى، ونستخدمها لغرض واحد: إرسال إشعار التذكير. ونص الإشعار ثابت ولا يحتوي على أي بيانات شخصية.</p>
+<p>يحدّث التطبيق هذا السجل مرة يوميًا عند فتحه، لو تغيّرت المنطقة الزمنية أو رمز الاشتراك.</p>
+<p><b>متى يُحذف:</b> فور ضغطك على «إيقاف التذكير» في التطبيق، أو عندما تُبلغنا خدمة الإشعارات أن الاشتراك لم يعد صالحًا.</p>
+
+<h2>٣. ما لا نجمعه</h2>
+<ul>
+  <li>الاسم أو البريد الإلكتروني أو رقم الهاتف.</li>
+  <li>موقعك الجغرافي.</li>
+  <li>جهات الاتصال أو الصور أو الملفات أو الميكروفون أو الكاميرا.</li>
+  <li>معلومات الدفع، فالتطبيق مجاني.</li>
+  <li>بيانات تحليلية أو إعلانية، ولا نستخدم ملفات تعريف الارتباط للتتبّع.</li>
+</ul>
+
+<h2>٤. الخدمات التي يعتمد عليها التطبيق</h2>
+<ul>
+  <li><b>Cloudflare:</b> نستضيف عليها الموقع وخادم الإشعارات وقاعدة البيانات الصغيرة التي فيها السجل الموضح في القسم ٢. وقد تسجّل أي خدمة استضافة بيانات تقنية قياسية، مثل عنوان IP، لأغراض التشغيل والأمان.</li>
+  <li><b>خطوط Google:</b> تُحمَّل خطوط التطبيق من خوادم Google، فقد تستقبل Google عنوان IP ونوع المتصفح عند التحميل، وفق سياسة الخصوصية الخاصة بها.</li>
+  <li><b>خدمات الإشعارات:</b> تصل الإشعارات عبر الخدمة التي يوفرها متصفحك أو نظام جهازك (مثل Google وApple وMozilla وMicrosoft)، وتخضع بياناتها لسياساتها.</li>
+</ul>
+<p>لا نبيع بياناتك ولا نشاركها مع أي جهة لأغراض إعلانية.</p>
+
+<h2>٥. الصلاحيات التي يطلبها التطبيق</h2>
+<ul>
+  <li><b>الإشعارات:</b> اختيارية، ولا تُطلب إلا لإرسال التذكير. يعمل التطبيق كاملًا بدونها.</li>
+  <li><b>إبقاء الشاشة صاحية والاهتزاز:</b> لخدمة القراءة والعدّ فقط، ولا تُرسل أي بيانات.</li>
+  <li><b>المشاركة:</b> عند الضغط على زر المشاركة يفتح التطبيق قائمة المشاركة في جهازك، وما تشاركه يذهب إلى الجهة التي تختارها أنت.</li>
+</ul>
+
+<h2>٦. التحكم في بياناتك وحذفها</h2>
+<ul>
+  <li>لحذف ما على خادمنا: اضغط «إيقاف التذكير» من أيقونة الجرس في التطبيق، فيُحذف السجل فورًا.</li>
+  <li>لحذف ما على جهازك: امسح بيانات التطبيق أو الموقع من إعدادات الجهاز، أو احذف التطبيق.</li>
+  <li>لأننا لا نحتفظ باسم أو بريد، لا نستطيع ربط السجل بشخص بعينه، ولذلك تتم إدارته من الجهاز نفسه كما سبق. وإن واجهتك مشكلة، راسلنا على البريد في آخر الصفحة.</li>
+</ul>
+
+<h2>٧. الأطفال</h2>
+<p>طوبى مناسب لجميع الأعمار ولا يجمع معلومات شخصية من أي مستخدم، ومنهم الأطفال.</p>
+
+<h2>٨. الأمان</h2>
+<p>تتم كل الاتصالات مع خادمنا عبر HTTPS. وقد جعلنا ما نحفظه في أقل نطاق ممكن، فهو أفضل حماية للبيانات.</p>
+
+<h2>٩. تعديل هذه السياسة</h2>
+<p>إن تغيّرت طريقة تعاملنا مع البيانات سنحدّث هذه الصفحة ونغيّر تاريخ «آخر تحديث» في أعلاها.</p>
+
+<h2>١٠. التواصل</h2>
+<p>للاستفسار أو الملاحظات حول الخصوصية:<br><a class="mail" href="mailto:tooba.app.support@gmail.com">tooba.app.support@gmail.com</a></p>
+
+<section class="en-sec" id="en" lang="en" dir="ltr">
+  <h1>Privacy Policy</h1>
+  <div class="meta">Tooba — Morning &amp; Evening Adhkar<br>Last updated: October 9, 2026</div>
+
+  <div class="summary">
+    <h2>In short</h2>
+    <ul>
+      <li>No accounts, no ads, no tracking or analytics.</li>
+      <li>Your progress, tasbih counter, daily wirds and custom adhkar stay on your device only.</li>
+      <li>Nothing reaches our server unless you turn on notification reminders. In that case we store only your device's push subscription token, your reminder times and your time zone — no name, no email.</li>
+    </ul>
+  </div>
+
+  <h2>1. Data stored on your device only</h2>
+  <p>Tooba keeps the following in your browser or app storage. It is never sent to us or to anyone else: your daily adhkar progress; tasbih counter, daily wirds, their targets and any wirds you add; custom adhkar and supplications you write; display settings (font size, dark mode, vibration); and your chosen reminder times. This data is removed when you clear the app's or site's data, or uninstall the app.</p>
+
+  <h2>2. Data sent to our server</h2>
+  <p>This happens only if you enable notification reminders. We then store exactly three things:</p>
+  <div class="tbl">
+    <div><b>Push subscription token</b><span>A technical URL issued by your browser's push service, used only to deliver the reminder to your device.</span></div>
+    <div><b>Reminder times</b><span>The morning and evening times you chose.</span></div>
+    <div><b>Time zone</b><span>Your device's time zone name, so the reminder arrives at the right local time. It does not reveal your precise location.</span></div>
+  </div>
+  <p>This record is not linked to your name, email, phone number or any other identity. It is used for one purpose only: sending your reminder. The notification text is fixed and contains no personal data. The app refreshes the record at most once a day when opened, in case your time zone or token has changed.</p>
+  <p><b>When it is deleted:</b> immediately when you tap "Stop reminders" in the app, or when the push service tells us the subscription is no longer valid.</p>
+
+  <h2>3. What we do not collect</h2>
+  <p>Names, emails or phone numbers; your location; contacts, photos, files, microphone or camera; payment information (the app is free); and analytics or advertising data. We do not use cookies for tracking.</p>
+
+  <h2>4. Services the app relies on</h2>
+  <ul>
+    <li><b>Cloudflare</b> hosts the website, the notification server and the small database holding the record described above. Hosting providers may log standard technical data, such as IP addresses, for operation and security.</li>
+    <li><b>Google Fonts</b> serves the app's fonts, so Google may receive your IP address and browser type when fonts load, under Google's own privacy policy.</li>
+    <li><b>Push services</b> provided by your browser or operating system (such as Google, Apple, Mozilla and Microsoft) deliver notifications and are governed by their own policies.</li>
+  </ul>
+  <p>We do not sell your data or share it with anyone for advertising.</p>
+
+  <h2>5. Permissions</h2>
+  <ul>
+    <li><b>Notifications</b> — optional, requested only to send reminders. The app works fully without it.</li>
+    <li><b>Keep screen awake and vibration</b> — used only for reading and counting; no data is sent.</li>
+    <li><b>Sharing</b> — the share button opens your device's share sheet; what you share goes where you choose.</li>
+  </ul>
+
+  <h2>6. Your choices and deletion</h2>
+  <p>To delete what is on our server, tap "Stop reminders" under the bell icon in the app; the record is removed immediately. To delete what is on your device, clear the app's or site's data or uninstall the app. Because we hold no name or email, we cannot tie the server record to a specific person, so it is managed from the device itself. If you have a problem, contact us below.</p>
+
+  <h2>7. Children</h2>
+  <p>Tooba is suitable for all ages and does not collect personal information from any user, including children.</p>
+
+  <h2>8. Security</h2>
+  <p>All communication with our server uses HTTPS, and we keep what we store to a minimum.</p>
+
+  <h2>9. Changes to this policy</h2>
+  <p>If our data practices change, we will update this page and the "Last updated" date above.</p>
+
+  <h2>10. Contact</h2>
+  <p>Questions or feedback about privacy: <a class="mail" href="mailto:tooba.app.support@gmail.com">tooba.app.support@gmail.com</a></p>
+</section>
+
+<footer>طوبى · toobaapp.com</footer>
+</div>
+</body>
+</html>
