@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.toobaapp.tooba",
+      "sha256_cert_fingerprints": [
+        "AD:E7:FC:0F:C3:4B:C2:5D:9D:51:54:E1:85:1B:90:E0:4B:15:F2:D3:5A:A8:1D:ED:73:68:81:3C:69:EA:93:59",
+        "7E:29:F3:CD:FB:16:AD:B8:71:0A:11:0E:A6:23:4A:66:23:C3:E0:44:BE:39:36:22:B3:60:0B:7A:C2:B3:BE:92"
+      ]
+    }
+  }
+]
