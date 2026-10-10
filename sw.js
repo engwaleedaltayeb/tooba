@@ -1,4 +1,4 @@
-const VERSION = 'tooba-v1.73';
+const VERSION = 'tooba-v1.74';
 const CORE = [
   '/', '/index.html', '/manifest.webmanifest',
   '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png', '/badge-96.png',
@@ -30,6 +30,23 @@ self.addEventListener('fetch', (e) => {
   if (req.mode === 'navigate') {
     // نخزّن الصفحة الرئيسية فقط كنسخة /index.html، فلا تحلّ صفحة الخصوصية مكانها في الكاش
     const isApp = url.origin === location.origin && (url.pathname === '/' || url.pathname === '/index.html');
+    if (isApp) {
+      // الصفحة الرئيسية: من الكاش فورًا (فيختفي انتظار شاشة البداية البيضاء)، وتتحدّث في الخلفية للمرة الجاية
+      e.respondWith(
+        caches.match('/index.html').then((cached) => {
+          const fresh = fetch(req).then((res) => {
+            if (res && res.ok && !res.redirected) {
+              const copy = res.clone();
+              caches.open(VERSION).then((c) => c.put('/index.html', copy));
+            }
+            return res;
+          });
+          if (cached) { e.waitUntil(fresh.catch(() => {})); return cached; }
+          return fresh.catch(() => caches.match('/'));
+        })
+      );
+      return;
+    }
     e.respondWith(
       fetch(req)
         .then((res) => {
