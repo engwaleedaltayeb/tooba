@@ -104,6 +104,15 @@
     min-height:100%;
     transition:background .5s ease, color .5s ease;
   }
+  body::before{
+    content:'';
+    position:fixed; top:0; left:0; right:0;
+    height:var(--sa-top);
+    background:var(--bg);
+    z-index:40;
+    pointer-events:none;
+    transition:background .5s ease;
+  }
   .wrap{
     overflow-x:clip;
     max-width:680px;
@@ -1327,7 +1336,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.76</div>
+    <div class="about-ver">الإصدار 1.77</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1399,6 +1408,7 @@ if(NATIVE){
   const note = document.getElementById('aboutPushNote');
   if(note) note.textContent = 'التذكير في تطبيق أندرويد يعمل على جهازك مباشرة، ولا نرسل عنه أي بيانات إلى خادمنا.';
 }
+const HAPTICS = NATIVE ? nativePlugin('Haptics') : null;
 function nativeBars(active){
   if(!NATIVE) return;
   try{ const sb = nativePlugin('SystemBars'); if(sb) sb.setStyle({ style: active === 'dark' ? 'DARK' : 'LIGHT' }); }catch(e){}
@@ -1612,6 +1622,11 @@ let hapticLabel = null;
 function haptic(kind, force){
   if(!hapticOn && !force) return;
   try{
+    if(NATIVE && HAPTICS){
+      const p = kind === 'done' ? HAPTICS.notification({ type:'SUCCESS' }) : HAPTICS.impact({ style:'LIGHT' });
+      if(p && p.catch) p.catch(() => { try{ if(navigator.vibrate) navigator.vibrate(kind === 'done' ? [12, 45, 22] : 8); }catch(e){} });
+      return;
+    }
     if(navigator.vibrate){
       navigator.vibrate(kind === 'done' ? [12, 45, 22] : 8);
       return;
