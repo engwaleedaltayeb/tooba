@@ -1229,10 +1229,28 @@
   .rrow input[type=time]:focus{ border-color:var(--accent-tasbeeh); }
   .rrow.off input[type=time]{ opacity:.4; }
   #zOverlay .sheet{ position:relative; }
-  .zd-draw{ stroke-dasharray:100; stroke-dashoffset:100; }
-  .r-done.show .zd-draw{ animation:zdDraw .45s ease .3s both; }
-  @keyframes zdDraw{ to{ stroke-dashoffset:0; } }
-  @media (prefers-reduced-motion: reduce){ .r-done.show .zd-draw{ animation:none !important; stroke-dashoffset:0; } }
+  .zd-icon .zd-logo, .zd-icon .zd-ring{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .zd-logo{ transform-origin:50% 50%; }
+  .zd-p{ transform-origin:168.21px 168.21px; fill:currentColor; opacity:0; }
+  .zd-circle, .zd-check{ stroke-dasharray:100; stroke-dashoffset:100; opacity:0; }
+  .zd-ring{ transform-origin:50% 50%; }
+  #zDone.show .zd-p{ animation:zdPetal .45s cubic-bezier(.2,.9,.3,1.25) both; }
+  #zDone.show .zd-p.p1{ animation-delay:.15s; } #zDone.show .zd-p.p2{ animation-delay:.2s; } #zDone.show .zd-p.p3{ animation-delay:.25s; }
+  #zDone.show .zd-p.p4{ animation-delay:.3s; } #zDone.show .zd-p.p5{ animation-delay:.35s; }
+  #zDone.show .zd-logo{ animation:zdOut .3s ease .8s forwards; }
+  #zDone.show .zd-circle{ animation:zdDraw .4s ease .8s forwards; }
+  #zDone.show .zd-check{ animation:zdDraw .35s ease 1.05s forwards; }
+  #zDone.show .zd-ring{ animation:zdPop .35s ease 1.35s; }
+  #zDone.show .rd-text{ animation:rdText .4s ease 1.1s both; }
+  @keyframes zdPetal{ 0%{ opacity:0; transform:rotate(-110deg) scale(0); } 60%{ opacity:1; } 100%{ opacity:1; transform:rotate(0) scale(1); } }
+  @keyframes zdOut{ 0%{ opacity:1; transform:scale(1); } 100%{ opacity:0; transform:scale(.55); } }
+  @keyframes zdDraw{ 0%{ opacity:1; stroke-dashoffset:100; } 100%{ opacity:1; stroke-dashoffset:0; } }
+  @keyframes zdPop{ 0%{ transform:scale(1); } 45%{ transform:scale(1.12); } 100%{ transform:scale(1); } }
+  @media (prefers-reduced-motion: reduce){
+    #zDone.show .zd-logo, #zDone.show .zd-p, #zDone.show .zd-circle, #zDone.show .zd-check, #zDone.show .zd-ring, #zDone.show .rd-text{ animation:none !important; }
+    .zd-logo{ display:none; }
+    .zd-circle, .zd-check{ opacity:1; stroke-dashoffset:0; }
+  }
   #rPush:disabled{ opacity:.6; }
   #rPush[hidden]{ display:none; }
 </style>
@@ -1341,7 +1359,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.78</div>
+    <div class="about-ver">الإصدار 1.80</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1373,7 +1391,7 @@
     <div class="zscope" id="zScope"><button type="button" data-m="morning">الصباح</button><button type="button" data-m="evening">المساء</button><button type="button" data-m="both">كلاهما</button></div>
     <button class="sheet-close" id="zSave">حفظ</button>
     <button class="done-btn wird-del" id="zDel" hidden><span id="zDelLabel">حذف الذكر أو الدعاء</span></button>
-    <div class="r-done" id="zDone" aria-hidden="true"><span class="rt-icon"><svg class="rt-bellwrap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path class="zd-draw" pathLength="100" d="M7.6 12.6l3 3 5.8-6.4"/></svg></span><div class="rd-text" id="zDoneText"></div></div>
+    <div class="r-done" id="zDone" aria-hidden="true"><span class="rt-icon zd-icon"><svg class="zd-logo" viewBox="0 0 336.42 336.42"><path class="zd-p p1" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path class="zd-p p2" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path class="zd-p p3" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path class="zd-p p4" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path class="zd-p p5" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><svg class="zd-ring" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle class="zd-circle" cx="12" cy="12" r="9.5" pathLength="100"/><path class="zd-check" pathLength="100" d="M7.6 12.6l3 3 5.8-6.4"/></svg></span><div class="rd-text" id="zDoneText"></div></div>
   </div>
 </div>
 
@@ -2461,7 +2479,8 @@ function syncZScope(){
   zScope.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.m === zScopeVal));
 }
 function openZikrSheet(id){
-  clearTimeout(zDoneT); zDone.classList.remove('show'); zOverlay.querySelector('.sheet').style.overflowY = 'auto';
+  clearTimeout(zDoneT); zDoneFinish = null; zDone.classList.remove('show');
+  { const zs = zOverlay.querySelector('.sheet'); zs.style.overflowY = 'auto'; zs.style.height = ''; zs.style.transition = ''; }
   editingZ = id || null;
   const z = id ? customAdhkar.find(x => x.id === id) : null;
   document.getElementById('zSheetTitle').textContent = z ? 'تعديل الذكر أو الدعاء' : 'إضافة ذكر أو دعاء خاص';
@@ -2477,20 +2496,33 @@ function openZikrSheet(id){
 }
 function closeZikrSheet(){ zOverlay.classList.remove('open'); zTextEl.blur(); zCountEl.blur(); }
 const zDone = document.getElementById('zDone');
-let zDoneT = null;
-// رسالة كبيرة داخل النافذة بعد الإضافة، ثم تُقفل النافذة
+let zDoneT = null, zDoneFinish = null, zDoneAt = 0;
+// رسالة كبيرة داخل النافذة بعد الإضافة: النافذة تصغر لحجم نافذة التذكير، واللوجو يلف ويتحول لعلامة صح
 function showZikrDone(text, after){
   const sheet = zOverlay.querySelector('.sheet');
+  const rs = document.getElementById('rOverlay').querySelector('.sheet');
+  const from = sheet.offsetHeight;
+  const to = Math.min(from, (rs && rs.offsetHeight) || 380);
   sheet.scrollTop = 0; sheet.style.overflowY = 'hidden';
+  sheet.style.height = from + 'px';
+  void sheet.offsetHeight;
+  sheet.style.transition = 'transform .35s cubic-bezier(.65,0,.35,1), height .4s cubic-bezier(.65,0,.35,1)';
+  sheet.style.height = to + 'px';
   document.getElementById('zDoneText').textContent = text;
   zDone.classList.remove('show'); void zDone.offsetWidth; zDone.classList.add('show');
   clearTimeout(zDoneT);
-  zDoneT = setTimeout(() => {
+  zDoneAt = Date.now();
+  const finish = () => {
+    if(zDoneFinish !== finish) return;
+    zDoneFinish = null; clearTimeout(zDoneT);
     closeZikrSheet();
     if(after) after();
-    setTimeout(() => { zDone.classList.remove('show'); sheet.style.overflowY = 'auto'; }, 450);
-  }, 1500);
+    setTimeout(() => { zDone.classList.remove('show'); sheet.style.overflowY = 'auto'; sheet.style.height = ''; sheet.style.transition = ''; }, 450);
+  };
+  zDoneFinish = finish;
+  zDoneT = setTimeout(finish, 2000);
 }
+zDone.addEventListener('click', () => { if(zDoneFinish && Date.now() - zDoneAt > 600) zDoneFinish(); });
 document.addEventListener('click', (e) => {
   const addZikrBtn = e.target.closest && e.target.closest('#addZikrBtn');
   if(!addZikrBtn || mode === 'tasbeeh') return;
