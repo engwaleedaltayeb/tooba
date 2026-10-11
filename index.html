@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" translate="no">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="google" content="notranslate">
 <title>أذكار الصباح والمساء — طوبى</title>
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" id="themeMeta" content="#fbfbfa">
@@ -56,9 +57,13 @@
     --accent-tasbeeh:#15ce57;
     --bell-on:#0d9a43;
     --accent: var(--accent-morning);
+    --sa-top:max(env(safe-area-inset-top,0px), var(--safe-area-inset-top,0px));
+    --sa-bottom:max(env(safe-area-inset-bottom,0px), var(--safe-area-inset-bottom,0px));
+    --sa-left:max(env(safe-area-inset-left,0px), var(--safe-area-inset-left,0px));
+    --sa-right:max(env(safe-area-inset-right,0px), var(--safe-area-inset-right,0px));
     box-sizing:border-box;
-    padding-top: env(safe-area-inset-top,0px);
-    padding-bottom: env(safe-area-inset-bottom,0px);
+    padding-top: var(--sa-top);
+    padding-bottom: var(--sa-bottom);
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
@@ -170,7 +175,7 @@
 
   .progress{
     position:sticky;
-    top:env(safe-area-inset-top,0px);
+    top:var(--sa-top);
     z-index:10;
     text-align:center;
     color:var(--text-dim);
@@ -611,7 +616,7 @@
     --ta:var(--accent-text);
     position:fixed;
     left:50%;
-    bottom:calc(env(safe-area-inset-bottom,0px) + 20px);
+    bottom:calc(var(--sa-bottom) + 20px);
     transform:translate(-50%, 160%);
     opacity:0;
     pointer-events:none;
@@ -683,8 +688,8 @@
   }
   .reset-btn{
     position:fixed;
-    top:calc(env(safe-area-inset-top,0px) + 14px);
-    left:calc(env(safe-area-inset-left,0px) + 20px);
+    top:calc(var(--sa-top) + 14px);
+    left:calc(var(--sa-left) + 20px);
     z-index:50;
     width:34px; height:34px;
     border-radius:50%;
@@ -702,8 +707,8 @@
   .reset-btn:active{ transform:scale(0.9) rotate(-45deg); }
   .theme-toggle{
     position:fixed;
-    top:calc(env(safe-area-inset-top,0px) + 14px);
-    right:calc(env(safe-area-inset-right,0px) + 20px);
+    top:calc(var(--sa-top) + 14px);
+    right:calc(var(--sa-right) + 20px);
     z-index:50;
     width:34px; height:34px;
     border-radius:50%;
@@ -760,7 +765,7 @@
     max-width:520px;
     background:var(--surface);
     border-radius:24px 24px 0 0;
-    padding:14px 26px calc(28px + env(safe-area-inset-bottom,0px));
+    padding:14px 26px calc(28px + var(--sa-bottom));
     transform:translateY(100%);
     transition:transform .35s cubic-bezier(.65,0,.35,1);
     box-shadow:0 -4px 24px var(--shadow);
@@ -869,7 +874,7 @@
   body[data-mode="tasbeeh"] #focusBtn{ display:flex; }
   body.focus[data-mode="tasbeeh"] #focusBtn{
     position:fixed;
-    top:calc(env(safe-area-inset-top,0px) + 14px);
+    top:calc(var(--sa-top) + 14px);
     left:50%; margin-left:-17px;
     width:34px; height:34px; padding:0;
     border-radius:50%;
@@ -1065,7 +1070,7 @@
   .about-share{ width:100%; height:auto; min-height:50px; padding:10px 18px; margin:4px 0 6px; color:var(--accent-text); line-height:1.5; text-align:center; }
   .battery-toast{
     position:fixed;
-    top:calc(env(safe-area-inset-top,0px) + 58px);
+    top:calc(var(--sa-top) + 58px);
     left:50%;
     z-index:70;
     padding:10px 18px;
@@ -1313,16 +1318,16 @@
     <div class="about-text">
       <p>طوبى تطبيق بسيط لأذكار الصباح والمساء، مع عدّاد لكل ذكر، وفضله وسنده، وسبحة وأوراد يومية.</p>
       <p>تقدّمك وسبحتك محفوظان على جهازك فقط، بلا حسابات.</p>
-      <p>عند تفعيل التذكير نحفظ على خادمنا بيانات تقنية فقط (رمز الجهاز وأوقات التذكير والمنطقة الزمنية)، بلا اسم ولا بريد.</p>
+      <p id="aboutPushNote">عند تفعيل التذكير نحفظ على خادمنا بيانات تقنية فقط (رمز الجهاز وأوقات التذكير والمنطقة الزمنية)، بلا اسم ولا بريد.</p>
       <p>التطبيق مجاني، نسأل الله أن يتقبّله ويجعله خالصًا لوجهه الكريم.</p>
       <p>للملاحظات أو التبليغ عن خطأ في نص أو سند:<br><a class="about-mail" href="mailto:tooba.app.support@gmail.com">tooba.app.support@gmail.com</a></p>
-      <p><a class="about-priv" href="/privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a></p>
+      <p><a class="about-priv" href="https://toobaapp.com/privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a></p>
     </div>
     <button class="done-btn about-share" id="aboutShare">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.74</div>
+    <div class="about-ver">الإصدار 1.76</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1382,6 +1387,22 @@
 </div>
 
 <script>
+// ---------- تطبيق أندرويد الأصلي (Capacitor): على الموقع كل هذا يتخطّى ----------
+const NATIVE = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform());
+function nativePlugin(name){
+  try{ return (window.Capacitor.Plugins && window.Capacitor.Plugins[name]) || window.Capacitor.registerPlugin(name); }catch(e){ return null; }
+}
+if(NATIVE){
+  // WebView لا يدعم navigator.share، فنوجّهها لنافذة المشاركة الأصلية
+  const SharePlugin = nativePlugin('Share');
+  if(SharePlugin) navigator.share = (d) => SharePlugin.share({ title:d.title, text:d.text, url:d.url, dialogTitle:'مشاركة' });
+  const note = document.getElementById('aboutPushNote');
+  if(note) note.textContent = 'التذكير في تطبيق أندرويد يعمل على جهازك مباشرة، ولا نرسل عنه أي بيانات إلى خادمنا.';
+}
+function nativeBars(active){
+  if(!NATIVE) return;
+  try{ const sb = nativePlugin('SystemBars'); if(sb) sb.setStyle({ style: active === 'dark' ? 'DARK' : 'LIGHT' }); }catch(e){}
+}
 const data = {
   morning: [
     {text:"اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ", count:1, note:"آية الكرسي"},
@@ -2574,6 +2595,7 @@ function applyThemeIcon(){
   fresh.id = 'themeMeta';
   fresh.content = c;
   old.replaceWith(fresh);
+  nativeBars(active);
 }
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyThemeIcon);
 (function initTheme(){
@@ -2617,6 +2639,7 @@ window.addEventListener('scroll', () => {
 const installBtn = document.getElementById('installBtn');
 // داخل تطبيق جوجل بلاي (TWA) أو الشاشة الرئيسية: لا حاجة لزر التثبيت
 function isInstalledApp(){
+  if(NATIVE) return true;
   try{ if(document.referrer && document.referrer.indexOf('android-app://') === 0) sessionStorage.setItem('tooba-app', '1'); }catch(e){}
   let flag = false;
   try{ flag = sessionStorage.getItem('tooba-app') === '1'; }catch(e){}
@@ -2738,7 +2761,48 @@ function setRStatus(t){ rStatus.hidden = !t; rStatus.textContent = t || ''; }
 function isStandalone(){
   return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
 }
+const LN = NATIVE ? nativePlugin('LocalNotifications') : null;
+const LN_CHANNEL = 'adhkar-reminders';
+async function nativePerm(){ try{ return (await LN.checkPermissions()).display; }catch(e){ return 'denied'; } }
+async function nativeOn(){
+  try{
+    if(await nativePerm() !== 'granted') return false;
+    const p = await LN.getPending();
+    return !!(p.notifications && p.notifications.length);
+  }catch(e){ return false; }
+}
+async function nativeCancel(){ try{ await LN.cancel({ notifications:[{ id:1 }, { id:2 }] }); }catch(e){} }
+async function nativeSchedule(cfg){
+  let perm = await nativePerm();
+  if(perm !== 'granted'){ perm = (await LN.requestPermissions()).display; }
+  if(perm !== 'granted') throw new Error('denied');
+  try{ await LN.createChannel({ id:LN_CHANNEL, name:'تذكير الأذكار', description:'تذكير بأوقات أذكار الصباح والمساء', importance:4, visibility:1, vibration:true }); }catch(e){}
+  await nativeCancel();
+  const list = [];
+  const add = (id, kind, hm) => {
+    const parts = String(hm).split(':');
+    list.push({
+      id, channelId:LN_CHANNEL,
+      title: kind === 'morning' ? 'أذكار الصباح' : 'أذكار المساء',
+      body: kind === 'morning' ? 'حان وقت أذكار الصباح، اضغط للبدء.' : 'حان وقت أذكار المساء، اضغط للبدء.',
+      schedule:{ on:{ hour:parseInt(parts[0], 10), minute:parseInt(parts[1], 10) }, allowWhileIdle:true },
+      extra:{ m:kind }
+    });
+  };
+  if(cfg.mOn) add(1, 'morning', cfg.m);
+  if(cfg.eOn) add(2, 'evening', cfg.e);
+  if(list.length) await LN.schedule({ notifications:list });
+}
+if(NATIVE && LN){
+  try{
+    LN.addListener('localNotificationActionPerformed', (ev) => {
+      const m = ev && ev.notification && ev.notification.extra && ev.notification.extra.m;
+      if(m === 'morning' || m === 'evening'){ hideUndo(); unlockScrollHeight(); mode = m; render(); }
+    });
+  }catch(e){}
+}
 function pushSupport(){
+  if(NATIVE) return LN ? 'ok' : 'none';
   if(isIOS && !isStandalone()) return 'ios-install';
   if(!SW_OK || !('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return 'none';
   return 'ok';
@@ -2802,6 +2866,7 @@ function syncBody(sub, cfg){
   return { endpoint:sub.endpoint, m:cfg.mOn ? cfg.m : null, e:cfg.eOn ? cfg.e : null, tz:Intl.DateTimeFormat().resolvedOptions().timeZone };
 }
 async function enablePush(cfg){
+  if(NATIVE) return nativeSchedule(cfg);
   const reg = await navigator.serviceWorker.ready;
   if(Notification.permission === 'denied') throw new Error('denied');
   const perm = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
@@ -2814,6 +2879,7 @@ async function enablePush(cfg){
   await postJSON('/api/subscribe', syncBody(sub, cfg));
 }
 async function disablePush(){
+  if(NATIVE){ await nativeCancel(); return; }
   const sub = await getPushSub();
   if(!sub) return;
   try{ await postJSON('/api/unsubscribe', { endpoint:sub.endpoint }); }catch(e){}
@@ -2836,13 +2902,13 @@ async function openRemind(){
     document.getElementById('ruTitle').textContent = 'الإشعارات غير متاحة';
     document.getElementById('ruText').textContent = 'هذا المتصفح لا يدعم إشعارات التذكير. جرّب فتح طوبى من متصفح آخر.';
   } else {
-    const sub = await getPushSub();
-    const on = !!sub && Notification.permission === 'granted';
+    const on = NATIVE ? await nativeOn() : (!!(await getPushSub()) && Notification.permission === 'granted');
+    const denied = NATIVE ? (await nativePerm()) === 'denied' : Notification.permission === 'denied';
     setPushFlag(on);
     rPush.textContent = on ? 'حفظ الأوقات' : 'تفعيل التذكير بالإشعارات';
     rOff.hidden = !on;
     if(on) setRStatus('التذكير مفعّل على هذا الجهاز.');
-    else if(Notification.permission === 'denied') setRStatus('الإشعارات محظورة لهذا الموقع. فعّلها من إعدادات المتصفح ثم أعد المحاولة.');
+    else if(denied) setRStatus(NATIVE ? 'الإشعارات محظورة للتطبيق. فعّلها من إعدادات الجوال ← التطبيقات ← طوبى ← الإشعارات ثم أعد المحاولة.' : 'الإشعارات محظورة لهذا الموقع. فعّلها من إعدادات المتصفح ثم أعد المحاولة.');
   }
 }
 document.getElementById('bellBtn').addEventListener('click', () => { haptic('tap'); openRemind(); });
@@ -2861,7 +2927,7 @@ rPush.addEventListener('click', async () => {
     haptic('done');
     showRemindDone('تم حفظ الأوقات وتفعيل الإشعارات');
   }catch(err){
-    if(err && err.message === 'denied') setRStatus('لم يتم السماح بالإشعارات. فعّلها من إعدادات المتصفح ثم أعد المحاولة.');
+    if(err && err.message === 'denied') setRStatus(NATIVE ? 'لم يتم السماح بالإشعارات. فعّلها من إعدادات الجوال ← التطبيقات ← طوبى ← الإشعارات ثم أعد المحاولة.' : 'لم يتم السماح بالإشعارات. فعّلها من إعدادات المتصفح ثم أعد المحاولة.');
     else setRStatus('تعذّر تفعيل التذكير الآن، حاول لاحقًا.');
   }finally{ rPush.disabled = false; }
 });
@@ -2880,6 +2946,7 @@ rOff.addEventListener('click', async () => {
 // مزامنة هادئة مرة يوميًا (لو تغيّرت المنطقة الزمنية أو رمز الاشتراك)
 (async function resyncPush(){
   try{
+    if(NATIVE) return;
     if(localStorage.getItem('tooba-push') !== '1' || pushSupport() !== 'ok' || Notification.permission !== 'granted') return;
     if(localStorage.getItem('tooba-push-sync') === new Date().toDateString()) return;
     const sub = await getPushSub();
@@ -2891,11 +2958,12 @@ rOff.addEventListener('click', async () => {
 
 // تفعيل تلقائي: الصباح 5 ص والمساء 3 م. المتصفح لا يسمح بطلب إذن الإشعارات إلا بعد لمسة من المستخدم،
 // فإن كان الإذن ممنوحًا مسبقًا يتفعّل بصمت، وإلا نطلبه عند أول لمسة (مرة واحدة فقط على كل جهاز).
-(function autoPush(){
+(async function autoPush(){
   try{
     if(pushSupport() !== 'ok') return;
     if(localStorage.getItem(PUSH_OFF_KEY) === '1') return;
-    if(Notification.permission === 'denied'){ setPushFlag(false); return; }
+    const perm = NATIVE ? ({ granted:'granted', denied:'denied' }[await nativePerm()] || 'default') : Notification.permission;
+    if(perm === 'denied'){ setPushFlag(false); return; }
     async function go(){
       try{
         await enablePush(remindCfg);
@@ -2905,7 +2973,7 @@ rOff.addEventListener('click', async () => {
         if(!was) showRemindToast('تم تفعيل إشعارات الأذكار');
       }catch(e){ setPushFlag(false); }
     }
-    if(Notification.permission === 'granted'){
+    if(perm === 'granted'){
       if(!pushFlag()) go();
       return;
     }
