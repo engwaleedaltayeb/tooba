@@ -1350,7 +1350,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.81</div>
+    <div class="about-ver">الإصدار 1.82</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1821,6 +1821,7 @@ let focusPushed = false;
 const OV_IDS = ['aboutOverlay','wirdOverlay','zOverlay','rOverlay','sheetOverlay'];
 const ovStack = [];
 let ovIgnore = 0;
+let ovNativeBack = false;
 function ovClose(o){
   if(o.id === 'wirdOverlay') closeWirdSheet();
   else if(o.id === 'zOverlay'){ if(zDoneFinish) zDoneFinish(); else closeZikrSheet(); }
@@ -1831,12 +1832,17 @@ const ovObserver = new MutationObserver((list) => {
     const open = o.classList.contains('open');
     if(open && !o._hist){
       o._hist = true; ovStack.push(o);
-      try{ history.pushState({ toobaOv:o.id }, ''); }catch(e){ o._hist = false; ovStack.pop(); }
+      if(!ovNativeBack){
+        try{ history.pushState({ toobaOv:o.id }, ''); o._hpush = true; }catch(e){ o._hpush = false; }
+      }
     } else if(!open && o._hist){
       o._hist = false;
       const i = ovStack.indexOf(o); if(i > -1) ovStack.splice(i, 1);
-      ovIgnore++;
-      try{ history.back(); }catch(e){ ovIgnore--; }
+      if(o._hpush){
+        o._hpush = false;
+        ovIgnore++;
+        try{ history.back(); }catch(e){ ovIgnore--; }
+      }
     }
   });
 });
@@ -1845,7 +1851,7 @@ window.addEventListener('popstate', () => {
   if(ovIgnore > 0){ ovIgnore--; return; }
   if(ovStack.length){
     const o = ovStack.pop();
-    o._hist = false;
+    o._hist = false; o._hpush = false;
     ovClose(o);
     return;
   }
@@ -1855,6 +1861,24 @@ window.addEventListener('popstate', () => {
     exitFS();
   }
 });
+// تطبيق أندرويد (Capacitor): زر الرجوع يُعالَج برمجيًا عبر @capacitor/app بدل تاريخ الـ WebView
+if(NATIVE){
+  try{
+    const AppP = nativePlugin('App');
+    const reg = AppP.addListener('backButton', () => {
+      if(ovStack.length){
+        const o = ovStack.pop();
+        o._hist = false;
+        if(o._hpush){ o._hpush = false; ovIgnore++; try{ history.back(); }catch(e){ ovIgnore--; } }
+        ovClose(o);
+        return;
+      }
+      if(body.classList.contains('focus')){ setFocus(false); exitFS(); return; }
+      try{ AppP.exitApp(); }catch(e){}
+    });
+    if(reg && reg.then) reg.then(() => { ovNativeBack = true; }).catch(() => {});
+  }catch(e){}
+}
 focusBtn.addEventListener('click', () => {
   const on = !body.classList.contains('focus');
   setFocus(on);
