@@ -1228,18 +1228,18 @@
   }
   .rrow input[type=time]:focus{ border-color:var(--accent-tasbeeh); }
   .rrow.off input[type=time]{ opacity:.4; }
-  #zOverlay .sheet{ position:relative; }
+  #zOverlay .sheet, #wirdOverlay .sheet{ position:relative; }
   .zd-icon .zd-ring{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
   .zd-circle, .zd-check{ stroke-dasharray:100; stroke-dashoffset:100; opacity:0; }
   .zd-ring{ transform-origin:50% 50%; }
-  #zDone.show .zd-circle{ animation:zdDraw .4s ease .1s forwards; }
-  #zDone.show .zd-check{ animation:zdDraw .3s ease .45s forwards; }
-  #zDone.show .zd-ring{ animation:zdPop .35s ease .75s; }
-  #zDone.show .rd-text{ animation:rdText .35s ease .5s both; }
+  :is(#zDone,#wDone).show .zd-circle{ animation:zdDraw .4s ease .1s forwards; }
+  :is(#zDone,#wDone).show .zd-check{ animation:zdDraw .3s ease .45s forwards; }
+  :is(#zDone,#wDone).show .zd-ring{ animation:zdPop .35s ease .75s; }
+  :is(#zDone,#wDone).show .rd-text{ animation:rdText .35s ease .5s both; }
   @keyframes zdDraw{ 0%{ opacity:1; stroke-dashoffset:100; } 100%{ opacity:1; stroke-dashoffset:0; } }
   @keyframes zdPop{ 0%{ transform:scale(1); } 45%{ transform:scale(1.12); } 100%{ transform:scale(1); } }
   @media (prefers-reduced-motion: reduce){
-    #zDone.show .zd-circle, #zDone.show .zd-check, #zDone.show .zd-ring, #zDone.show .rd-text{ animation:none !important; }
+    :is(#zDone,#wDone).show .zd-circle, :is(#zDone,#wDone).show .zd-check, :is(#zDone,#wDone).show .zd-ring, :is(#zDone,#wDone).show .rd-text{ animation:none !important; }
     .zd-circle, .zd-check{ opacity:1; stroke-dashoffset:0; }
   }
   #rPush:disabled{ opacity:.6; }
@@ -1264,8 +1264,8 @@
     <button class="install-btn" id="installBtn">
       <span class="install-icon">⬇︎</span> ثبت التطبيق
     </button>
-    <button class="install-btn" id="siteShareBtn" aria-label="اجعله صدقة جارية عنك وعن أحبابك">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg><span id="siteShareLabel">اجعله صدقة جارية عنك وعن أحبابك</span>
+    <button class="install-btn" id="siteShareBtn" aria-label="صَدَقَةٌ جَارِيَةٌ لَكَ وَلِوَالِدَيْكَ">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg><span id="siteShareLabel">صَدَقَةٌ جَارِيَةٌ لَكَ وَلِوَالِدَيْكَ</span>
     </button>
   </div>
 
@@ -1350,7 +1350,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.82</div>
+    <div class="about-ver">الإصدار 1.84</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1366,6 +1366,7 @@
     <label class="field"><span>أو أدخل عددًا آخر</span><input id="wirdTarget" type="text" inputmode="numeric" autocomplete="off" value="100"></label>
     <button class="sheet-close" id="wirdSave">حفظ</button>
     <button class="done-btn wird-del" id="wirdDel" hidden><span id="wirdDelLabel">حذف الورد</span></button>
+    <div class="r-done" id="wDone" aria-hidden="true"><span class="rt-icon zd-icon"><svg class="zd-ring" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle class="zd-circle" cx="12" cy="12" r="9.5" pathLength="100"/><path class="zd-check" pathLength="100" d="M7.6 12.6l3 3 5.8-6.4"/></svg></span><div class="rd-text" id="wDoneText"></div></div>
   </div>
 </div>
 
@@ -1423,6 +1424,8 @@ if(NATIVE){
   const note = document.getElementById('aboutPushNote');
   if(note) note.textContent = 'التذكير في تطبيق أندرويد يعمل على جهازك مباشرة، ولا نرسل عنه أي بيانات إلى خادمنا.';
 }
+// وسم لتمييز مستخدمي التطبيق عن الموقع في Clarity (Filters ← Custom tags ← platform)
+try{ if(window.clarity) window.clarity('set', 'platform', NATIVE ? 'android-app' : 'web'); }catch(e){}
 const HAPTICS = NATIVE ? nativePlugin('Haptics') : null;
 function nativeBars(active){
   if(!NATIVE) return;
@@ -1823,7 +1826,7 @@ const ovStack = [];
 let ovIgnore = 0;
 let ovNativeBack = false;
 function ovClose(o){
-  if(o.id === 'wirdOverlay') closeWirdSheet();
+  if(o.id === 'wirdOverlay'){ if(wDoneFinish) wDoneFinish(); else closeWirdSheet(); }
   else if(o.id === 'zOverlay'){ if(zDoneFinish) zDoneFinish(); else closeZikrSheet(); }
   o.classList.remove('open');
 }
@@ -2043,8 +2046,37 @@ const wirdNameEl = document.getElementById('wirdName');
 const wirdTargetEl = document.getElementById('wirdTarget');
 const wirdDelBtn = document.getElementById('wirdDel');
 let editingWird = null, delArmed = false;
+const wDone = document.getElementById('wDone');
+let wDoneT = null, wDoneFinish = null, wDoneAt = 0;
+// رسالة نجاح داخل نافذة الورد بعد الإضافة: علامة صح متحركة فقط
+function showWirdDone(text){
+  const sheet = wirdOverlay.querySelector('.sheet');
+  const rs = document.getElementById('rOverlay').querySelector('.sheet');
+  const from = sheet.offsetHeight;
+  const to = Math.min(from, (rs && rs.offsetHeight) || 380);
+  sheet.scrollTop = 0; sheet.style.overflowY = 'hidden';
+  sheet.style.height = from + 'px';
+  void sheet.offsetHeight;
+  sheet.style.transition = 'transform .35s cubic-bezier(.65,0,.35,1), height .4s cubic-bezier(.65,0,.35,1)';
+  sheet.style.height = to + 'px';
+  document.getElementById('wDoneText').textContent = text;
+  wDone.classList.remove('show'); void wDone.offsetWidth; wDone.classList.add('show');
+  clearTimeout(wDoneT);
+  wDoneAt = Date.now();
+  const finish = () => {
+    if(wDoneFinish !== finish) return;
+    wDoneFinish = null; clearTimeout(wDoneT);
+    closeWirdSheet();
+    setTimeout(() => { wDone.classList.remove('show'); sheet.style.overflowY = ''; sheet.style.height = ''; sheet.style.transition = ''; }, 450);
+  };
+  wDoneFinish = finish;
+  wDoneT = setTimeout(finish, 1500);
+}
+wDone.addEventListener('click', () => { if(wDoneFinish && Date.now() - wDoneAt > 400) wDoneFinish(); });
 function toLatinDigits(t){ return String(t).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)); }
 function openWirdSheet(id){
+  clearTimeout(wDoneT); wDoneFinish = null; wDone.classList.remove('show');
+  { const ws = wirdOverlay.querySelector('.sheet'); ws.style.overflowY = ''; ws.style.height = ''; ws.style.transition = ''; }
   editingWird = id || null;
   const w = id ? allWirds().find(x => x.id === id) : null;
   const core = !!(w && !w.custom);
@@ -2087,6 +2119,7 @@ document.getElementById('wirdSave').addEventListener('click', () => {
   let target = parseInt(toLatinDigits(wirdTargetEl.value), 10);
   if(!(target > 0)) target = 100;
   target = Math.min(target, 10000);
+  let added = false;
   if(core){
     coreW.target = target;
     if(target === coreW.def) delete wirdTargets[coreW.id]; else wirdTargets[coreW.id] = target;
@@ -2098,8 +2131,15 @@ document.getElementById('wirdSave').addEventListener('click', () => {
     const nid = 'c' + Date.now().toString(36);
     customWirds.push({ id:nid, name, target, custom:true });
     selWird = nid;
+    added = true;
   }
   if(!core) saveCustom();
+  if(added){
+    if(mode === 'tasbeeh') render();
+    haptic('done');
+    showWirdDone('تمت إضافة الورد بنجاح');
+    return;
+  }
   closeWirdSheet();
   if(mode === 'tasbeeh') render();
 });
@@ -2745,7 +2785,7 @@ siteShareBtn.addEventListener('click', async () => {
     } else {
       await navigator.clipboard.writeText('أذكار الصباح والمساء\n' + url);
       siteShareLabel.textContent = 'تم النسخ ✓';
-      setTimeout(() => siteShareLabel.textContent = 'اجعله صدقة جارية عنك وعن أحبابك', 1600);
+      setTimeout(() => siteShareLabel.textContent = 'صَدَقَةٌ جَارِيَةٌ لَكَ وَلِوَالِدَيْكَ', 1600);
     }
   }catch(err){ /* المستخدم لغى المشاركة */ }
 });
