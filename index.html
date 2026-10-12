@@ -1244,6 +1244,66 @@
   }
   #rPush:disabled{ opacity:.6; }
   #rPush[hidden]{ display:none; }
+
+  /* بانر نشر التطبيق أسفل الشاشة */
+  .promo{
+    position:fixed; left:0; right:0; bottom:0; z-index:45;
+    display:flex; align-items:center;
+    height:calc(54px + var(--sa-bottom));
+    padding:0 4px var(--sa-bottom) 4px;
+    background:color-mix(in srgb, var(--bg) 82%, transparent);
+    -webkit-backdrop-filter:blur(14px) saturate(160%);
+    backdrop-filter:blur(14px) saturate(160%);
+    border-top:1px solid var(--border);
+    animation:promoIn .5s cubic-bezier(.2,.9,.3,1) both;
+    transition:background .5s ease, transform .35s cubic-bezier(.65,0,.35,1), opacity .3s ease;
+  }
+  @keyframes promoIn{ from{ transform:translateY(100%); } to{ transform:translateY(0); } }
+  .promo.closing{ transform:translateY(100%); opacity:0; pointer-events:none; }
+  /* الصف كله (الاسم + الرسالة + أيقونة الإرسال) مجموعة واحدة في المنتصف، وعرضها يتبع عرض الرسالة */
+  .promo-main{
+    flex:1; min-width:0; height:100%; padding:0 42px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    color:var(--text); cursor:pointer;
+    -webkit-tap-highlight-color:transparent; transition:opacity .15s ease;
+  }
+  .promo-main:active{ opacity:.65; }
+  .promo-brand{ display:flex; align-items:center; gap:6px; flex-shrink:0; }
+  .promo-lead{ font-size:13px; font-weight:500; color:var(--text-dim); white-space:nowrap; }
+  .promo-logo{ width:24px; height:24px; overflow:visible; flex-shrink:0; }
+  .promo-name{ font-size:19px; font-weight:700; line-height:1; white-space:nowrap; }
+  .promo-msg{
+    flex:0 1 auto; min-width:0;
+    font-size:12.5px; line-height:1.4; color:var(--text-dim); text-align:center; text-wrap:balance;
+    transition:opacity .25s ease, width .35s ease;
+  }
+  .promo-msg.out{ opacity:0; }
+  .promo-close{
+    position:absolute; left:4px; top:9px;
+    width:36px; height:36px; border-radius:50%;
+    border:none; background:transparent; color:var(--text-dim);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition:background .2s ease;
+  }
+  .promo-close:active{ background:var(--border); }
+  .promo.inline{
+    position:relative; z-index:auto; height:54px; padding:0 12px;
+    margin:34px 0 6px; border:1px solid var(--border); border-radius:999px;
+    background:var(--surface); -webkit-backdrop-filter:none; backdrop-filter:none;
+    box-shadow:0 1px 2px var(--shadow); animation:promoFade .4s ease both;
+  }
+  .promo.inline .promo-close{ display:none; }
+  .promo.inline .promo-main{ padding:0; }
+  @keyframes promoFade{ from{ opacity:0; } to{ opacity:1; } }
+  body.has-banner .wrap{ padding-bottom:calc(100px + 54px); }
+  body.has-banner .undo-toast{ bottom:calc(var(--sa-bottom) + 68px); }
+  body.focus .promo{ display:none; }
+  @media (max-width:380px){
+    .promo-lead{ font-size:12px; }
+    .promo-name{ font-size:18px; }
+    .promo-msg{ font-size:12px; line-height:1.3; }
+  }
+  @media (prefers-reduced-motion: reduce){ .promo{ animation:none; } }
 </style>
 <!-- Microsoft Clarity -->
 <script type="text/javascript">
@@ -1263,9 +1323,6 @@
   <div class="top-actions">
     <button class="install-btn" id="installBtn">
       <span class="install-icon">⬇︎</span> ثبت التطبيق
-    </button>
-    <button class="install-btn" id="siteShareBtn" aria-label="صَدَقَةٌ جَارِيَةٌ لَكَ وَلِوَالِدَيْكَ">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg><span id="siteShareLabel">صَدَقَةٌ جَارِيَةٌ لَكَ وَلِوَالِدَيْكَ</span>
     </button>
   </div>
 
@@ -1318,6 +1375,14 @@
   <div class="about-wrap"><button class="about-link" id="aboutBtn">عن طوبى</button></div>
 </div>
 
+<div class="promo" id="promo" role="complementary" aria-label="انشر طوبى">
+  <div class="promo-main" id="promoMain" role="button" tabindex="0" aria-label="شارك طوبى">
+    <span class="promo-brand"><span class="promo-lead">انشر تطبيق</span><svg class="promo-logo" viewBox="0 0 336.42 336.42" aria-hidden="true"><path fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><span class="promo-name">طوبى</span></span>
+    <span class="promo-msg" id="promoMsg"></span>
+  </div>
+  <button class="promo-close" id="promoClose" type="button" aria-label="إغلاق"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg></button>
+</div>
+
 <div class="undo-toast" id="undoToast" role="status" aria-live="polite">
   <div class="undo-ring">
     <svg viewBox="0 0 36 36" width="34" height="34" aria-hidden="true">
@@ -1350,7 +1415,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.84</div>
+    <div class="about-ver">الإصدار 1.92</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -2775,21 +2840,6 @@ themeToggle.addEventListener('click', () => {
   applyThemeIcon();
 });
 
-const siteShareBtn = document.getElementById('siteShareBtn');
-const siteShareLabel = document.getElementById('siteShareLabel');
-siteShareBtn.addEventListener('click', async () => {
-  const url = 'https://toobaapp.com';
-  try{
-    if(navigator.share){
-      await navigator.share({ title:'طوبى — أذكار الصباح والمساء', text:'أذكار الصباح والمساء', url });
-    } else {
-      await navigator.clipboard.writeText('أذكار الصباح والمساء\n' + url);
-      siteShareLabel.textContent = 'تم النسخ ✓';
-      setTimeout(() => siteShareLabel.textContent = 'صَدَقَةٌ جَارِيَةٌ لَكَ وَلِوَالِدَيْكَ', 1600);
-    }
-  }catch(err){ /* المستخدم لغى المشاركة */ }
-});
-
 const progressBar = document.querySelector('.progress');
 window.addEventListener('scroll', () => {
   progressBar.classList.toggle('scrolled', window.scrollY > 10);
@@ -2806,8 +2856,9 @@ function isInstalledApp(){
   return flag || navigator.standalone === true ||
     (window.matchMedia && (window.matchMedia('(display-mode: standalone)').matches || window.matchMedia('(display-mode: minimal-ui)').matches));
 }
-if(isInstalledApp()) installBtn.style.display = 'none';
-window.addEventListener('appinstalled', () => { installBtn.style.display = 'none'; });
+const topActions = document.querySelector('.top-actions');
+if(isInstalledApp()){ installBtn.style.display = 'none'; topActions.style.display = 'none'; }
+window.addEventListener('appinstalled', () => { installBtn.style.display = 'none'; topActions.style.display = 'none'; });
 const sheetOverlay = document.getElementById('sheetOverlay');
 const sheetSteps = document.getElementById('sheetSteps');
 const sheetTitle = document.getElementById('sheetTitle');
@@ -3145,6 +3196,95 @@ rOff.addEventListener('click', async () => {
       go();
     }, true);
   }catch(e){}
+})();
+
+// ---------- بانر نشر التطبيق: ثابت أسفل الشاشة، وعند إخفائه ينتقل لآخر الصفحة مكان التلميح، ويرجع ثابتًا عند فتح التطبيق من جديد ----------
+(function(){
+  const promo = document.getElementById('promo');
+  const msgEl = document.getElementById('promoMsg');
+  const logo = promo.querySelector('.promo-logo');
+  const MSGS = [
+    'بنية الصدقة الجارية عنك وعن أحبائك',
+    'صَدَقَةٌ جَارِيَةٌ لَكَ وَلِوَالِدَيْكَ',
+    'مَنْ دَلَّ عَلَى خَيْرٍ فَلَهُ مِثْلُ أَجْرِ فَاعِلِهِ'
+  ];
+  let i = 0, copied = false, curText = MSGS[0];
+  // عرض الرسالة = أعرض سطر فيها، فيكون عرض المجموعة كلها ديناميكيًا والمسافات ثابتة
+  function measure(){
+    msgEl.style.width = '';
+    const r = document.createRange(); r.selectNodeContents(msgEl);
+    const rs = Array.from(r.getClientRects());
+    if(!rs.length) return 0;
+    return Math.ceil(Math.max.apply(null, rs.map(x => x.right)) - Math.min.apply(null, rs.map(x => x.left))) + 1;
+  }
+  function setText(t, animate){
+    curText = t;
+    const apply = () => {
+      const old = msgEl.getBoundingClientRect().width;
+      msgEl.style.transition = 'none';
+      msgEl.textContent = t;
+      const w = measure();
+      if(animate && old){ msgEl.style.width = old + 'px'; void msgEl.offsetWidth; }
+      msgEl.style.transition = '';
+      if(w) msgEl.style.width = w + 'px';
+      msgEl.classList.remove('out');
+    };
+    if(animate && !reduceMotion){
+      msgEl.classList.add('out');
+      setTimeout(() => { if(curText === t) apply(); }, 260);
+    } else apply();
+  }
+  function refit(){ setText(curText, false); }
+  setText(MSGS[0], false);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
+  let rt = null;
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(refit, 200); });
+  try{ localStorage.removeItem('tooba-promo-off'); }catch(e){}
+  document.body.classList.add('has-banner');
+  function toInline(){
+    promo.classList.remove('closing');
+    promo.classList.add('inline');
+    document.body.classList.remove('has-banner');
+    const hint = document.querySelector('.hint');
+    if(hint && hint.isConnected) hint.replaceWith(promo);
+    else document.querySelector('.wrap').appendChild(promo);
+    requestAnimationFrame(refit);
+  }
+  function spin(){
+    if(reduceMotion || !logo.animate) return;
+    logo.animate([{ transform:'rotate(0deg)' }, { transform:'rotate(360deg)' }], { duration:900, easing:'cubic-bezier(.45,0,.2,1)' });
+  }
+  function next(){
+    if(copied || document.hidden) return;
+    spin();
+    i = (i + 1) % MSGS.length;
+    setText(MSGS[i], true);
+  }
+  setTimeout(spin, 900);
+  setInterval(next, 6000);
+  async function share(){
+    haptic('tap');
+    const url = 'https://toobaapp.com';
+    try{
+      if(navigator.share){
+        await navigator.share({ title:'طوبى — أذكار الصباح والمساء', text:'أذكار الصباح والمساء', url });
+      } else {
+        await navigator.clipboard.writeText('أذكار الصباح والمساء\n' + url);
+        copied = true; setText('تم نسخ الرابط ✓', true);
+        setTimeout(() => { copied = false; setText(MSGS[i], true); }, 1800);
+      }
+    }catch(err){ /* المستخدم لغى المشاركة */ }
+  }
+  const pm = document.getElementById('promoMain');
+  pm.addEventListener('click', share);
+  pm.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); share(); } });
+  // الإخفاء مباشر وبدون تأكيد، ولا يُحفظ: يرجع البانر عند فتح التطبيق من جديد
+  document.getElementById('promoClose').addEventListener('click', () => {
+    haptic('tap');
+    promo.classList.add('closing');
+    document.body.classList.remove('has-banner');
+    setTimeout(toInline, 380);
+  });
 })();
 
 // العمل بدون إنترنت (على الدومين الحقيقي بس)
