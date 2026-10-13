@@ -95,7 +95,9 @@
   :root[data-theme="dark"] body[data-mode="morning"]{ --accent-text:#15ce57; }
   :root[data-theme="dark"] body[data-mode="evening"]{ --accent-text:#8ba0e8; }
   html,body{height:100%;}
-  *{margin:0; box-sizing:border-box;}
+  *{margin:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{ -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; touch-action:manipulation; }
+  input, textarea, .about-text{ -webkit-user-select:text; user-select:text; }
   body{
     background:var(--bg);
     color:var(--text);
@@ -1251,9 +1253,9 @@
     display:flex; align-items:center;
     height:calc(54px + var(--sa-bottom));
     padding:0 4px var(--sa-bottom) 4px;
-    background:color-mix(in srgb, var(--bg) 82%, transparent);
-    -webkit-backdrop-filter:blur(14px) saturate(160%);
-    backdrop-filter:blur(14px) saturate(160%);
+    background:color-mix(in srgb, var(--bg) 50%, transparent);
+    -webkit-backdrop-filter:blur(26px) saturate(190%);
+    backdrop-filter:blur(26px) saturate(190%);
     border-top:1px solid var(--border);
     animation:promoIn .5s cubic-bezier(.2,.9,.3,1) both;
     transition:background .5s ease, transform .35s cubic-bezier(.65,0,.35,1), opacity .3s ease;
@@ -1415,7 +1417,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.92</div>
+    <div class="about-ver">الإصدار 1.93</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1596,6 +1598,7 @@ const btnMorning = document.getElementById('btnMorning');
 const btnEvening = document.getElementById('btnEvening');
 const MODE_TITLES = { morning:'أذكار الصباح', evening:'أذكار المساء', tasbeeh:'السبحة' };
 const MODE_DONE = { morning:'أتممت أذكار الصباح', evening:'أتممت أذكار المساء' };
+const MODE_REMIND_BTN = { morning:'ذكّر أحبابك بأذكار الصباح', evening:'ذكّر أحبابك بأذكار المساء' };
 const MODE_REMIND = { morning:'لا تنسَ أذكار الصباح 🤍 ذكّرتك بها هنا:', evening:'لا تنسَ أذكار المساء 🤍 ذكّرتك بها هنا:' };
 const title = document.getElementById('pageTitle');
 const dateLine = document.getElementById('dateLine');
@@ -1810,7 +1813,7 @@ document.addEventListener('click', (e) => {
   if(mode !== 'tasbeeh') return;
   // composedPath يحفظ مسار الضغطة حتى لو العنصر اتشال من الصفحة أثناء المعالجة (زي أيقونة زر التركيز)
   const path = e.composedPath ? e.composedPath() : [e.target];
-  if(path.some(el => el.matches && el.matches('button, a, .sheet-overlay, .undo-toast, .wsel'))) return;
+  if(path.some(el => el.matches && el.matches('button, a, .sheet-overlay, .undo-toast, .wsel, .promo'))) return;
   const w = selWirdObj();
   if(w){
     const c = wirdCounts[w.id] || 0;
@@ -2368,12 +2371,8 @@ function render(){
       </button>
       <div class="done-actions">
         <button class="done-btn primary" id="remindBtn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-          <span>ذكّر أحبابك وأصدقاءك بالأذكار</span>
-        </button>
-        <button class="done-btn" id="shareSiteBtn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
-          <span>شارك التطبيق صدقة جارية</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" fill-opacity=".16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 3.9L4.1 10c-.9.34-.86 1.58.05 1.86l6.1 2.1 2.1 6.1c.28.9 1.52.94 1.86.05L20.6 3.9z"/><path d="M10.5 13.7l4.4-4.4"/></svg>
+          <span>${MODE_REMIND_BTN[mode]}</span>
         </button>
       </div>
     `;
@@ -2381,7 +2380,6 @@ function render(){
     empty.querySelector('#replayBtn').addEventListener('click', (e) => { haptic('done'); megaCelebrate(e.currentTarget); });
     const remindText = MODE_REMIND[mode];
     empty.querySelector('#remindBtn').addEventListener('click', (e) => shareOrCopy(e.currentTarget, remindText, 'أذكار الصباح والمساء'));
-    empty.querySelector('#shareSiteBtn').addEventListener('click', (e) => shareOrCopy(e.currentTarget, 'أذكار الصباح والمساء', 'أذكار الصباح والمساء'));
   }
   listEl.insertAdjacentHTML('beforeend', '<button class="wird-add" id="addZikrBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span>إضافة ذكر أو دعاء خاص</span></button>');
   updateProgress();
@@ -2463,11 +2461,21 @@ function completeItem(card, index, prevRemaining){
       else drawRing(chip, 1, 0);
     }
   }
+  const nextEl = card.nextElementSibling;
+  const nextKey = (nextEl && nextEl.dataset) ? nextEl.dataset.index : undefined;
   setTimeout(() => slideOut(card, () => {
     render();
     if(listEl.querySelector('.all-done')){
       unlockScrollHeight();
       window.scrollTo({ top:0, behavior:'smooth' });
+    } else if(nextKey != null){
+      // الذكر التالي يطلع لتحت الهيدر مباشرة بدل ما الهيدر يقفل عليه
+      const nx = listEl.querySelector('[data-index="' + nextKey + '"]');
+      const bar = document.querySelector('.progress');
+      if(nx && bar){
+        const gap = nx.getBoundingClientRect().top - bar.getBoundingClientRect().bottom;
+        if(gap < 14) window.scrollBy({ top: gap - 14, behavior: reduceMotion ? 'auto' : 'smooth' });
+      }
     }
   }), reduceMotion ? 0 : 50);
 }
@@ -2747,9 +2755,22 @@ zDelBtn.addEventListener('click', () => {
   render();
 });
 
-btnMorning.addEventListener('click', ()=>{ hideUndo(); unlockScrollHeight(); mode='morning'; render(); });
-btnEvening.addEventListener('click', ()=>{ hideUndo(); unlockScrollHeight(); mode='evening'; render(); });
-btnTasbih.addEventListener('click', ()=>{ hideUndo(); unlockScrollHeight(); mode='tasbeeh'; render(); });
+// التنقل بين الأقسام: الشاشة الجديدة تدخل من اتجاه زرها (صباح ← مساء ← سبحة من اليسار، والرجوع من اليمين)
+const MODE_ORDER = ['morning','evening','tasbeeh'];
+function switchMode(m){
+  const dir = MODE_ORDER.indexOf(m) > MODE_ORDER.indexOf(mode) ? -1 : 1;
+  const same = m === mode;
+  hideUndo(); unlockScrollHeight(); mode = m; render();
+  if(!same && !reduceMotion && listEl.animate){
+    listEl.animate([
+      { transform:'translateX(' + (dir * 56) + 'px)', opacity:0 },
+      { transform:'translateX(0)', opacity:1 }
+    ], { duration:340, easing:'cubic-bezier(.2,.8,.3,1)' });
+  }
+}
+btnMorning.addEventListener('click', () => switchMode('morning'));
+btnEvening.addEventListener('click', () => switchMode('evening'));
+btnTasbih.addEventListener('click', () => switchMode('tasbeeh'));
 document.getElementById('resetBtn').addEventListener('click', ()=>{
   hideUndo();
   unlockScrollHeight();
