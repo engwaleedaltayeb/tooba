@@ -1285,23 +1285,6 @@
     transition:opacity .25s ease, width .35s ease;
   }
   .promo-msg.out{ opacity:0; }
-  .promo-eye{
-    position:fixed; left:calc(var(--sa-left) + 6px); bottom:calc(var(--sa-bottom) + 9px); z-index:46;
-    width:36px; height:36px; border-radius:50%;
-    border:1px solid transparent; background:transparent; color:var(--text-dim);
-    display:flex; align-items:center; justify-content:center; cursor:pointer;
-    transition:background .3s ease, border-color .3s ease, box-shadow .3s ease, transform .15s ease;
-  }
-  .promo-eye:active{ transform:scale(0.9); }
-  .promo-eye .eye-on{ display:none; }
-  .promo-eye.off{
-    background:color-mix(in srgb, var(--bg) 50%, transparent);
-    -webkit-backdrop-filter:blur(26px) saturate(190%); backdrop-filter:blur(26px) saturate(190%);
-    border-color:var(--border); box-shadow:0 4px 16px rgba(0,0,0,.14);
-  }
-  .promo-eye.off .eye-on{ display:block; }
-  .promo-eye.off .eye-off{ display:none; }
-  body.focus .promo-eye{ display:none; }
   .pnum + .inf, .inf{ font-family:system-ui, sans-serif; font-size:1.35em; line-height:1; vertical-align:-0.1em; font-weight:700; color:var(--text); }
   .wird-next{ width:100%; max-width:320px; height:auto; min-height:48px; padding:10px 18px; font-size:14.5px; line-height:1.6; text-align:center; }
   .wird-next[hidden]{ display:none; }
@@ -1316,7 +1299,7 @@
   .promo.inline .promo-main{ padding:0; }
   @keyframes promoFade{ from{ opacity:0; } to{ opacity:1; } }
   body.has-banner .wrap{ padding-bottom:calc(100px + 54px); }
-  body.has-banner .undo-toast{ bottom:calc(var(--sa-bottom) + 68px); }
+  body.banner-on .undo-toast{ bottom:calc(var(--sa-bottom) + 68px); }
   body.focus .promo{ display:none; }
   @media (max-width:380px){
     .promo-lead{ font-size:12px; }
@@ -1401,10 +1384,6 @@
     <span class="promo-msg" id="promoMsg"></span>
   </div>
 </div>
-<button class="promo-eye" id="promoEye" type="button" aria-label="إخفاء البانر" aria-pressed="false">
-  <svg class="eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.53 13.53 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><path d="m2 2 20 20"/></svg>
-  <svg class="eye-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-</button>
 <div class="undo-toast upd-toast" id="updToast" role="status" aria-live="polite"><span class="undo-text">تم تنزيل التحديث</span><button class="undo-btn" id="updBtn">إعادة التشغيل</button></div>
 
 
@@ -1440,7 +1419,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.0</div>
+    <div class="about-ver">الإصدار 2.4.1</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1590,6 +1569,7 @@ const data = {
 };
 
 let mode = "morning";
+let bannerLockUntil = 0;
 let progress = { morning:{}, evening:{} };
 
 const STORAGE_KEY = 'tooba-progress-v1';
@@ -2508,6 +2488,7 @@ window.addEventListener('scroll', () => {
 function completeItem(card, index, prevRemaining){
   if(card.dataset.completing) return;
   card.dataset.completing = '1';
+  bannerLockUntil = Date.now() + 1500;
   progress[mode][index] = 0;
   saveProgress();
   updateProgress();
@@ -2538,7 +2519,7 @@ function completeItem(card, index, prevRemaining){
       const bar = document.querySelector('.progress');
       if(nx && bar){
         const gap = nx.getBoundingClientRect().top - bar.getBoundingClientRect().bottom;
-        if(gap < 14) window.scrollBy({ top: gap - 14, behavior: reduceMotion ? 'auto' : 'smooth' });
+        if(gap < 14){ bannerLockUntil = Date.now() + 1000; window.scrollBy({ top: gap - 14, behavior: reduceMotion ? 'auto' : 'smooth' }); }
       }
     }
   }), reduceMotion ? 0 : 50);
@@ -3335,11 +3316,19 @@ rOff.addEventListener('click', async () => {
   }catch(e){}
 })();
 
-// ---------- بانر نشر التطبيق: ثابت أسفل الشاشة، وعند إخفائه ينتقل لآخر الصفحة مكان التلميح، ويرجع ثابتًا عند فتح التطبيق من جديد ----------
+// ---------- بانر نشر التطبيق: ثابت أسفل الشاشة لكن ذكي (يختفي مع السكرول لتحت ويرجع مع السكرول لفوق)، ونسخة ثانية داخل الصفحة تحت التلميح ----------
 (function(){
   const promo = document.getElementById('promo');
   const msgEl = document.getElementById('promoMsg');
   const logo = promo.querySelector('.promo-logo');
+  // النسخة الداخلية (الفوتر): نسخة من البانر بعد التلميح مباشرة
+  const inline = promo.cloneNode(true);
+  inline.removeAttribute('id'); inline.removeAttribute('role'); inline.removeAttribute('aria-label');
+  inline.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+  inline.classList.add('inline');
+  inline.style.animation = '';
+  const inMsg = inline.querySelector('.promo-msg'), inLogo = inline.querySelector('.promo-logo');
+  document.querySelector('.hint').insertAdjacentElement('afterend', inline);
   const MSGS = [
     'بنية الصدقة الجارية عنك وعن أحبائك',
     'صَدَقَةٌ جَارِيَةٌ لَكَ وَلِوَالِدَيْكَ',
@@ -3359,15 +3348,15 @@ rOff.addEventListener('click', async () => {
     const apply = () => {
       const old = msgEl.getBoundingClientRect().width;
       msgEl.style.transition = 'none';
-      msgEl.textContent = t;
+      msgEl.textContent = t; inMsg.textContent = t;
       const w = measure();
       if(animate && old){ msgEl.style.width = old + 'px'; void msgEl.offsetWidth; }
       msgEl.style.transition = '';
       if(w) msgEl.style.width = w + 'px';
-      msgEl.classList.remove('out');
+      msgEl.classList.remove('out'); inMsg.classList.remove('out');
     };
     if(animate && !reduceMotion){
-      msgEl.classList.add('out');
+      msgEl.classList.add('out'); inMsg.classList.add('out');
       setTimeout(() => { if(curText === t) apply(); }, 260);
     } else apply();
   }
@@ -3377,10 +3366,11 @@ rOff.addEventListener('click', async () => {
   let rt = null;
   window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(refit, 200); });
   try{ localStorage.removeItem('tooba-promo-off'); }catch(e){}
-  document.body.classList.add('has-banner');
+  document.body.classList.add('has-banner', 'banner-on');
+  promo.addEventListener('animationend', () => { promo.style.animation = 'none'; });
   function spin(){
     if(reduceMotion || !logo.animate) return;
-    logo.animate([{ transform:'rotate(0deg)' }, { transform:'rotate(360deg)' }], { duration:900, easing:'cubic-bezier(.45,0,.2,1)' });
+    [logo, inLogo].forEach(l => l.animate([{ transform:'rotate(0deg)' }, { transform:'rotate(360deg)' }], { duration:900, easing:'cubic-bezier(.45,0,.2,1)' }));
   }
   function next(){
     if(copied || document.hidden) return;
@@ -3403,24 +3393,29 @@ rOff.addEventListener('click', async () => {
       }
     }catch(err){ /* المستخدم لغى المشاركة */ }
   }
-  const pm = document.getElementById('promoMain');
-  pm.addEventListener('click', share);
-  pm.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); share(); } });
-  // الإخفاء مباشر وبدون تأكيد، ولا يُحفظ: يرجع البانر عند فتح التطبيق من جديد
-  // العين: تخفي البانر وتبقى عائمة يسار، وبالضغط عليها يرجع. الإخفاء مؤقت ويرجع البانر عند فتح التطبيق من جديد
-  const eye = document.getElementById('promoEye');
-  let hidden = false;
-  eye.addEventListener('click', () => {
-    haptic('tap');
-    hidden = !hidden;
-    promo.style.animation = 'none';
-    promo.classList.toggle('closing', hidden);
-    eye.classList.toggle('off', hidden);
-    eye.setAttribute('aria-pressed', hidden ? 'true' : 'false');
-    eye.setAttribute('aria-label', hidden ? 'إظهار البانر' : 'إخفاء البانر');
-    document.body.classList.toggle('has-banner', !hidden);
-    if(!hidden) requestAnimationFrame(refit);
+  [document.getElementById('promoMain'), inline.querySelector('.promo-main')].forEach(pm => {
+    pm.addEventListener('click', share);
+    pm.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); share(); } });
   });
+  // الثابت الذكي: يختفي لما تسكرول لتحت، ويرجع لما تسكرول لفوق أو تكون في أول الصفحة، ويختفي لما النسخة الداخلية تظهر
+  let lastY = Math.max(0, window.scrollY), want = true, inlineVis = false;
+  function applyBanner(){
+    const show = want && !inlineVis;
+    promo.classList.toggle('closing', !show);
+    document.body.classList.toggle('banner-on', show);
+  }
+  window.addEventListener('scroll', () => {
+    const y = Math.max(0, window.scrollY), d = y - lastY;
+    if(Date.now() < bannerLockUntil){ lastY = y; return; }
+    if(y < 40) want = true;
+    else if(d > 6) want = false;
+    else if(d < -6) want = true;
+    if(Math.abs(d) >= 6) lastY = y;
+    applyBanner();
+  }, { passive:true });
+  if('IntersectionObserver' in window){
+    new IntersectionObserver((es) => { inlineVis = es[0].isIntersecting; applyBanner(); }, { threshold:0.6 }).observe(inline);
+  }
 })();
 
 // العمل بدون إنترنت (على الدومين الحقيقي بس)
