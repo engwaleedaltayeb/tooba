@@ -1256,12 +1256,17 @@
     background:color-mix(in srgb, var(--bg) 50%, transparent);
     -webkit-backdrop-filter:blur(26px) saturate(190%);
     backdrop-filter:blur(26px) saturate(190%);
-    border-top:1px solid var(--border);
     animation:promoIn .5s cubic-bezier(.2,.9,.3,1) both;
     transition:background .5s ease, transform .35s cubic-bezier(.65,0,.35,1), opacity .3s ease;
   }
   @keyframes promoIn{ from{ transform:translateY(100%); } to{ transform:translateY(0); } }
   .promo.closing{ transform:translateY(100%); opacity:0; pointer-events:none; }
+  .promo::before{
+    content:''; position:absolute; top:0; height:1px; background:var(--border); pointer-events:none;
+    left:calc((100% - min(100%, 680px)) / 2 + 24px);
+    right:calc((100% - min(100%, 680px)) / 2 + 24px);
+  }
+  .promo.inline::before{ display:none; }
   /* الصف كله (الاسم + الرسالة + أيقونة الإرسال) مجموعة واحدة في المنتصف، وعرضها يتبع عرض الرسالة */
   .promo-main{
     flex:1; min-width:0; height:100%; padding:0 42px;
@@ -1280,14 +1285,27 @@
     transition:opacity .25s ease, width .35s ease;
   }
   .promo-msg.out{ opacity:0; }
-  .promo-close{
-    position:absolute; left:4px; top:9px;
+  .promo-eye{
+    position:fixed; left:calc(var(--sa-left) + 6px); bottom:calc(var(--sa-bottom) + 9px); z-index:46;
     width:36px; height:36px; border-radius:50%;
-    border:none; background:transparent; color:var(--text-dim);
+    border:1px solid transparent; background:transparent; color:var(--text-dim);
     display:flex; align-items:center; justify-content:center; cursor:pointer;
-    transition:background .2s ease;
+    transition:background .3s ease, border-color .3s ease, box-shadow .3s ease, transform .15s ease;
   }
-  .promo-close:active{ background:var(--border); }
+  .promo-eye:active{ transform:scale(0.9); }
+  .promo-eye .eye-on{ display:none; }
+  .promo-eye.off{
+    background:color-mix(in srgb, var(--bg) 50%, transparent);
+    -webkit-backdrop-filter:blur(26px) saturate(190%); backdrop-filter:blur(26px) saturate(190%);
+    border-color:var(--border); box-shadow:0 4px 16px rgba(0,0,0,.14);
+  }
+  .promo-eye.off .eye-on{ display:block; }
+  .promo-eye.off .eye-off{ display:none; }
+  body.focus .promo-eye{ display:none; }
+  .pnum + .inf, .inf{ font-family:system-ui, sans-serif; font-size:1.35em; line-height:1; vertical-align:-0.1em; font-weight:700; color:var(--text); }
+  .wird-next{ width:100%; max-width:320px; height:auto; min-height:48px; padding:10px 18px; font-size:14.5px; line-height:1.6; text-align:center; }
+  .wird-next[hidden]{ display:none; }
+  .upd-toast .undo-text{ white-space:normal; }
   .promo.inline{
     position:relative; z-index:auto; height:54px; padding:0 12px;
     margin:34px 0 6px; border:1px solid var(--border); border-radius:999px;
@@ -1382,8 +1400,13 @@
     <span class="promo-brand"><span class="promo-lead">انشر تطبيق</span><svg class="promo-logo" viewBox="0 0 336.42 336.42" aria-hidden="true"><path fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><span class="promo-name">طوبى</span></span>
     <span class="promo-msg" id="promoMsg"></span>
   </div>
-  <button class="promo-close" id="promoClose" type="button" aria-label="إغلاق"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg></button>
 </div>
+<button class="promo-eye" id="promoEye" type="button" aria-label="إخفاء البانر" aria-pressed="false">
+  <svg class="eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.53 13.53 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><path d="m2 2 20 20"/></svg>
+  <svg class="eye-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+</button>
+<div class="undo-toast upd-toast" id="updToast" role="status" aria-live="polite"><span class="undo-text">تم تنزيل التحديث</span><button class="undo-btn" id="updBtn">إعادة التشغيل</button></div>
+
 
 <div class="undo-toast" id="undoToast" role="status" aria-live="polite">
   <div class="undo-ring">
@@ -1417,7 +1440,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 1.93</div>
+    <div class="about-ver">الإصدار 2.4.0</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1709,12 +1732,12 @@ function haptic(kind, force){
   if(!hapticOn && !force) return;
   try{
     if(NATIVE && HAPTICS){
-      const p = kind === 'done' ? HAPTICS.notification({ type:'SUCCESS' }) : HAPTICS.impact({ style:'LIGHT' });
-      if(p && p.catch) p.catch(() => { try{ if(navigator.vibrate) navigator.vibrate(kind === 'done' ? [12, 45, 22] : 8); }catch(e){} });
+      const p = kind === 'long' ? HAPTICS.vibrate({ duration:450 }) : kind === 'done' ? HAPTICS.notification({ type:'SUCCESS' }) : HAPTICS.impact({ style:'LIGHT' });
+      if(p && p.catch) p.catch(() => { try{ if(navigator.vibrate) navigator.vibrate(kind === 'long' ? 450 : kind === 'done' ? [12, 45, 22] : 8); }catch(e){} });
       return;
     }
     if(navigator.vibrate){
-      navigator.vibrate(kind === 'done' ? [12, 45, 22] : 8);
+      navigator.vibrate(kind === 'long' ? 450 : kind === 'done' ? [12, 45, 22] : 8);
       return;
     }
     if(!hapticLabel){
@@ -1726,6 +1749,7 @@ function haptic(kind, force){
     }
     hapticLabel.click();
     if(kind === 'done') setTimeout(() => hapticLabel.click(), 90);
+    if(kind === 'long') [70, 140, 210, 280].forEach(t => setTimeout(() => hapticLabel.click(), t));
   }catch(e){}
 }
 const hapticBtn = document.getElementById('hapticBtn');
@@ -1776,7 +1800,7 @@ function drawTasbih(bump){
   const row = document.getElementById('segRow');
   if(!row) return;
   const w = selWirdObj();
-  const n = w ? Math.min(wirdCounts[w.id] || 0, w.target) : tasbihCount;
+  const n = w ? (wirdCounts[w.id] || 0) : tasbihCount;
   row.setAttribute('aria-label', String(n));
   row.innerHTML = tasbihDigits(n);
   const hint = document.getElementById('tasbihHint');
@@ -1784,7 +1808,7 @@ function drawTasbih(bump){
   if(hint){
     if(w){
       const fin = n >= w.target;
-      hint.textContent = 'اكتمل الورد، تقبّل الله منك';
+      hint.textContent = n > w.target ? 'ما شاء الله، زادك الله من فضله' : 'اكتمل الورد، تقبّل الله منك';
       hint.style.display = fin ? '' : 'none';
       hint.style.visibility = 'visible';
       hint.classList.toggle('done', fin);
@@ -1792,12 +1816,23 @@ function drawTasbih(bump){
         rb.hidden = !(fin && w.z);
         if(fin && w.z) rb.querySelector('span').textContent = 'ذكّر أحبابك ب' + w.short;
       }
+      const nb = document.getElementById('wirdNext');
+      if(nb){
+        const nx = fin ? nextWird(w) : null;
+        nb.hidden = !nx;
+        if(nx){
+          nb.dataset.id = nx.id;
+          nb.querySelector('span').textContent = 'ما رأيك أن تبدأ ' + nx.name + '؟';
+          if(nx.custom) nb.setAttribute('data-clarity-mask', 'true'); else nb.removeAttribute('data-clarity-mask');
+        }
+      }
     } else {
       hint.textContent = 'اضغط في أي مكان على الشاشة للبدء';
       hint.style.display = '';
       hint.style.visibility = tasbihCount > 0 ? 'hidden' : 'visible';
       hint.classList.remove('done');
       if(rb) rb.hidden = true;
+      const nb0 = document.getElementById('wirdNext'); if(nb0) nb0.hidden = true;
     }
   }
   const info = document.getElementById('wirdInfo');
@@ -1817,10 +1852,10 @@ document.addEventListener('click', (e) => {
   const w = selWirdObj();
   if(w){
     const c = wirdCounts[w.id] || 0;
-    if(c >= w.target) return;
+    if(c >= 99999) return;
     wirdCounts[w.id] = c + 1;
     saveWird();
-    haptic(c + 1 >= w.target ? 'done' : 'tap');
+    haptic(c + 1 === w.target ? 'long' : 'tap');
     drawTasbih(true);
     paintChips();
     paintWirdProgress(c);
@@ -2037,7 +2072,7 @@ function paintChips(){
     const id = ch.dataset.id || null;
     const w = id ? allWirds().find(x => x.id === id) : null;
     ch.classList.toggle('on', id === selWird);
-    const c = w ? Math.min(wirdCounts[w.id] || 0, w.target) : 0;
+    const c = w ? (wirdCounts[w.id] || 0) : 0;
     ch.classList.toggle('done', !!w && c >= w.target);
     ch.classList.toggle('started', !!w && c > 0);
     if(w){
@@ -2051,7 +2086,7 @@ function paintChips(){
         const d = badgeGeom(bw);
         bd.querySelectorAll('path').forEach(pp => pp.setAttribute('d', d));
       }
-      if(f) f.style.strokeDasharray = (c / w.target * 100).toFixed(2) + ' 100';
+      if(f) f.style.strokeDasharray = Math.min(100, c / w.target * 100).toFixed(2) + ' 100';
     }
   });
 }
@@ -2076,10 +2111,15 @@ function paintWirdProgress(prev){
     if(w && w.custom) wt.setAttribute('data-clarity-mask', 'true'); else wt.removeAttribute('data-clarity-mask');
   }
   if(!w) return;
-  const c = Math.min(wirdCounts[w.id] || 0, w.target), t = w.target;
-  progressText.innerHTML = '<b class="pnum">' + c + '</b> من ' + t;
-  barFill.style.width = (c / t * 100) + '%';
+  const c = wirdCounts[w.id] || 0, t = w.target;
+  progressText.innerHTML = '<b class="pnum">' + c + '</b> من ' + (c > t ? '<span class="inf">∞</span>' : t);
+  barFill.style.width = Math.min(100, c / t * 100) + '%';
   if(prev == null || c <= prev) return;
+  if(c > t){
+    const nm = progressText.querySelector('.pnum');
+    if(nm){ nm.classList.remove('bump'); void nm.offsetWidth; nm.classList.add('bump'); }
+    return;
+  }
   const prevPct = prev / t * 100, pct = c / t * 100;
   if(MILESTONES.some(([m]) => prevPct < m && pct >= m) || c === t){
     celebrate(prev, c, t, pct);
@@ -2089,11 +2129,33 @@ function paintWirdProgress(prev){
     if(num){ num.classList.remove('bump'); void num.offsetWidth; num.classList.add('bump'); }
   }
 }
-function selectWird(id){
+function wirdIndex(id){ return id ? allWirds().findIndex(x => x.id === id) + 1 : 0; }
+function nextWird(w){
+  const list = allWirds(), i = list.findIndex(x => x.id === w.id);
+  for(let k = 1; k < list.length; k++){
+    const x = list[(i + k) % list.length];
+    if((wirdCounts[x.id] || 0) < x.target) return x;
+  }
+  return null;
+}
+function slideIn(els, dir){
+  if(reduceMotion) return;
+  els.forEach(el => { if(el && el.animate) el.animate([
+    { transform:'translateX(' + (dir * 56) + 'px)', opacity:0 },
+    { transform:'translateX(0)', opacity:1 }
+  ], { duration:340, easing:'cubic-bezier(.2,.8,.3,1)' }); });
+}
+function selectWird(id, animate, center){
+  const prevIdx = wirdIndex(selWird);
   selWird = id || null;
   paintChips();
   drawTasbih(false);
   paintWirdProgress(null);
+  if(center){
+    const chip = document.querySelector('.wchip.on'), sc = document.getElementById('wsel');
+    if(chip && sc) sc.scrollLeft += chip.getBoundingClientRect().left + chip.offsetWidth / 2 - (sc.getBoundingClientRect().left + sc.clientWidth / 2);
+  }
+  if(animate) slideIn([listEl.querySelector('.tasbih'), document.getElementById('wirdTitle')], wirdIndex(selWird) > prevIdx ? -1 : 1);
 }
 document.addEventListener('click', (e) => {
   if(mode !== 'tasbeeh') return;
@@ -2104,7 +2166,9 @@ document.addEventListener('click', (e) => {
     return;
   }
   const ch = e.target.closest && e.target.closest('.wchip[data-id]');
-  if(ch){ haptic('tap'); selectWird(ch.dataset.id); return; }
+  const nbtn = e.target.closest && e.target.closest('#wirdNext');
+  if(nbtn){ haptic('tap'); selectWird(nbtn.dataset.id, true, true); return; }
+  if(ch){ haptic('tap'); selectWird(ch.dataset.id, true); return; }
   if(e.target.closest && e.target.closest('#wedit') && selWird) openWirdSheet(selWird);
 });
 
@@ -2254,7 +2318,7 @@ function render(){
   btnTasbih.classList.toggle('active', mode==='tasbeeh');
   if(mode === 'tasbeeh'){
     if(selWird && !selWirdObj()) selWird = null;
-    listEl.innerHTML = '<div class="wsel" id="wsel">' + chipsHTML() + '</div><div class="tasbih"><div class="seg-row" id="segRow" role="img"></div><div class="tasbih-hint" id="tasbihHint">اضغط في أي مكان على الشاشة للبدء</div><button class="done-btn wird-remind" id="wirdRemind" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span></span></button><div class="wird-info" id="wirdInfo" hidden><div class="wi-z"></div><div class="wi-f"></div></div></div>';
+    listEl.innerHTML = '<div class="wsel" id="wsel">' + chipsHTML() + '</div><div class="tasbih"><div class="seg-row" id="segRow" role="img"></div><div class="tasbih-hint" id="tasbihHint">اضغط في أي مكان على الشاشة للبدء</div><button class="done-btn wird-remind" id="wirdRemind" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span></span></button><button class="done-btn primary wird-next" id="wirdNext" hidden><span></span></button><div class="wird-info" id="wirdInfo" hidden><div class="wi-z"></div><div class="wi-f"></div></div></div>';
     paintChips();
     drawTasbih(false);
     paintWirdProgress(null);
@@ -2791,6 +2855,58 @@ document.getElementById('resetBtn').addEventListener('click', ()=>{
 { const qm = new URLSearchParams(location.search).get('m'); if(qm === 'morning' || qm === 'evening') mode = qm; }
 render();
 
+// ---------- السوايب يمين/شمال: بين الصباح والمساء والسبحة، وبين الأوراد في وضع السبحة الهادئ ----------
+(function(){
+  let sx = 0, sy = 0, st = 0, ok = false;
+  function swipeGo(dir){
+    if(mode === 'tasbeeh' && body.classList.contains('focus')){
+      const ids = [null].concat(allWirds().map(w => w.id));
+      const j = ids.indexOf(selWird) + (dir > 0 ? 1 : -1);
+      if(j < 0 || j >= ids.length) return;
+      haptic('tap'); selectWird(ids[j], true, false);
+      return;
+    }
+    const j = MODE_ORDER.indexOf(mode) + (dir > 0 ? 1 : -1);
+    if(j < 0 || j >= MODE_ORDER.length) return;
+    haptic('tap'); switchMode(MODE_ORDER[j]);
+  }
+  document.addEventListener('touchstart', (e) => {
+    const t = e.touches[0];
+    if(e.touches.length !== 1 || ovStack.length || (e.target.closest && e.target.closest('input, textarea, .wsel, .promo, .undo-toast')) ||
+       t.clientX < 24 || t.clientX > window.innerWidth - 24){ ok = false; return; }
+    sx = t.clientX; sy = t.clientY; st = Date.now(); ok = true;
+  }, { passive:true });
+  document.addEventListener('touchend', (e) => {
+    if(!ok) return;
+    ok = false;
+    const t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+    if(Date.now() - st > 700 || Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.8) return;
+    swipeGo(dx > 0 ? 1 : -1);
+  }, { passive:true });
+  document.addEventListener('touchcancel', () => { ok = false; }, { passive:true });
+})();
+
+// ---------- تحديث التطبيق من جوجل بلاي (أندرويد فقط) ----------
+(function(){
+  if(!NATIVE) return;
+  const AU = nativePlugin('AppUpdate');
+  if(!AU) return;
+  const tst = document.getElementById('updToast');
+  document.getElementById('updBtn').addEventListener('click', () => { try{ AU.completeFlexibleUpdate(); }catch(e){} });
+  try{ AU.addListener('onFlexibleUpdateStateChange', (st) => { if(st && st.installStatus === 11) tst.classList.add('show'); }); }catch(e){}
+  async function check(){
+    try{
+      const info = await AU.getAppUpdateInfo();
+      if(info.updateAvailability === 2){
+        if(info.flexibleUpdateAllowed) await AU.startFlexibleUpdate();
+        else if(info.immediateUpdateAllowed) await AU.performImmediateUpdate();
+      } else if(info.installStatus === 11){ tst.classList.add('show'); }
+    }catch(e){}
+  }
+  setTimeout(check, 4000);
+  document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') check(); });
+})();
+
 // إبقاء الشاشة صاحية: Wake Lock، ويتحرر بعد 10 دقايق من غير أي لمس لتوفير البطارية
 (function(){
   const IDLE_MS = 10 * 60 * 1000;
@@ -3262,15 +3378,6 @@ rOff.addEventListener('click', async () => {
   window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(refit, 200); });
   try{ localStorage.removeItem('tooba-promo-off'); }catch(e){}
   document.body.classList.add('has-banner');
-  function toInline(){
-    promo.classList.remove('closing');
-    promo.classList.add('inline');
-    document.body.classList.remove('has-banner');
-    const hint = document.querySelector('.hint');
-    if(hint && hint.isConnected) hint.replaceWith(promo);
-    else document.querySelector('.wrap').appendChild(promo);
-    requestAnimationFrame(refit);
-  }
   function spin(){
     if(reduceMotion || !logo.animate) return;
     logo.animate([{ transform:'rotate(0deg)' }, { transform:'rotate(360deg)' }], { duration:900, easing:'cubic-bezier(.45,0,.2,1)' });
@@ -3300,11 +3407,19 @@ rOff.addEventListener('click', async () => {
   pm.addEventListener('click', share);
   pm.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); share(); } });
   // الإخفاء مباشر وبدون تأكيد، ولا يُحفظ: يرجع البانر عند فتح التطبيق من جديد
-  document.getElementById('promoClose').addEventListener('click', () => {
+  // العين: تخفي البانر وتبقى عائمة يسار، وبالضغط عليها يرجع. الإخفاء مؤقت ويرجع البانر عند فتح التطبيق من جديد
+  const eye = document.getElementById('promoEye');
+  let hidden = false;
+  eye.addEventListener('click', () => {
     haptic('tap');
-    promo.classList.add('closing');
-    document.body.classList.remove('has-banner');
-    setTimeout(toInline, 380);
+    hidden = !hidden;
+    promo.style.animation = 'none';
+    promo.classList.toggle('closing', hidden);
+    eye.classList.toggle('off', hidden);
+    eye.setAttribute('aria-pressed', hidden ? 'true' : 'false');
+    eye.setAttribute('aria-label', hidden ? 'إظهار البانر' : 'إخفاء البانر');
+    document.body.classList.toggle('has-banner', !hidden);
+    if(!hidden) requestAnimationFrame(refit);
   });
 })();
 
