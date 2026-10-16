@@ -716,46 +716,27 @@
     transition:transform .15s ease, background .5s ease;
   }
   .reset-btn:active{ transform:scale(0.9) rotate(-45deg); }
-  /* السبحة: زر التصفير عائم وقابل للسحب (ضغطة مطوّلة للتصفير) */
+  /* السبحة: زر التصفير عائم بمكان ثابت، ضغطة واحدة تصفّر مع شريط التراجع */
   body[data-mode="tasbeeh"] .reset-btn{ display:none; }
   .t-reset{
-    position:fixed; left:0; top:0;
-    z-index:48;
-    width:40px; height:40px; padding:0;
+    position:absolute; left:calc(100% + 18px); top:-6px;
+    z-index:2;
+    width:34px; height:34px; padding:0;
     border-radius:50%;
-    border:1px solid var(--border);
-    background:var(--surface);
-    color:var(--text-dim);
-    display:none;
+    border:none;
+    background:color-mix(in srgb, var(--accent-tasbeeh) 15%, transparent);
+    color:var(--accent-text);
+    display:flex;
     align-items:center; justify-content:center;
     cursor:pointer;
-    box-shadow:0 1px 3px var(--shadow);
-    touch-action:none;
+    box-shadow:none;
+    touch-action:manipulation;
     -webkit-touch-callout:none;
-    opacity:0; pointer-events:none;
     transition:transform .15s ease, opacity .2s ease, color .2s ease, box-shadow .2s ease;
   }
-  body[data-mode="tasbeeh"] .t-reset{ display:flex; }
-  .t-reset.placed{ opacity:1; pointer-events:auto; }
-  .t-reset.holding{ transform:scale(0.92); color:var(--accent-text); }
-  .t-reset.dragging{ transform:scale(1.1); box-shadow:0 8px 22px rgba(0,0,0,0.25); }
-  .t-reset svg.tr-ico{ position:relative; }
-  .t-reset svg.tr-ring{ position:absolute; inset:-1px; width:calc(100% + 2px); height:calc(100% + 2px); transform:rotate(-90deg); pointer-events:none; overflow:visible; }
-  .t-reset .tr-fg{ fill:none; stroke:var(--accent-text); stroke-width:2.6; stroke-linecap:round; stroke-dasharray:113.1; stroke-dashoffset:113.1; }
-  .undo-toast.show ~ .t-reset.placed{ opacity:0; pointer-events:none; }
-  .tr-tip{
-    position:fixed; left:0; top:0;
-    z-index:49;
-    padding:8px 14px; border-radius:999px;
-    background:color-mix(in srgb, var(--surface) 86%, transparent);
-    -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
-    border:1px solid var(--border);
-    box-shadow:0 6px 20px rgba(0,0,0,0.16);
-    font-size:13.5px; font-weight:500; color:var(--text); white-space:nowrap;
-    opacity:0; pointer-events:none; transform:translateY(6px);
-    transition:opacity .2s ease, transform .2s ease;
-  }
-  .tr-tip.show{ opacity:1; transform:translateY(0); }
+  .seg-wrap{ position:relative; display:flex; justify-content:center; }
+  .t-reset.flip{ left:auto; right:0; top:-40px; }
+  .t-reset:active{ transform:scale(0.9) rotate(-45deg); background:color-mix(in srgb, var(--accent-tasbeeh) 28%, transparent); }
   .theme-toggle{
     position:fixed;
     top:calc(var(--sa-top) + 14px);
@@ -908,15 +889,10 @@
     gap:34px; min-height:52vh; text-align:center;
     user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent;
   }
-  .seg-row{ display:flex; direction:ltr; gap:clamp(4px,1.6vw,10px); }
+  .seg-row{ display:flex; direction:ltr; justify-content:center; align-items:center; gap:clamp(5px,1.8vw,9px); }
   .seg-row svg{ height:clamp(96px,26vw,150px); width:auto; overflow:visible; }
   .seg{ transition:fill .12s ease; }
   .seg.on{ fill:var(--accent-text); filter:drop-shadow(0 0 6px color-mix(in srgb, var(--accent-text) 45%, transparent)); }
-  .seg.off{ fill:color-mix(in srgb, var(--text) 3%, transparent); }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]) .seg.off{ fill:color-mix(in srgb, var(--text) 7%, transparent); }
-  }
-  :root[data-theme="dark"] .seg.off{ fill:color-mix(in srgb, var(--text) 7%, transparent); }
   .tasbih-hint{ font-size:16px; color:var(--text-dim); }
   #focusBtn{
     display:none;
@@ -932,6 +908,17 @@
     z-index:50;
   }
   body.focus[data-mode="tasbeeh"] .font-ctrl{ margin:0; height:0; }
+  /* زرّا «إتمام الورد» و«تعديل الورد»: في صف الأدوات (السبحة فقط)، وفي الوضع الهادئ فوق شمال */
+  #doneBtn, #wedit{ display:none; align-items:center; justify-content:center; }
+  body[data-mode="tasbeeh"] #doneBtn, body[data-mode="tasbeeh"] #wedit{ display:flex; }
+  #doneBtn{ color:var(--accent-text); }
+  #doneBtn.dis, #wedit.dis{ opacity:.35; color:var(--text-dim); }
+  body.focus[data-mode="tasbeeh"] #doneBtn, body.focus[data-mode="tasbeeh"] #wedit{
+    position:fixed; top:calc(var(--sa-top) + 14px);
+    width:34px; height:34px; padding:0; border-radius:50%; z-index:50;
+  }
+  body.focus[data-mode="tasbeeh"] #wedit{ left:calc(var(--sa-left) + 20px); }
+  body.focus[data-mode="tasbeeh"] #doneBtn{ left:calc(var(--sa-left) + 62px); }
   #focusBtn .fx-out{ display:none; }
   #focusBtn.on .fx-in{ display:none; }
   #focusBtn.on .fx-out{ display:block; }
@@ -1079,17 +1066,6 @@
   .wchip.wadd{ width:40px; padding:0; border-style:dashed; color:var(--accent-text); border-color:color-mix(in srgb, var(--accent-tasbeeh) 55%, transparent); box-shadow:none; background:transparent; }
   .tasbih-hint.done{ color:var(--accent-text); font-weight:600; }
   .prog-row{ display:flex; align-items:center; justify-content:center; gap:10px; }
-  body.has-wird .prog-row::before{ content:''; width:30px; flex-shrink:0; }
-  .wedit{
-    display:none; align-items:center; justify-content:center;
-    width:30px; height:30px; margin-block:-8px; padding:0; flex-shrink:0; border-radius:50%;
-    border:1px solid var(--border); background:var(--surface); color:var(--text-dim);
-    cursor:pointer; box-shadow:0 1px 3px var(--shadow);
-    transition:transform .15s ease, color .2s ease, border-color .2s ease;
-  }
-  body.has-wird .wedit{ display:flex; }
-  .wedit:active{ transform:scale(0.9); }
-  .wedit:hover{ color:var(--accent-text); border-color:var(--accent-tasbeeh); }
   .about-wrap{ text-align:center; margin:6px 0 0; }
   .about-link{
     border:none; background:transparent; font-family:inherit;
@@ -1343,6 +1319,10 @@
   body.has-banner .wrap{ padding-bottom:calc(100px + 54px); }
   body.banner-on .undo-toast{ bottom:calc(var(--sa-bottom) + 68px); }
   body.focus .promo{ display:none; }
+  /* السبحة: بدون بانر نهائيًا (الثابت والداخلي)، وبدون مساحته */
+  body[data-mode="tasbeeh"] .promo{ display:none !important; }
+  body[data-mode="tasbeeh"].has-banner .wrap{ padding-bottom:100px; }
+  body[data-mode="tasbeeh"].banner-on .undo-toast{ bottom:calc(var(--sa-bottom) + 20px); }
   @media (max-width:380px){
     .promo-lead{ font-size:12px; }
     .promo-name{ font-size:18px; }
@@ -1412,12 +1392,13 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3.5" width="8" height="17" rx="2"/><path d="M4.5 8v8"/><path d="M19.5 8v8"/><path d="M2 10.5v3"/><path d="M22 10.5v3"/><path class="hslash" d="M3.5 3L20.5 21"/></svg>
     </button>
     <button id="bellBtn" aria-label="تذكير بأوقات الأذكار" aria-pressed="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><path class="hslash" d="M3.5 3L20.5 21"/></svg></button>
+    <button id="doneBtn" class="dis" aria-label="إتمام الورد"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12l4 4L15 7"/><path d="M9 12l4 4L22 7"/></svg></button>
+    <button id="wedit" class="dis" aria-label="تعديل العدد"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
   </div>
 
   <div class="progress">
     <div class="prog-row">
       <span id="progressText">0 من 0</span>
-      <button class="wedit" id="wedit" aria-label="تعديل العدد"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
     </div>
     <div class="bar-wrap" id="barWrap">
       <div class="bar"><div class="bar-fill" id="barFill"><span class="bar-shine"></span></div></div>
@@ -1433,9 +1414,9 @@
   <div class="about-wrap"><button class="about-link" id="aboutBtn">عن طوبى</button></div>
 </div>
 
-<div class="promo" id="promo" role="complementary" aria-label="انشر طوبى">
+<div class="promo" id="promo" role="complementary" aria-label="شارك طوبى">
   <div class="promo-main" id="promoMain" role="button" tabindex="0" aria-label="شارك طوبى">
-    <span class="promo-brand"><span class="promo-lead">انشر تطبيق</span><svg class="promo-logo" viewBox="0 0 336.42 336.42" aria-hidden="true"><path fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><span class="promo-name">طوبى</span></span>
+    <span class="promo-brand"><span class="promo-lead">شارك تطبيق</span><svg class="promo-logo" viewBox="0 0 336.42 336.42" aria-hidden="true"><path fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><span class="promo-name">طوبى</span></span>
     <span class="promo-msg" id="promoMsg"></span>
   </div>
 </div>
@@ -1453,8 +1434,6 @@
   <span class="undo-text" id="undoText">تم إكمال الذكر</span>
   <button class="undo-btn" id="undoBtn">تراجع</button>
 </div>
-<button class="t-reset" id="tReset" aria-label="تصفير العدّاد، اضغط مطولًا"><svg class="tr-ring" viewBox="0 0 40 40" aria-hidden="true"><circle class="tr-fg" id="trFg" cx="20" cy="20" r="18"/></svg><svg class="tr-ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
-<div class="tr-tip" id="trTip" aria-hidden="true">اضغط مطولًا للتصفير</div>
 
 <div class="battery-toast" id="batteryToast" role="status" aria-live="polite"><span class="bt-icon" aria-hidden="true"><svg class="bt-logo" viewBox="0 0 336.42 336.42"><path fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><svg class="bt-bat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="4.5" width="11" height="17" rx="2.5"/><path d="M10.5 2.5h3"/><path class="bt-leaf" d="M12 17.8c-3.1-1-3.3-4.8 0-6.8 3.3 2 3.1 5.8 0 6.8z" fill="currentColor" stroke="none"/><path class="bt-leaf" d="M12 17.5v-3.5" stroke="var(--surface)" stroke-width="0.9"/></svg></span><span>تم تفعيل الوضع الهادئ وتوفير البطارية</span></div>
 
@@ -1479,7 +1458,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.6</div>
+    <div class="about-ver">الإصدار 2.4.16</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1840,13 +1819,19 @@ const SEG_PTS = {
   g:'8,50 13,45 37,45 42,50 37,55 13,55'
 };
 const DIG = {0:'abcdef',1:'bc',2:'abged',3:'abgcd',4:'fgbc',5:'afgcd',6:'afgedc',7:'abc',8:'abcdefg',9:'abcdfg'};
+const SEG_BOX = {};
+Object.keys(SEG_PTS).forEach(k => {
+  const xs = SEG_PTS[k].split(' ').map(p => +p.split(',')[0]);
+  SEG_BOX[k] = [Math.min.apply(null, xs), Math.max.apply(null, xs)];
+});
 function tasbihDigits(n){
-  const str = String(n);
-  const s = str;
-  return s.split('').map(ch => {
-    const on = ch === ' ' ? '' : DIG[ch];
-    return '<svg viewBox="0 0 50 100" aria-hidden="true"><g>' +
-      Object.keys(SEG_PTS).map(k => '<polygon class="seg ' + (on.includes(k) ? 'on' : 'off') + '" points="' + SEG_PTS[k] + '"/>').join('') +
+  return String(n).split('').map(ch => {
+    const on = DIG[ch];
+    if(!on) return '';
+    let x0 = 50, x1 = 0;
+    on.split('').forEach(k => { x0 = Math.min(x0, SEG_BOX[k][0]); x1 = Math.max(x1, SEG_BOX[k][1]); });
+    return '<svg viewBox="' + x0 + ' 0 ' + (x1 - x0) + ' 100" aria-hidden="true"><g>' +
+      on.split('').map(k => '<polygon class="seg on" points="' + SEG_PTS[k] + '"/>').join('') +
       '</g></svg>';
   }).join('');
 }
@@ -1896,7 +1881,19 @@ function drawTasbih(bump){
   }
   const ed = document.getElementById('wedit');
   if(ed && w) ed.setAttribute('aria-label', w.custom ? 'تعديل الورد' : 'تعديل العدد');
-  if(bump && !reduceMotion) row.animate([{transform:'scale(1)'},{transform:'scale(1.04)'},{transform:'scale(1)'}], {duration:140, easing:'ease-out'});
+  if(ed) ed.classList.toggle('dis', !w);
+  const dn = document.getElementById('doneBtn');
+  if(dn) dn.classList.toggle('dis', !(w && n < w.target));
+  fitReset();
+  if(bump && !reduceMotion){
+    // نفس إحساس رقم البروجريس الصغير (نفس المدة والنطة الناعمة)، بحجم أهدأ لأن الرقم كبير
+    if(row._bump) row._bump.cancel();
+    row._bump = row.animate([
+      { transform:'scale(1)', filter:'brightness(1)', offset:0 },
+      { transform:'scale(1.14)', filter:'brightness(1.3)', offset:0.4 },
+      { transform:'scale(1)', filter:'brightness(1)', offset:1 }
+    ], { duration:550, easing:'cubic-bezier(.2,.9,.3,1.4)' });
+  }
 }
 document.addEventListener('click', (e) => {
   if(mode !== 'tasbeeh') return;
@@ -1920,6 +1917,35 @@ document.addEventListener('click', (e) => {
   saveTasbih();
   haptic(tasbihCount % 100 === 0 ? 'long' : tasbihCount % 33 === 0 ? 'mile' : 'tap');
   drawTasbih(true);
+});
+
+// إتمام الورد بضغطة واحدة (لمن يعدّ بخاتم التسبيح): يوصّل العدّ للهدف كأنه اكتمل بالعدّ، مع شريط تراجع 8 ثواني
+function completeWird(){
+  const w = selWirdObj();
+  if(!w) return;
+  const c = wirdCounts[w.id] || 0;
+  if(c >= w.target) return;
+  let skRaw = null;
+  try{ skRaw = localStorage.getItem(STREAK_KEY); }catch(e){}
+  wirdCounts[w.id] = w.target;
+  saveWird();
+  haptic('long');
+  bumpStreak(); paintStreak();
+  drawTasbih(true);
+  paintChips();
+  paintWirdProgress(c);
+  showUndo('tasbeeh', null, c, 'تم إتمام الورد', () => {
+    if(c > 0) wirdCounts[w.id] = c; else delete wirdCounts[w.id];
+    saveWird();
+    try{ if(skRaw === null) localStorage.removeItem(STREAK_KEY); else localStorage.setItem(STREAK_KEY, skRaw); }catch(e){}
+    render();
+  }, 8);
+}
+document.addEventListener('click', (e) => {
+  if(mode !== 'tasbeeh') return;
+  const b = e.target.closest && e.target.closest('#doneBtn');
+  if(!b || b.classList.contains('dis')) return;
+  completeWird();
 });
 
 const focusBtn = document.getElementById('focusBtn');
@@ -2429,7 +2455,7 @@ function render(){
   if(mode === 'tasbeeh'){
     autoHaptic();
     if(selWird && !selWirdObj()) selWird = null;
-    listEl.innerHTML = '<div class="wsel" id="wsel">' + chipsHTML() + '</div><div class="streak" id="streakLine" hidden></div><div class="tasbih"><div class="seg-row" id="segRow" role="img"></div><div class="tasbih-hint" id="tasbihHint">اضغط في أي مكان على الشاشة للبدء</div><button class="done-btn wird-remind" id="wirdRemind" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span></span></button><button class="done-btn primary wird-next" id="wirdNext" hidden><span></span></button><div class="wird-info" id="wirdInfo" hidden><div class="wi-z"></div><div class="wi-f"></div></div></div>';
+    listEl.innerHTML = '<div class="wsel" id="wsel">' + chipsHTML() + '</div><div class="streak" id="streakLine" hidden></div><div class="tasbih"><div class="seg-wrap"><div class="seg-row" id="segRow" role="img"></div><button class="t-reset" id="tReset" aria-label="تصفير العدّاد"><svg class="tr-ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button></div><div class="tasbih-hint" id="tasbihHint">اضغط في أي مكان على الشاشة للبدء</div><button class="done-btn wird-remind" id="wirdRemind" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span></span></button><button class="done-btn primary wird-next" id="wirdNext" hidden><span></span></button><div class="wird-info" id="wirdInfo" hidden><div class="wi-z"></div><div class="wi-f"></div></div></div>';
     paintChips();
     paintStreak();
     drawTasbih(false);
@@ -2575,16 +2601,17 @@ function hideUndo(){
   undoToast.classList.remove('show');
 }
 
-function showUndo(m, index, prev, label, restore){
+function showUndo(m, index, prev, label, restore, secs){
+  const total = secs || UNDO_SECONDS;
   if(undoState){ clearInterval(undoState.interval); }
   undoState = { mode:m, index, prev, restore:restore || null, interval:null };
   document.getElementById('undoText').textContent = label || 'تم إكمال الذكر';
-  let sec = UNDO_SECONDS;
+  let sec = total;
   undoCount.textContent = sec;
   ringFg.style.transition = 'none';
   ringFg.style.strokeDashoffset = '0';
   void ringFg.getBoundingClientRect();
-  ringFg.style.transition = 'stroke-dashoffset ' + UNDO_SECONDS + 's linear';
+  ringFg.style.transition = 'stroke-dashoffset ' + total + 's linear';
   ringFg.style.strokeDashoffset = RING_LEN;
   undoToast.classList.add('show');
   undoState.interval = setInterval(() => {
@@ -2966,7 +2993,7 @@ function doReset(){
       if(sw){ wirdCounts[sw.id] = prevN; saveWird(); }
       else { tasbihCount = prevN; saveTasbih(); }
       render();
-    });
+    }, 8);
     return;
   }
   const m = mode, snap = JSON.parse(JSON.stringify(progress[m]));
@@ -2981,108 +3008,21 @@ function doReset(){
 }
 document.getElementById('resetBtn').addEventListener('click', doReset);
 
-// زر التصفير في السبحة: عائم وقابل للسحب لأي مكان مريح (يُحفظ مكانه). ضغطة مطوّلة (0.6 ثانية) تملأ الإطار ثم تصفّر، وبعدها يظهر شريط التراجع
-(function(){
-  const btn = document.getElementById('tReset'), fg = document.getElementById('trFg'), tip = document.getElementById('trTip');
-  const HOLD = 600, MOVE = 10, SIZE = 40, POS_KEY = 'tooba-reset-pos';
-  let pos = null, down = null, tipT = null, raf = 0;
-  try{ const p = JSON.parse(localStorage.getItem(POS_KEY)); if(p && isFinite(p.fx) && isFinite(p.fy)) pos = { fx:+p.fx, fy:+p.fy }; }catch(e){}
-  function clamp(x, y){
-    return { x:Math.max(6, Math.min(window.innerWidth - SIZE - 6, x)), y:Math.max(56, Math.min(window.innerHeight - SIZE - 6, y)) };
-  }
-  function place(){
-    raf = 0;
-    if(mode !== 'tasbeeh'){ btn.classList.remove('placed'); return; }
-    if(down && down.moved) return;
-    let x, y;
-    if(pos){ x = pos.fx * window.innerWidth; y = pos.fy * window.innerHeight; }
-    else {
-      // الافتراضي: شمال شرق الرقم الكبير
-      const sr = document.getElementById('segRow');
-      const r = sr ? sr.getBoundingClientRect() : null;
-      if(r && r.width){ x = r.right + 6; y = r.top - 6; }
-      else { x = window.innerWidth - SIZE - 20; y = window.innerHeight * 0.3; }
-    }
-    const c = clamp(x, y);
-    btn.style.left = c.x + 'px'; btn.style.top = c.y + 'px';
-    btn.classList.add('placed');
-  }
-  let trail = null;
-  // تأخير إضافي: أثناء انزلاق الشاشة عند التبديل يكون موضع الرقم مؤقتًا، فنعيد الحساب بعد انتهاء الحركة
-  function schedule(){ if(!raf) raf = requestAnimationFrame(place); clearTimeout(trail); trail = setTimeout(place, 450); }
-  new MutationObserver(schedule).observe(listEl, { childList:true, subtree:true });
-  new MutationObserver(schedule).observe(document.body, { attributes:true, attributeFilter:['data-mode', 'class'] });
-  window.addEventListener('resize', schedule);
-  schedule();
-  function ringTo(v, ms){
-    fg.style.transition = ms ? 'stroke-dashoffset ' + ms + 'ms linear' : 'none';
-    fg.style.strokeDashoffset = v;
-  }
-  function hideTip(){ clearTimeout(tipT); tip.classList.remove('show'); }
-  function showTip(){
-    clearTimeout(tipT);
-    const r = btn.getBoundingClientRect();
-    tip.classList.add('show');
-    const w = tip.offsetWidth;
-    const x = Math.max(8, Math.min(window.innerWidth - w - 8, r.left + r.width / 2 - w / 2));
-    let y = r.top - 46; if(y < 56) y = r.bottom + 8;
-    tip.style.left = x + 'px'; tip.style.top = y + 'px';
-    tipT = setTimeout(() => tip.classList.remove('show'), 1800);
-  }
-  btn.addEventListener('pointerdown', (e) => {
-    if(e.pointerType === 'mouse' && e.button !== 0) return;
-    try{ btn.setPointerCapture(e.pointerId); }catch(err){}
-    const r = btn.getBoundingClientRect();
-    down = { id:e.pointerId, x0:e.clientX, y0:e.clientY, bx:r.left, by:r.top, moved:false, fired:false, t0:Date.now(), timer:null };
-    btn.classList.add('holding');
-    ringTo(113.1, 0); void fg.getBoundingClientRect();
-    ringTo(0, reduceMotion ? 0 : HOLD);
-    haptic('tap');
-    const d = down;
-    d.timer = setTimeout(() => {
-      if(down !== d || d.moved) return;
-      d.fired = true;
-      btn.classList.remove('holding');
-      hideTip();
-      haptic('done');
-      doReset();
-      setTimeout(() => ringTo(113.1, 0), 250);
-    }, HOLD);
-  });
-  btn.addEventListener('pointermove', (e) => {
-    if(!down || e.pointerId !== down.id || down.fired) return;
-    const dx = e.clientX - down.x0, dy = e.clientY - down.y0;
-    if(!down.moved){
-      if(Math.hypot(dx, dy) < MOVE) return;
-      down.moved = true;
-      clearTimeout(down.timer);
-      hideTip();
-      btn.classList.remove('holding');
-      btn.classList.add('dragging');
-      ringTo(113.1, 150);
-    }
-    const c = clamp(down.bx + dx, down.by + dy);
-    btn.style.left = c.x + 'px'; btn.style.top = c.y + 'px';
-  });
-  function end(e){
-    if(!down || e.pointerId !== down.id) return;
-    clearTimeout(down.timer);
-    const d = down; down = null;
-    btn.classList.remove('holding', 'dragging');
-    if(d.moved){
-      const r = btn.getBoundingClientRect();
-      pos = { fx:r.left / window.innerWidth, fy:r.top / window.innerHeight };
-      try{ localStorage.setItem(POS_KEY, JSON.stringify(pos)); }catch(err){}
-    } else if(!d.fired){
-      ringTo(113.1, 150);
-      if(e.type === 'pointerup' && Date.now() - d.t0 < HOLD - 50) showTip();
-    }
-  }
-  btn.addEventListener('pointerup', end);
-  btn.addEventListener('pointercancel', end);
-  btn.addEventListener('contextmenu', (e) => e.preventDefault());
-  btn.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); doReset(); } });
-})();
+// زر التصفير في السبحة: جزء من حاوية الرقم نفسها (يلزقه عن يمينه)، فيتحرك مع الرقم والسكرول والانزلاق بدون أي حساب متأخر. ضغطة واحدة تصفّر ويظهر شريط التراجع
+try{ localStorage.removeItem('tooba-reset-pos'); }catch(e){}
+function fitReset(){
+  const b = document.getElementById('tReset'), w = document.querySelector('.seg-wrap');
+  if(!b || !w) return;
+  // لو الرقم عريض جدًا والزر هيطلع برّا الشاشة نحطه فوق الرقم (قياس بالتخطيط، لا يتأثر بانزلاق الشاشة)
+  const cw = document.documentElement.clientWidth;
+  b.classList.toggle('flip', (cw + w.offsetWidth) / 2 + 18 + 34 > cw - 6);
+}
+window.addEventListener('resize', fitReset);
+document.addEventListener('click', (e) => {
+  if(!(e.target.closest && e.target.closest('#tReset'))) return;
+  haptic('done'); doReset();
+});
+document.addEventListener('contextmenu', (e) => { if(e.target.closest && e.target.closest('#tReset')) e.preventDefault(); });
 
 { const qm = new URLSearchParams(location.search).get('m'); if(qm === 'morning' || qm === 'evening') mode = qm; }
 render();
