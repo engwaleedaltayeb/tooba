@@ -937,11 +937,23 @@
   body.focus[data-mode="tasbeeh"] .wrap{ padding-top:0; }
   body.focus[data-mode="tasbeeh"] .progress{ padding-top:58px; }
   /* شريط الأوراد في الوضع الهادئ: الورد الحالي في النص، وجيرانه على الجانبين (للعرض والسحب فقط) فيبان إن فيه تنقل */
-  .wstrip{ display:none; position:relative; overflow:hidden; margin:0 -24px 4px; padding:0 8px; text-align:center; user-select:none; -webkit-user-select:none; }
+  .wstrip{ display:none; position:relative; overflow-x:clip; overflow-y:visible; margin:0 -24px 4px; padding:0 8px; text-align:center; user-select:none; -webkit-user-select:none; }
   body.focus[data-mode="tasbeeh"] .wstrip{ display:block; }
+  /* الوضع الهادئ: شاشة واحدة ما بتتمرّرش، فنمنع المتصفح من إلغاء اللمسة عند السحب المائل لأعلى أو أسفل */
+  body.focus[data-mode="tasbeeh"], body.focus[data-mode="tasbeeh"] .wrap{ touch-action:pan-x; }
   body.focus[data-mode="tasbeeh"]:not(.has-wird) .wstrip{ margin-top:64px; }
   body.focus:not(.has-wird)[data-mode="tasbeeh"] .tasbih{ min-height:calc(100vh - 230px); }
-  .wcw{ position:relative; display:inline-block; white-space:nowrap; font-size:32px; font-weight:700; line-height:1.4; color:var(--accent-text); }
+  /* العنوان الحالي: نفس حجم الخط، ولو طويل بتنزل باقي كلماته تحت السطر الأول من غير ما تزوّد ارتفاع الشريط (الصف اللي تحته ما بيتحركش). الجيران سطر واحد */
+  .wcw{ position:relative; display:block; width:fit-content; max-width:100%; height:1.4em; margin:0 auto; text-align:center; font-size:32px; font-weight:700; line-height:1.4; color:var(--accent-text); }
+  .wct{ display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; overflow-wrap:anywhere; }
+  /* لو العنوان طويل ونزل على سطرين: نضيّق عرضه عشان جيرانه يمين وشمال يفضلوا ظاهرين */
+  .wcw.two{ max-width:68%; }
+  .wcw.two .wnb.prev{ left:calc(100% + 14px); }
+  .wcw.two .wnb.next{ right:calc(100% + 14px); }
+  /* تلاشي الجيران عند حافتي الشاشة: إيحاء إن الشريط أطول من الشاشة وينفع تسحبه */
+  .wstrip::before, .wstrip::after{ content:''; position:absolute; top:0; bottom:0; width:14%; z-index:2; pointer-events:none; }
+  .wstrip::before{ left:0; background:linear-gradient(to right, var(--bg), transparent); }
+  .wstrip::after{ right:0; background:linear-gradient(to left, var(--bg), transparent); }
   .wnb{
     position:absolute; top:50%; transform:translateY(-50%);
     white-space:nowrap; font-size:28px; font-weight:700; line-height:1.4; pointer-events:none;
@@ -1134,6 +1146,9 @@
     transition:transform .45s cubic-bezier(.2,.9,.3,1.1), opacity .3s ease;
   }
   .battery-toast.show{ opacity:1; transform:translate(-50%, 0) scale(1); }
+  /* رسالة «تم تفعيل الوضع الهادئ»: تطلع من تحت نفس مكان شريط التراجع، عشان ما تغطّيش على شريط الأوراد فوق */
+  #batteryToast{ top:auto; bottom:calc(var(--sa-bottom) + 20px); transform:translate(-50%, 160%) scale(.92); }
+  #batteryToast.show{ transform:translate(-50%, 0) scale(1); }
   .battery-toast{ display:flex; align-items:center; gap:10px; }
   .bt-icon{ position:relative; width:24px; height:24px; flex-shrink:0; color:var(--accent-text); }
   .bt-icon svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
@@ -1466,7 +1481,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.25</div>
+    <div class="about-ver">الإصدار 2.4.32</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -2001,6 +2016,16 @@ function setFocus(on){
     batteryPrevTheme = null;
   }
   body.classList.toggle('focus', on);
+  fitStrip();
+  // لمحة توضيحية خفيفة إن الشريط يتسحب: أول 3 مرات تدخل الوضع الهادئ فقط
+  if(on){
+    let hn = 0;
+    try{ hn = parseInt(localStorage.getItem('tooba-focus-hint'), 10) || 0; }catch(e){}
+    if(hn < 3){
+      try{ localStorage.setItem('tooba-focus-hint', String(hn + 1)); }catch(e){}
+      setTimeout(playSwipeHint, 700);
+    }
+  }
   focusBtn.classList.toggle('on', on);
   focusBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
   focusBtn.setAttribute('aria-label', on ? 'إنهاء الوضع الهادئ' : 'الوضع الهادئ');
@@ -2232,9 +2257,30 @@ function paintWirdStrip(){
   const dn = x => !!x && (wirdCounts[x.id] || 0) >= x.target;
   const mk = (x, cls) => x === undefined ? '' : '<span class="wnb ' + cls + (dn(x) ? ' done' : '') + '"' + (x && x.custom ? ' data-clarity-mask="true"' : '') + '>' + esc(nm(x)) + '</span>';
   const cur = items[i];
-  const html = '<span class="wcw"' + (cur && cur.custom ? ' data-clarity-mask="true"' : '') + '>' + esc(nm(cur)) + mk(items[i - 1], 'prev') + mk(items[i + 1], 'next') + '</span>';
+  const html = '<span class="wcw"' + (cur && cur.custom ? ' data-clarity-mask="true"' : '') + '><span class="wct">' + esc(nm(cur)) + '</span>' + mk(items[i - 1], 'prev') + mk(items[i + 1], 'next') + '</span>';
   if(wt.dataset.k !== html){ wt.dataset.k = html; wt.innerHTML = html; }
+  fitStrip();
 }
+function playSwipeHint(){
+  if(reduceMotion || mode !== 'tasbeeh' || !body.classList.contains('focus')) return;
+  const el = document.querySelector('#wirdTitle .wcw');
+  if(!el || !el.animate) return;
+  const ids = [null].concat(allWirds().map(w => w.id));
+  const d = ids.indexOf(selWird) < ids.length - 1 ? 30 : -30;
+  el.animate([
+    { transform:'translateX(0)' },
+    { transform:'translateX(' + d + 'px)', offset:0.4 },
+    { transform:'translateX(0)' }
+  ], { duration:900, easing:'cubic-bezier(.4,0,.2,1)' });
+}
+function fitStrip(){
+  const wcw = document.querySelector('#wirdTitle .wcw'), t = wcw && wcw.querySelector('.wct');
+  if(!t) return;
+  wcw.classList.remove('two');
+  if(t.scrollHeight > wcw.clientHeight + 2) wcw.classList.add('two');
+}
+window.addEventListener('resize', fitStrip);
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitStrip);
 function paintWirdProgress(prev){
   const w = selWirdObj();
   body.classList.toggle('has-wird', !!w);
@@ -2598,6 +2644,7 @@ let undoState = null;
 function hideUndo(){
   if(undoState){ clearInterval(undoState.interval); undoState = null; }
   undoToast.classList.remove('show');
+  if(!undoToast._dismissing){ undoToast.style.transition = ''; undoToast.style.transform = ''; undoToast.style.opacity = ''; }
 }
 
 function showUndo(m, index, prev, label, restore, secs){
@@ -2612,6 +2659,8 @@ function showUndo(m, index, prev, label, restore, secs){
   void ringFg.getBoundingClientRect();
   ringFg.style.transition = 'stroke-dashoffset ' + total + 's linear';
   ringFg.style.strokeDashoffset = RING_LEN;
+  undoToast._dismissing = false;
+  undoToast.style.transition = ''; undoToast.style.transform = ''; undoToast.style.opacity = '';
   undoToast.classList.add('show');
   undoState.interval = setInterval(() => {
     sec--;
@@ -2683,6 +2732,53 @@ function completeItem(card, index, prevRemaining){
     }
   }), reduceMotion ? 0 : 50);
 }
+
+// إخفاء شريط التراجع بالسحب يمينًا أو شمالًا (الإجراء نفسه يبقى منفّذًا، وبس بيتلغي خيار التراجع)
+(function(){
+  let sx = 0, sy = 0, dx = 0, drag = false, moved = false, pid = null;
+  undoToast.style.touchAction = 'pan-y';
+  undoToast.addEventListener('pointerdown', (e) => {
+    if(e.pointerType === 'mouse' && e.button !== 0) return;
+    sx = e.clientX; sy = e.clientY; dx = 0; drag = true; moved = false; pid = e.pointerId;
+  });
+  undoToast.addEventListener('pointermove', (e) => {
+    if(!drag || e.pointerId !== pid) return;
+    dx = e.clientX - sx;
+    if(!moved){
+      if(Math.abs(dx) < 8) return;
+      if(Math.abs(e.clientY - sy) > Math.abs(dx)){ drag = false; return; }
+      moved = true;
+      try{ undoToast.setPointerCapture(pid); }catch(err){}
+      undoToast.style.transition = 'none';
+    }
+    undoToast.style.transform = 'translate(calc(-50% + ' + dx + 'px), 0)';
+    undoToast.style.opacity = String(Math.max(.2, 1 - Math.abs(dx) / 220));
+  });
+  function end(e){
+    if(!drag || e.pointerId !== pid) return;
+    drag = false;
+    if(!moved) return;
+    if(Math.abs(dx) > 70){
+      const dir = dx > 0 ? 1 : -1, st = undoState;
+      undoToast._dismissing = true;
+      undoToast.style.transition = 'transform .22s ease, opacity .22s ease';
+      undoToast.style.transform = 'translate(calc(-50% + ' + (dir * window.innerWidth) + 'px), 0)';
+      undoToast.style.opacity = '0';
+      setTimeout(() => {
+        undoToast._dismissing = false;
+        if(undoState === st) hideUndo();
+        undoToast.style.transition = ''; undoToast.style.transform = ''; undoToast.style.opacity = '';
+      }, 230);
+    } else {
+      undoToast.style.transition = 'transform .25s cubic-bezier(.2,.9,.3,1.1), opacity .2s ease';
+      undoToast.style.transform = ''; undoToast.style.opacity = '';
+    }
+  }
+  undoToast.addEventListener('pointerup', end);
+  undoToast.addEventListener('pointercancel', end);
+  // لو السحب بدأ من زر «تراجع» ما تتنفذش النقرة
+  undoToast.addEventListener('click', (e) => { if(moved){ e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+})();
 
 undoBtn.addEventListener('click', () => {
   if(!undoState) return;
@@ -2992,7 +3088,7 @@ function doReset(){
       if(sw){ wirdCounts[sw.id] = prevN; saveWird(); }
       else { tasbihCount = prevN; saveTasbih(); }
       render();
-    }, 8);
+    });
     return;
   }
   const m = mode, snap = JSON.parse(JSON.stringify(progress[m]));
@@ -3037,15 +3133,22 @@ render();
   document.addEventListener('touchstart', (e) => {
     const t = e.touches[0];
     if(e.touches.length !== 1 || ovStack.length || (e.target.closest && e.target.closest('input, textarea, .wsel, .promo, .undo-toast, .t-reset')) ||
-       t.clientX < 24 || t.clientX > window.innerWidth - 24){ ok = false; return; }
+       t.clientX < 14 || t.clientX > window.innerWidth - 14){ ok = false; return; }
     sx = t.clientX; sy = t.clientY; st = Date.now(); ok = true;
   }, { passive:true });
   document.addEventListener('touchend', (e) => {
     if(!ok) return;
     ok = false;
     const t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
-    if(Date.now() - st > 700 || Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.8) return;
+    if(Date.now() - st > 1000 || Math.abs(dx) < 44 || Math.abs(dx) < Math.abs(dy) * 1.3) return;
     swipeGo(dx > 0 ? 1 : -1);
+  }, { passive:true });
+  // التنقّل يحصل أثناء السحب نفسه أول ما تتضح النية (بدل انتظار رفع الإصبع)، فيبقى الإحساس فوريًا وما يضيعش لو المتصفح ألغى اللمسة
+  document.addEventListener('touchmove', (e) => {
+    if(!ok) return;
+    const t = e.touches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+    if(Math.abs(dy) > 40 && Math.abs(dy) > Math.abs(dx)){ ok = false; return; }
+    if(Math.abs(dx) >= 56 && Math.abs(dx) >= Math.abs(dy) * 1.3){ ok = false; swipeGo(dx > 0 ? 1 : -1); }
   }, { passive:true });
   document.addEventListener('touchcancel', () => { ok = false; }, { passive:true });
   // الماوس (الويب على الكمبيوتر): اسحب بالضغط المستمر يمينًا أو شمالًا، نفس شروط اللمس
