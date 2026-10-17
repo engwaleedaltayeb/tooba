@@ -56,6 +56,7 @@
     --accent-evening:#3a4a7a;
     --accent-tasbeeh:#15ce57;
     --bell-on:#0d9a43;
+    --reset:#d8453a;
     --accent: var(--accent-morning);
     --sa-top:max(env(safe-area-inset-top,0px), var(--safe-area-inset-top,0px));
     --sa-bottom:max(env(safe-area-inset-bottom,0px), var(--safe-area-inset-bottom,0px));
@@ -94,7 +95,7 @@
   }
   :root[data-theme="dark"] body[data-mode="morning"]{ --accent-text:#15ce57; }
   :root[data-theme="dark"] body[data-mode="evening"]{ --accent-text:#8ba0e8; }
-  html,body{height:100%;}
+  html,body{height:100%; overscroll-behavior-x:none;}
   *{margin:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   body{ -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; touch-action:manipulation; }
   input, textarea, .about-text{ -webkit-user-select:text; user-select:text; }
@@ -463,9 +464,9 @@
   }
   #bellBtn.on .hslash{ opacity:0; }
   @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){ --bell-on:#15ce57; }
+    :root:not([data-theme="light"]){ --bell-on:#15ce57; --reset:#f0766c; }
   }
-  :root[data-theme="dark"]{ --bell-on:#15ce57; }
+  :root[data-theme="dark"]{ --bell-on:#15ce57; --reset:#f0766c; }
   [data-mode="evening"] #bellBtn.on{ color:#6c85d6; border-color:color-mix(in srgb, #6c85d6 45%, transparent); background:color-mix(in srgb, #6c85d6 12%, var(--surface)); }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]) [data-mode="evening"] #bellBtn.on{ color:#8ba0e8; border-color:color-mix(in srgb, #8ba0e8 45%, transparent); background:color-mix(in srgb, #8ba0e8 14%, var(--surface)); }
@@ -716,27 +717,30 @@
     transition:transform .15s ease, background .5s ease;
   }
   .reset-btn:active{ transform:scale(0.9) rotate(-45deg); }
-  /* السبحة: زر التصفير عائم بمكان ثابت، ضغطة واحدة تصفّر مع شريط التراجع */
+  /* السبحة: زر التصفير أول زر من اليمين في صف الأدوات، وفي الوضع الهادئ فوق يمين جنب زر الثيم */
   body[data-mode="tasbeeh"] .reset-btn{ display:none; }
-  .t-reset{
-    position:absolute; left:calc(100% + 18px); top:-6px;
-    z-index:2;
-    width:34px; height:34px; padding:0;
-    border-radius:50%;
-    border:none;
-    background:color-mix(in srgb, var(--accent-tasbeeh) 15%, transparent);
-    color:var(--accent-text);
-    display:flex;
-    align-items:center; justify-content:center;
-    cursor:pointer;
-    box-shadow:none;
-    touch-action:manipulation;
-    -webkit-touch-callout:none;
-    transition:transform .15s ease, opacity .2s ease, color .2s ease, box-shadow .2s ease;
+  #tReset{
+    display:none; align-items:center; justify-content:center;
+    width:38px; height:34px; padding:0; border-radius:999px;
+    border:1px solid transparent; box-shadow:none;
+    background:color-mix(in srgb, var(--reset) 14%, transparent);
+    color:var(--reset);
+    touch-action:manipulation; -webkit-touch-callout:none;
+    transition:background .25s ease, color .25s ease, opacity .25s ease, border-color .25s ease, transform .15s ease;
+  }
+  /* مطفي لما العدّ صفر، ويضيء أحمر هادي أول ما يبدأ العدّ */
+  #tReset.dis{
+    background:var(--surface); border-color:var(--border);
+    box-shadow:0 1px 3px var(--shadow);
+    color:var(--text-dim); opacity:.35;
+  }
+  body[data-mode="tasbeeh"] #tReset{ display:flex; }
+  #tReset:not(.dis):active{ transform:scale(0.9) rotate(-45deg); background:color-mix(in srgb, var(--reset) 28%, transparent); }
+  body.focus[data-mode="tasbeeh"] #tReset{
+    position:fixed; top:calc(var(--sa-top) + 14px); right:calc(var(--sa-right) + 62px);
+    width:34px; height:34px; padding:0; border-radius:50%; z-index:50;
   }
   .seg-wrap{ position:relative; display:flex; justify-content:center; }
-  .t-reset.flip{ left:auto; right:0; top:-40px; }
-  .t-reset:active{ transform:scale(0.9) rotate(-45deg); background:color-mix(in srgb, var(--accent-tasbeeh) 28%, transparent); }
   .theme-toggle{
     position:fixed;
     top:calc(var(--sa-top) + 14px);
@@ -908,17 +912,17 @@
     z-index:50;
   }
   body.focus[data-mode="tasbeeh"] .font-ctrl{ margin:0; height:0; }
-  /* زرّا «إتمام الورد» و«تعديل الورد»: في صف الأدوات (السبحة فقط)، وفي الوضع الهادئ فوق شمال */
+  /* زرّا «إتمام الورد» و«تعديل الورد»: فوق شمال في الهيدر في كل أوضاع السبحة (العادي والهادئ) */
   #doneBtn, #wedit{ display:none; align-items:center; justify-content:center; }
   body[data-mode="tasbeeh"] #doneBtn, body[data-mode="tasbeeh"] #wedit{ display:flex; }
   #doneBtn{ color:var(--accent-text); }
   #doneBtn.dis, #wedit.dis{ opacity:.35; color:var(--text-dim); }
-  body.focus[data-mode="tasbeeh"] #doneBtn, body.focus[data-mode="tasbeeh"] #wedit{
+  body[data-mode="tasbeeh"] #doneBtn, body[data-mode="tasbeeh"] #wedit{
     position:fixed; top:calc(var(--sa-top) + 14px);
     width:34px; height:34px; padding:0; border-radius:50%; z-index:50;
   }
-  body.focus[data-mode="tasbeeh"] #wedit{ left:calc(var(--sa-left) + 20px); }
-  body.focus[data-mode="tasbeeh"] #doneBtn{ left:calc(var(--sa-left) + 62px); }
+  body[data-mode="tasbeeh"] #doneBtn{ left:calc(var(--sa-left) + 20px); }
+  body[data-mode="tasbeeh"] #wedit{ left:calc(var(--sa-left) + 62px); }
   #focusBtn .fx-out{ display:none; }
   #focusBtn.on .fx-in{ display:none; }
   #focusBtn.on .fx-out{ display:block; }
@@ -932,8 +936,20 @@
   body.focus[data-mode="tasbeeh"] .wsel{ display:none; }
   body.focus[data-mode="tasbeeh"] .wrap{ padding-top:0; }
   body.focus[data-mode="tasbeeh"] .progress{ padding-top:58px; }
-  .wird-title{ display:none; text-align:center; font-size:32px; font-weight:700; line-height:1.4; color:var(--accent-text); margin:0 0 4px; padding:0 8px; }
-  body.focus.has-wird[data-mode="tasbeeh"] .wird-title{ display:block; }
+  /* شريط الأوراد في الوضع الهادئ: الورد الحالي في النص، وجيرانه على الجانبين (للعرض والسحب فقط) فيبان إن فيه تنقل */
+  .wstrip{ display:none; position:relative; overflow:hidden; margin:0 -24px 4px; padding:0 8px; text-align:center; user-select:none; -webkit-user-select:none; }
+  body.focus[data-mode="tasbeeh"] .wstrip{ display:block; }
+  body.focus[data-mode="tasbeeh"]:not(.has-wird) .wstrip{ margin-top:64px; }
+  body.focus:not(.has-wird)[data-mode="tasbeeh"] .tasbih{ min-height:calc(100vh - 230px); }
+  .wcw{ position:relative; display:inline-block; white-space:nowrap; font-size:32px; font-weight:700; line-height:1.4; color:var(--accent-text); }
+  .wnb{
+    position:absolute; top:50%; transform:translateY(-50%);
+    white-space:nowrap; font-size:28px; font-weight:700; line-height:1.4; pointer-events:none;
+    color:color-mix(in srgb, var(--text) 26%, var(--bg));
+  }
+  .wnb.done{ color:color-mix(in srgb, var(--accent-text) 42%, var(--bg)); }
+  .wnb.prev{ left:calc(100% + 30px); }
+  .wnb.next{ right:calc(100% + 30px); }
   body.focus.has-wird[data-mode="tasbeeh"] .progress{ margin-bottom:12px; }
   body.focus.has-wird[data-mode="tasbeeh"] .tasbih{ min-height:calc(100vh - 290px); }
   .wirds{ display:flex; flex-direction:column; gap:12px; margin-top:6px; }
@@ -1329,15 +1345,6 @@
     .promo-msg{ font-size:12px; line-height:1.3; }
   }
   @media (prefers-reduced-motion: reduce){ .promo{ animation:none; } }
-  .wnav{ position:fixed; left:0; right:0; bottom:calc(var(--sa-bottom) + 14px); z-index:30; display:none; flex-direction:column; align-items:center; gap:6px; pointer-events:none; }
-  body.focus[data-mode="tasbeeh"] .wnav{ display:flex; }
-  .wdots{ display:flex; direction:rtl; align-items:center; pointer-events:auto; max-width:100%; }
-  .wdot{ width:20px; height:24px; padding:0; border:none; background:transparent; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-  .wdot::before{ content:''; width:6px; height:6px; border-radius:999px; background:var(--text-dim); opacity:.4; transition:width .3s ease, background .3s ease, opacity .3s ease; }
-  .wdot.done::before{ background:var(--accent-text); opacity:.65; }
-  .wdot.on::before{ width:18px; background:var(--accent-text); opacity:1; }
-  .swipe-hint{ font-size:13px; color:var(--text-dim); opacity:0; transition:opacity .5s ease; }
-  .swipe-hint.show{ opacity:1; }
   .streak{ display:flex; align-items:center; justify-content:center; gap:6px; font-size:13px; color:var(--text-dim); margin:0 0 6px; }
   .streak[hidden]{ display:none; }
   .streak svg{ color:var(--accent-text); flex-shrink:0; }
@@ -1382,6 +1389,7 @@
   </div>
 
   <div class="font-ctrl" aria-label="حجم الخط">
+    <button id="tReset" class="dis" aria-label="تصفير العدّاد"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
     <button id="fontMinus" aria-label="تصغير الخط">أ</button>
     <button id="fontPlus" aria-label="تكبير الخط">أ</button>
     <button id="focusBtn" aria-label="الوضع الهادئ" aria-pressed="false">
@@ -1392,8 +1400,8 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3.5" width="8" height="17" rx="2"/><path d="M4.5 8v8"/><path d="M19.5 8v8"/><path d="M2 10.5v3"/><path d="M22 10.5v3"/><path class="hslash" d="M3.5 3L20.5 21"/></svg>
     </button>
     <button id="bellBtn" aria-label="تذكير بأوقات الأذكار" aria-pressed="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><path class="hslash" d="M3.5 3L20.5 21"/></svg></button>
-    <button id="doneBtn" class="dis" aria-label="إتمام الورد"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12l4 4L15 7"/><path d="M9 12l4 4L22 7"/></svg></button>
     <button id="wedit" class="dis" aria-label="تعديل العدد"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+    <button id="doneBtn" class="dis" aria-label="إتمام الورد"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12l4 4L15 7"/><path d="M9 12l4 4L22 7"/></svg></button>
   </div>
 
   <div class="progress">
@@ -1406,7 +1414,7 @@
     </div>
   </div>
 
-  <div class="wird-title" id="wirdTitle" aria-hidden="true"></div>
+  <div class="wstrip" id="wirdTitle" aria-hidden="true"></div>
 
   <div class="list" id="list"></div>
 
@@ -1439,7 +1447,7 @@
 
 <div class="battery-toast remind-toast" id="remindToast" role="status" aria-live="polite"><span class="rt-icon" aria-hidden="true"><svg class="rt-logo" viewBox="0 0 336.42 336.42"><path class="rt-p p1" fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path class="rt-p p2" fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path class="rt-p p3" fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path class="rt-p p4" fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path class="rt-p p5" fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><svg class="rt-bellwrap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g class="rt-bell"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g><path class="rt-slash" d="M3.5 3L20.5 21" pathLength="100"/><g class="rt-check"><circle cx="19" cy="18.6" r="3.7" fill="#15ce57" stroke="var(--surface)" stroke-width="1"/><path d="M17.5 18.7l1.1 1.1 2-2.3" stroke="#fff" stroke-width="1.1"/></g></svg></span><span id="remindToastText">تم حفظ الأوقات وتفعيل الإشعارات</span></div>
 
-<div class="wnav" id="wnav"><div class="swipe-hint" id="swipeHint">اسحب يمينًا أو يسارًا للتنقل بين الأوراد</div><div class="wdots" id="wdots"></div></div>
+
 
 <div class="sheet-overlay" id="aboutOverlay">
   <div class="sheet">
@@ -1458,7 +1466,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.16</div>
+    <div class="about-ver">الإصدار 2.4.25</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1884,7 +1892,8 @@ function drawTasbih(bump){
   if(ed) ed.classList.toggle('dis', !w);
   const dn = document.getElementById('doneBtn');
   if(dn) dn.classList.toggle('dis', !(w && n < w.target));
-  fitReset();
+  const trb = document.getElementById('tReset');
+  if(trb) trb.classList.toggle('dis', !(n > 0));
   if(bump && !reduceMotion){
     // نفس إحساس رقم البروجريس الصغير (نفس المدة والنطة الناعمة)، بحجم أهدأ لأن الرقم كبير
     if(row._bump) row._bump.cancel();
@@ -1996,7 +2005,7 @@ function setFocus(on){
   focusBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
   focusBtn.setAttribute('aria-label', on ? 'إنهاء الوضع الهادئ' : 'الوضع الهادئ');
   applyThemeIcon();
-  if(on){ showBatteryToast(); maybeSwipeHint(); } else hideBatteryToast();
+  if(on){ showBatteryToast(); } else hideBatteryToast();
   // زر الرجوع في الموبايل يقفل الوضع الهادئ بس بدل ما يقفل التطبيق
   try{
     if(on && !focusPushed){ history.pushState({ toobaFocus:true }, ''); focusPushed = true; }
@@ -2004,13 +2013,6 @@ function setFocus(on){
   }catch(e){ focusPushed = false; }
 }
 let focusPushed = false;
-// تلميح السوايب: مرة واحدة فقط أول مرة يدخل الوضع الهادئ
-function maybeSwipeHint(){
-  if(mode !== 'tasbeeh') return;
-  try{ if(localStorage.getItem('tooba-swipe-hint') === '1') return; localStorage.setItem('tooba-swipe-hint', '1'); }catch(e){ return; }
-  const h = document.getElementById('swipeHint');
-  setTimeout(() => { h.classList.add('show'); setTimeout(() => h.classList.remove('show'), 4500); }, 1800);
-}
 // زر الرجوع يقفل النافذة المنبثقة المفتوحة فقط بدل ما يقفل التطبيق
 const OV_IDS = ['aboutOverlay','wirdOverlay','zOverlay','rOverlay','sheetOverlay'];
 const ovStack = [];
@@ -2213,22 +2215,25 @@ function paintChips(){
       if(f) f.style.strokeDasharray = Math.min(100, c / w.target * 100).toFixed(2) + ' 100';
     }
   });
-  paintDots();
-}
-function paintDots(){
-  const el = document.getElementById('wdots');
-  if(!el) return;
-  el.innerHTML = [null].concat(allWirds()).map(w => {
-    const id = w ? w.id : '';
-    const done = !!w && (wirdCounts[w.id] || 0) >= w.target;
-    return '<button class="wdot' + ((w ? w.id : null) === selWird ? ' on' : '') + (done ? ' done' : '') + '" data-id="' + esc(id) + '" aria-label="' + (w ? esc(w.short || w.name) : 'عدّ حر') + '"></button>';
-  }).join('');
 }
 // حلقة التاج: دائرة للأرقام الصغيرة وتتحول لبيضاوي (كبسولة) كل ما زادت خانات الرقم
 function badgeGeom(w){
   const h = 28, sw = 2.6, r = (h - sw) / 2, x0 = sw / 2, y0 = sw / 2, x1 = w - sw / 2, y1 = h - sw / 2, cx = w / 2;
   return 'M' + cx + ' ' + y0 + 'H' + (x1 - r) + 'A' + r + ' ' + r + ' 0 0 1 ' + (x1 - r) + ' ' + y1 +
          'H' + (x0 + r) + 'A' + r + ' ' + r + ' 0 0 1 ' + (x0 + r) + ' ' + y0 + 'H' + cx;
+}
+function paintWirdStrip(){
+  const wt = document.getElementById('wirdTitle');
+  if(!wt) return;
+  const items = [null].concat(allWirds());
+  const i = items.findIndex(x => (x ? x.id : null) === selWird);
+  if(i < 0) return;
+  const nm = x => x ? (x.short || x.name) : 'عدّ حر';
+  const dn = x => !!x && (wirdCounts[x.id] || 0) >= x.target;
+  const mk = (x, cls) => x === undefined ? '' : '<span class="wnb ' + cls + (dn(x) ? ' done' : '') + '"' + (x && x.custom ? ' data-clarity-mask="true"' : '') + '>' + esc(nm(x)) + '</span>';
+  const cur = items[i];
+  const html = '<span class="wcw"' + (cur && cur.custom ? ' data-clarity-mask="true"' : '') + '>' + esc(nm(cur)) + mk(items[i - 1], 'prev') + mk(items[i + 1], 'next') + '</span>';
+  if(wt.dataset.k !== html){ wt.dataset.k = html; wt.innerHTML = html; }
 }
 function paintWirdProgress(prev){
   const w = selWirdObj();
@@ -2239,11 +2244,7 @@ function paintWirdProgress(prev){
     if(w) title.innerHTML = 'السبحة<span class="t-sub"' + (w.custom ? ' data-clarity-mask="true"' : '') + '> - ' + esc(w.short || w.name) + '</span>';
     else title.textContent = MODE_TITLES.tasbeeh;
   }
-  const wt = document.getElementById('wirdTitle');
-  if(wt){
-    wt.textContent = w ? (w.short || w.name) : '';
-    if(w && w.custom) wt.setAttribute('data-clarity-mask', 'true'); else wt.removeAttribute('data-clarity-mask');
-  }
+  paintWirdStrip();
   if(!w) return;
   const c = wirdCounts[w.id] || 0, t = w.target;
   progressText.innerHTML = '<b class="pnum">' + c + '</b> من ' + (c > t ? '<span class="inf">∞</span>' : t);
@@ -2289,7 +2290,7 @@ function selectWird(id, animate, center){
     const chip = document.querySelector('.wchip.on'), sc = document.getElementById('wsel');
     if(chip && sc) sc.scrollLeft += chip.getBoundingClientRect().left + chip.offsetWidth / 2 - (sc.getBoundingClientRect().left + sc.clientWidth / 2);
   }
-  if(animate) slideIn([listEl.querySelector('.tasbih'), document.getElementById('wirdTitle')], wirdIndex(selWird) > prevIdx ? -1 : 1);
+  if(animate) slideIn([listEl.querySelector('.tasbih'), document.querySelector('#wirdTitle .wcw')], wirdIndex(selWird) > prevIdx ? -1 : 1);
 }
 document.addEventListener('click', (e) => {
   if(mode !== 'tasbeeh') return;
@@ -2300,8 +2301,6 @@ document.addEventListener('click', (e) => {
     return;
   }
   const ch = e.target.closest && e.target.closest('.wchip[data-id]');
-  const dot = e.target.closest && e.target.closest('.wdot');
-  if(dot){ haptic('tap'); selectWird(dot.dataset.id || null, true, false); return; }
   const nbtn = e.target.closest && e.target.closest('#wirdNext');
   if(nbtn){ haptic('tap'); selectWird(nbtn.dataset.id, true, true); return; }
   if(ch){ haptic('tap'); selectWird(ch.dataset.id, true); return; }
@@ -2455,7 +2454,7 @@ function render(){
   if(mode === 'tasbeeh'){
     autoHaptic();
     if(selWird && !selWirdObj()) selWird = null;
-    listEl.innerHTML = '<div class="wsel" id="wsel">' + chipsHTML() + '</div><div class="streak" id="streakLine" hidden></div><div class="tasbih"><div class="seg-wrap"><div class="seg-row" id="segRow" role="img"></div><button class="t-reset" id="tReset" aria-label="تصفير العدّاد"><svg class="tr-ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button></div><div class="tasbih-hint" id="tasbihHint">اضغط في أي مكان على الشاشة للبدء</div><button class="done-btn wird-remind" id="wirdRemind" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span></span></button><button class="done-btn primary wird-next" id="wirdNext" hidden><span></span></button><div class="wird-info" id="wirdInfo" hidden><div class="wi-z"></div><div class="wi-f"></div></div></div>';
+    listEl.innerHTML = '<div class="wsel" id="wsel">' + chipsHTML() + '</div><div class="streak" id="streakLine" hidden></div><div class="tasbih"><div class="seg-wrap"><div class="seg-row" id="segRow" role="img"></div></div><div class="tasbih-hint" id="tasbihHint">اضغط في أي مكان على الشاشة للبدء</div><button class="done-btn wird-remind" id="wirdRemind" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span></span></button><button class="done-btn primary wird-next" id="wirdNext" hidden><span></span></button><div class="wird-info" id="wirdInfo" hidden><div class="wi-z"></div><div class="wi-f"></div></div></div>';
     paintChips();
     paintStreak();
     drawTasbih(false);
@@ -3008,18 +3007,11 @@ function doReset(){
 }
 document.getElementById('resetBtn').addEventListener('click', doReset);
 
-// زر التصفير في السبحة: جزء من حاوية الرقم نفسها (يلزقه عن يمينه)، فيتحرك مع الرقم والسكرول والانزلاق بدون أي حساب متأخر. ضغطة واحدة تصفّر ويظهر شريط التراجع
+// زر التصفير في السبحة: في صف الأدوات (أول زر من اليمين)، وفي الوضع الهادئ فوق يمين. ضغطة واحدة تصفّر ويظهر شريط التراجع
 try{ localStorage.removeItem('tooba-reset-pos'); }catch(e){}
-function fitReset(){
-  const b = document.getElementById('tReset'), w = document.querySelector('.seg-wrap');
-  if(!b || !w) return;
-  // لو الرقم عريض جدًا والزر هيطلع برّا الشاشة نحطه فوق الرقم (قياس بالتخطيط، لا يتأثر بانزلاق الشاشة)
-  const cw = document.documentElement.clientWidth;
-  b.classList.toggle('flip', (cw + w.offsetWidth) / 2 + 18 + 34 > cw - 6);
-}
-window.addEventListener('resize', fitReset);
 document.addEventListener('click', (e) => {
-  if(!(e.target.closest && e.target.closest('#tReset'))) return;
+  const tb = e.target.closest && e.target.closest('#tReset');
+  if(!tb || tb.classList.contains('dis')) return;
   haptic('done'); doReset();
 });
 document.addEventListener('contextmenu', (e) => { if(e.target.closest && e.target.closest('#tReset')) e.preventDefault(); });
@@ -3056,6 +3048,36 @@ render();
     swipeGo(dx > 0 ? 1 : -1);
   }, { passive:true });
   document.addEventListener('touchcancel', () => { ok = false; }, { passive:true });
+  // الماوس (الويب على الكمبيوتر): اسحب بالضغط المستمر يمينًا أو شمالًا، نفس شروط اللمس
+  let mx = 0, my = 0, mt = 0, mok = false, swipedAt = 0;
+  const NOSWIPE = 'input, textarea, .wsel, .promo, .undo-toast, #tReset';
+  document.addEventListener('pointerdown', (e) => {
+    if(e.pointerType !== 'mouse' || e.button !== 0 || ovStack.length || (e.target.closest && e.target.closest(NOSWIPE))){ mok = false; return; }
+    mx = e.clientX; my = e.clientY; mt = Date.now(); mok = true;
+  });
+  document.addEventListener('pointerup', (e) => {
+    if(!mok || e.pointerType !== 'mouse') return;
+    mok = false;
+    const dx = e.clientX - mx, dy = e.clientY - my;
+    if(Date.now() - mt > 900 || Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.8) return;
+    swipedAt = Date.now();
+    swipeGo(dx > 0 ? 1 : -1);
+  });
+  document.addEventListener('pointercancel', () => { mok = false; });
+  // بعد سحبة بالماوس نمنع النقرة اللي المتصفح بيولّدها، عشان ما تتحسب عدّة
+  document.addEventListener('click', (e) => {
+    if(swipedAt && Date.now() - swipedAt < 400){ swipedAt = 0; e.stopPropagation(); e.preventDefault(); }
+  }, true);
+  // التراكباد: تمرير بإصبعين أفقيًا
+  let wx = 0, wlock = 0, wreset = null;
+  document.addEventListener('wheel', (e) => {
+    if(ovStack.length || Math.abs(e.deltaX) < Math.abs(e.deltaY) * 1.5 || (e.target.closest && e.target.closest('input, textarea, .wsel'))) return;
+    const now = Date.now();
+    if(now < wlock) return;
+    wx += e.deltaX;
+    clearTimeout(wreset); wreset = setTimeout(() => { wx = 0; }, 200);
+    if(Math.abs(wx) >= 90){ const d = wx < 0 ? 1 : -1; wx = 0; wlock = now + 700; swipeGo(d); }
+  }, { passive:true });
 })();
 
 // ---------- تحديث التطبيق من جوجل بلاي (أندرويد فقط) ----------
