@@ -291,6 +291,9 @@
     100%{ transform:scale(1); }
   }
   [data-mode="evening"] .pnum.bump{ color:#8ba0e8; }
+  .cnum{ display:inline-block; font-variant-numeric:tabular-nums; }
+  .cnum.bump{ animation:numBump .55s cubic-bezier(.2,.9,.3,1.4); }
+  @media (prefers-reduced-motion: reduce){ .cnum.bump{ animation:none !important; } }
   @media (prefers-reduced-motion: reduce){
     .bar.pop, .pnum.bump, .bar-fill.shine .bar-shine{ animation:none !important; }
   }
@@ -644,7 +647,8 @@
     backdrop-filter:blur(18px) saturate(170%);
     border:1px solid var(--border);
     box-shadow:0 10px 32px rgba(0,0,0,0.16);
-    transition:transform .4s cubic-bezier(.2,.9,.3,1.1), opacity .25s ease;
+    margin-bottom:var(--lift,0px);
+    transition:transform .4s cubic-bezier(.2,.9,.3,1.1), opacity .25s ease, margin-bottom .3s ease;
   }
   .undo-toast.show{ transform:translate(-50%, 0); opacity:1; pointer-events:auto; }
   [data-mode="evening"] .undo-toast{ --ta:#6c85d6; }
@@ -1143,7 +1147,8 @@
     opacity:0;
     pointer-events:none;
     transform:translate(-50%, -46px) scale(.92);
-    transition:transform .45s cubic-bezier(.2,.9,.3,1.1), opacity .3s ease;
+    margin-bottom:var(--lift,0px);
+    transition:transform .45s cubic-bezier(.2,.9,.3,1.1), opacity .3s ease, margin-bottom .3s ease;
   }
   .battery-toast.show{ opacity:1; transform:translate(-50%, 0) scale(1); }
   /* رسالة «تم تفعيل الوضع الهادئ»: تطلع من تحت نفس مكان شريط التراجع، عشان ما تغطّيش على شريط الأوراد فوق */
@@ -1481,7 +1486,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.32</div>
+    <div class="about-ver">الإصدار 2.4.36</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1525,6 +1530,11 @@
     <div class="zsheet-note">يصلك إشعار من طوبى في الوقت الذي تختاره، حتى لو كان التطبيق مغلقًا.</div>
     <div class="rrow" id="rowM"><label class="rchk"><input type="checkbox" id="rMOn" checked><span>أذكار الصباح</span></label><input id="rMorning" type="time" value="05:00"></div>
     <div class="rrow" id="rowE"><label class="rchk"><input type="checkbox" id="rEOn" checked><span>أذكار المساء</span></label><input id="rEvening" type="time" value="15:00"></div>
+    <div id="nagBox" hidden>
+      <div class="zsheet-note" style="margin:10px 0 12px;">وتنبيه إضافي إن نسيت: يصلك فقط إذا لم تُكمل الأذكار حتى هذا الوقت.</div>
+      <div class="rrow" id="rowNM"><label class="rchk"><input type="checkbox" id="rNMOn" checked><span>إن لم تكتمل أذكار الصباح</span></label><input id="rNMTime" type="time" value="10:00"></div>
+      <div class="rrow" id="rowNE"><label class="rchk"><input type="checkbox" id="rNEOn" checked><span>إن لم تكتمل أذكار المساء</span></label><input id="rNETime" type="time" value="21:00"></div>
+    </div>
     <div class="zsheet-note" id="rStatus" hidden style="margin:0 0 14px;"></div>
     <button class="sheet-close" id="rPush" style="margin-top:6px;">تفعيل التذكير بالإشعارات</button>
     <button class="done-btn wird-del" id="rOff" hidden><span>إيقاف التذكير</span></button>
@@ -1997,11 +2007,14 @@ let batteryToastT = null;
 function showBatteryToast(){
   clearTimeout(batteryToastT);
   batteryToast.classList.add('show');
-  batteryToastT = setTimeout(() => batteryToast.classList.remove('show'), 2800);
+  batteryToast._at = Date.now();
+  relayoutToasts();
+  batteryToastT = setTimeout(() => { batteryToast.classList.remove('show'); relayoutToasts(); }, 2800);
 }
 function hideBatteryToast(){
   clearTimeout(batteryToastT);
   batteryToast.classList.remove('show');
+  relayoutToasts();
 }
 function setFocus(on){
   const was = body.classList.contains('focus');
@@ -2527,7 +2540,7 @@ function render(){
       ${m && m[0] ? `<div class="zikr-fadl"><b>الفضل:</b>${/^من\s/.test(m[0]) ? m[0] : 'من قالها ' + m[0]}</div>` : ''}
       ${m && m[1] ? `<div class="zikr-src">${m[1]}</div>` : ''}
       <div class="card-bottom">
-        <div class="count-chip">${remaining}</div>
+        <div class="count-chip"><span class="cnum">${remaining}</span></div>
         ${item.count > 1 && remaining > 0 ? `
           <button class="complete-all-btn" aria-label="إكمال كل التكرارات">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l4 4L15 7"/><path d="M9 12l4 4L22 7"/></svg>
@@ -2552,14 +2565,25 @@ function render(){
     }
     card.querySelector('.card-reset-btn').addEventListener('click', (e) => {
       e.stopPropagation();
-      delete progress[mode][k];
+      const m0 = mode, prevRem = progress[m0][k];
+      delete progress[m0][k];
       saveProgress();
       updateProgress();
+      // شريط تراجع يرجّع العدّ اللي كان قبل التصفير (لو الذكر لسه ما اتعدّش مفيش حاجة تترجع)
+      if(prevRem !== undefined){
+        showUndo(m0, k, prevRem, 'تم إعادة تعيين الذكر', () => {
+          progress[m0][k] = prevRem;
+          saveProgress();
+          render();
+          const back = listEl.querySelector('[data-index="' + k + '"]');
+          if(back) back.classList.add('enter');
+        });
+      }
       const chip = card.querySelector('.count-chip');
       const path = chip.querySelector('.chip-ring path');
       if(path && !reduceMotion){
         chip.classList.add('resetting');
-        chip.childNodes[0].nodeValue = item.count;
+        chip.querySelector('.cnum').textContent = item.count;
         path.style.strokeDasharray = '0.01 100';
         setTimeout(() => { if(card.isConnected) render(); }, 500);
       } else {
@@ -2600,6 +2624,11 @@ function render(){
       card.classList.add('pulse');
       setTimeout(()=>card.classList.remove('pulse'), 200);
       render();
+      // نفس نطة رقم البروجريس الصغير، على رقم الكارد بعد ما اتعاد رسمه
+      if(!reduceMotion){
+        const nc = listEl.querySelector('[data-index="' + k + '"] .cnum');
+        if(nc) nc.classList.add('bump');
+      }
     });
     listEl.appendChild(card);
     const f = (item.count - remaining) / item.count;
@@ -2641,9 +2670,21 @@ const undoBtn = document.getElementById('undoBtn');
 const ringFg = document.getElementById('ringFg');
 let undoState = null;
 
+// لو رسالتين ظاهرتين مع بعض (التراجع والوضع الهادئ): الأحدث تفضل في المكان الأساسي، واللي ظهرت قبلها تطلع فوقها
+function relayoutToasts(){
+  const all = [undoToast, batteryToast];
+  const vis = all.filter(t => t.classList.contains('show')).sort((a, b) => (a._at || 0) - (b._at || 0));
+  let lift = 0;
+  for(let i = vis.length - 1; i >= 0; i--){
+    vis[i].style.setProperty('--lift', lift + 'px');
+    lift += vis[i].offsetHeight + 10;
+  }
+  all.forEach(t => { if(!vis.includes(t)) t.style.removeProperty('--lift'); });
+}
 function hideUndo(){
   if(undoState){ clearInterval(undoState.interval); undoState = null; }
   undoToast.classList.remove('show');
+  relayoutToasts();
   if(!undoToast._dismissing){ undoToast.style.transition = ''; undoToast.style.transform = ''; undoToast.style.opacity = ''; }
 }
 
@@ -2662,6 +2703,8 @@ function showUndo(m, index, prev, label, restore, secs){
   undoToast._dismissing = false;
   undoToast.style.transition = ''; undoToast.style.transform = ''; undoToast.style.opacity = '';
   undoToast.classList.add('show');
+  undoToast._at = Date.now();
+  relayoutToasts();
   undoState.interval = setInterval(() => {
     sec--;
     if(sec <= 0){ hideUndo(); return; }
@@ -2706,7 +2749,7 @@ function completeItem(card, index, prevRemaining){
   const chip = card.querySelector('.count-chip');
   if(chip){
     chip.classList.add('completing');
-    chip.childNodes[0].nodeValue = '';
+    chip.querySelector('.cnum').textContent = '';
     chip.insertAdjacentHTML('afterbegin', '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>');
     if(+card.dataset.count > 1){
       const path = chip.querySelector('.chip-ring path');
@@ -2921,6 +2964,7 @@ function updateProgress(){
   const prev = lastDone[mode];
   lastDone[mode] = done;
   if(prev !== null && done > prev) celebrate(prev, done, total, pct);
+  nagWatch();
 }
 
 // ---------- نافذة إضافة وتعديل الذكر الخاص ----------
@@ -3382,9 +3426,12 @@ const rMorning = document.getElementById('rMorning'), rEvening = document.getEle
 const rMOn = document.getElementById('rMOn'), rEOn = document.getElementById('rEOn');
 const rStatus = document.getElementById('rStatus'), rPush = document.getElementById('rPush');
 const rOff = document.getElementById('rOff');
+const rNMOn = document.getElementById('rNMOn'), rNEOn = document.getElementById('rNEOn');
+const rNMTime = document.getElementById('rNMTime'), rNETime = document.getElementById('rNETime');
+const nagBox = document.getElementById('nagBox');
 const REMIND_KEY = 'tooba-remind';
 const SW_OK = /(^|\.)toobaapp\.com$/.test(location.hostname);
-let remindCfg = { m:'05:00', e:'15:00', mOn:true, eOn:true };
+let remindCfg = { m:'05:00', e:'15:00', mOn:true, eOn:true, nm:'10:00', ne:'21:00', nmOn:true, neOn:true };
 try{
   const r = JSON.parse(localStorage.getItem(REMIND_KEY));
   if(r){
@@ -3394,22 +3441,33 @@ try{
     if(!oldDef && /^\d\d:\d\d$/.test(r.e)) remindCfg.e = r.e;
     if(r.mOn === false) remindCfg.mOn = false;
     if(r.eOn === false) remindCfg.eOn = false;
+    if(/^[0-9]{2}:[0-9]{2}$/.test(r.nm)) remindCfg.nm = r.nm;
+    if(/^[0-9]{2}:[0-9]{2}$/.test(r.ne)) remindCfg.ne = r.ne;
+    if(r.nmOn === false) remindCfg.nmOn = false;
+    if(r.neOn === false) remindCfg.neOn = false;
   }
 }catch(e){}
 function saveRemindCfg(){ try{ localStorage.setItem(REMIND_KEY, JSON.stringify(remindCfg)); }catch(e){} }
 function paintRemindUI(){
   rMorning.value = remindCfg.m; rEvening.value = remindCfg.e;
   rMOn.checked = remindCfg.mOn; rEOn.checked = remindCfg.eOn;
+  rNMTime.value = remindCfg.nm; rNETime.value = remindCfg.ne;
+  rNMOn.checked = remindCfg.nmOn; rNEOn.checked = remindCfg.neOn;
   syncRows();
 }
 function syncRows(){
   document.getElementById('rowM').classList.toggle('off', !rMOn.checked);
   document.getElementById('rowE').classList.toggle('off', !rEOn.checked);
+  document.getElementById('rowNM').classList.toggle('off', !rNMOn.checked);
+  document.getElementById('rowNE').classList.toggle('off', !rNEOn.checked);
 }
 rMOn.addEventListener('change', syncRows);
 rEOn.addEventListener('change', syncRows);
+rNMOn.addEventListener('change', syncRows);
+rNEOn.addEventListener('change', syncRows);
 function readRemindUI(){
-  return { m:rMorning.value || '05:00', e:rEvening.value || '15:00', mOn:rMOn.checked, eOn:rEOn.checked };
+  return { m:rMorning.value || '05:00', e:rEvening.value || '15:00', mOn:rMOn.checked, eOn:rEOn.checked,
+           nm:rNMTime.value || '10:00', ne:rNETime.value || '21:00', nmOn:rNMOn.checked, neOn:rNEOn.checked };
 }
 function setRStatus(t){ rStatus.hidden = !t; rStatus.textContent = t || ''; }
 function isStandalone(){
@@ -3426,6 +3484,53 @@ async function nativeOn(){
   }catch(e){ return false; }
 }
 async function nativeCancel(){ try{ await LN.cancel({ notifications:[{ id:1 }, { id:2 }] }); }catch(e){} }
+// ---------- تنبيه «لم تكتمل الأذكار» (تطبيق أندرويد فقط) ----------
+// إشعارات لمرة واحدة للأيام السبعة القادمة (المعرّفات 100+ للصباح و200+ للمساء)، وتُعاد جدولتها عند فتح التطبيق وعند تغيّر اكتمال الأذكار.
+// فلو أكملت أذكار اليوم يُلغى تنبيه اليوم فقط. كله محلي على الجهاز ولا يُرسل شيء للخادم.
+const NAG_DAYS = 7;
+function nagDoneToday(kind){
+  return itemsOf(kind).every((item, i) => (progress[kind][pkey(item, i)] ?? item.count) <= 0);
+}
+async function syncNags(){
+  if(!NATIVE || !LN) return;
+  try{
+    const ids = [];
+    for(let d = 0; d < NAG_DAYS; d++){ ids.push({ id:100 + d }, { id:200 + d }); }
+    await LN.cancel({ notifications:ids });
+    if(!pushFlag() || await nativePerm() !== 'granted') return;
+    const now = new Date(), list = [];
+    [['morning', 100, remindCfg.nmOn, remindCfg.nm, 'أذكار الصباح لم تكتمل', 'لم تُكمل أذكار الصباح بعد، اضغط لإكمالها.'],
+     ['evening', 200, remindCfg.neOn, remindCfg.ne, 'أذكار المساء لم تكتمل', 'لم تُكمل أذكار المساء بعد، اضغط لإكمالها.']
+    ].forEach(([kind, base, on, hm, title, body]) => {
+      if(!on) return;
+      const p = String(hm).split(':'), h = parseInt(p[0], 10), mi = parseInt(p[1], 10);
+      for(let d = 0; d < NAG_DAYS; d++){
+        const at = new Date(now.getFullYear(), now.getMonth(), now.getDate() + d, h, mi, 0, 0);
+        if(at <= now) continue;
+        if(d === 0 && nagDoneToday(kind)) continue;
+        list.push({ id:base + d, channelId:LN_CHANNEL, title, body, schedule:{ at, allowWhileIdle:true }, extra:{ m:kind } });
+      }
+    });
+    if(list.length) await LN.schedule({ notifications:list });
+  }catch(e){}
+}
+// مراقبة اكتمال أذكار القسم الحالي: لو اتغيّرت الحالة (اكتملت أو رجعت ناقصة) نعيد الجدولة
+function nagWatch(){
+  if(!NATIVE || !window.__nagReady || (mode !== 'morning' && mode !== 'evening')) return;
+  const st = nagWatch.s || (nagWatch.s = {});
+  const all = nagDoneToday(mode);
+  if(st[mode] === all) return;
+  const first = st[mode] === undefined;
+  st[mode] = all;
+  if(first) return;
+  clearTimeout(nagWatch.t);
+  nagWatch.t = setTimeout(syncNags, 700);
+}
+if(NATIVE){
+  window.__nagReady = true;
+  setTimeout(syncNags, 2500);
+  document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') setTimeout(syncNags, 600); });
+}
 async function nativeSchedule(cfg){
   let perm = await nativePerm();
   if(perm !== 'granted'){ perm = (await LN.requestPermissions()).display; }
@@ -3542,6 +3647,7 @@ async function disablePush(){
 async function openRemind(){
   clearTimeout(rDoneT); rDone.classList.remove('show');
   paintRemindUI();
+  nagBox.hidden = !NATIVE;
   setRStatus('');
   rOff.hidden = true;
   rOverlay.classList.add('open');
@@ -3570,12 +3676,13 @@ document.getElementById('ruClose').addEventListener('click', () => rOverlay.clas
 rOverlay.addEventListener('click', (e) => { if(e.target === rOverlay) rOverlay.classList.remove('open'); });
 rPush.addEventListener('click', async () => {
   const cfg = readRemindUI();
-  if(!cfg.mOn && !cfg.eOn){ setRStatus('اختر وقتًا واحدًا على الأقل.'); return; }
+  if(!cfg.mOn && !cfg.eOn && !(NATIVE && (cfg.nmOn || cfg.neOn))){ setRStatus('اختر وقتًا واحدًا على الأقل.'); return; }
   rPush.disabled = true;
   try{
     await enablePush(cfg);
     remindCfg = cfg; saveRemindCfg();
     setPushFlag(true);
+    syncNags();
     rPush.textContent = 'حفظ الأوقات';
     rOff.hidden = false;
     haptic('done');
@@ -3590,6 +3697,7 @@ rOff.addEventListener('click', async () => {
   await disablePush();
   try{ localStorage.setItem(PUSH_OFF_KEY, '1'); }catch(e){}
   setPushFlag(false);
+  syncNags();
   rOff.disabled = false;
   rOff.hidden = true;
   rPush.textContent = 'تفعيل التذكير بالإشعارات';
@@ -3624,6 +3732,7 @@ rOff.addEventListener('click', async () => {
         saveRemindCfg();
         const was = pushFlag();
         setPushFlag(true);
+        syncNags();
         if(!was) showRemindToast('تم تفعيل إشعارات الأذكار');
       }catch(e){ setPushFlag(false); }
     }
