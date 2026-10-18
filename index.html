@@ -1369,6 +1369,7 @@
   .streak[hidden]{ display:none; }
   .streak svg{ color:var(--accent-text); flex-shrink:0; }
   body.focus .streak{ display:none; }
+
 </style>
 <!-- Microsoft Clarity -->
 <script type="text/javascript">
@@ -1481,12 +1482,13 @@
       <p>للملاحظات أو التبليغ عن خطأ في نص أو سند:<br><a class="about-mail" href="mailto:tooba.app.support@gmail.com">tooba.app.support@gmail.com</a></p>
       <p><a class="about-priv" href="https://toobaapp.com/privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a></p>
       <p><button class="about-link" id="streakToggle"></button></p>
+      <p id="wgLinkP" hidden><button class="about-link" id="wgOpen">تخصيص الودجيت</button></p>
     </div>
     <button class="done-btn about-share" id="aboutShare">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.37</div>
+    <div class="about-ver">الإصدار 2.4.40</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -3537,18 +3539,30 @@ if(NATIVE){
 // نبعت للودجيت ملخّص التقدّم (مكتمل من الإجمالي) لكل من الصباح والمساء والأوراد، وهو محلي على الجهاز فقط.
 // ولو الودجيت اتضغط عليه نفتح القسم المناسب.
 const WB = NATIVE ? nativePlugin('WidgetBridge') : null;
+function widgetData(){
+  const cnt = (m) => { const it = itemsOf(m); return [it.filter((x, i) => (progress[m][pkey(x, i)] ?? x.count) <= 0).length, it.length]; };
+  const mm = cnt('morning'), ee = cnt('evening'), ws = allWirds();
+  const wd = ws.filter(w => (wirdCounts[w.id] || 0) >= w.target).length;
+  return { md:mm[0], mt:mm[1], ed:ee[0], et:ee[1], wd:wd, wt:ws.length };
+}
 function pushWidget(){
   if(!window.__wbReady || !WB) return;
   clearTimeout(pushWidget.t);
   pushWidget.t = setTimeout(() => {
     try{
-      const cnt = (m) => { const it = itemsOf(m); return [it.filter((x, i) => (progress[m][pkey(x, i)] ?? x.count) <= 0).length, it.length]; };
-      const mm = cnt('morning'), ee = cnt('evening'), ws = allWirds();
-      const wd = ws.filter(w => (wirdCounts[w.id] || 0) >= w.target).length;
-      const p = WB.update({ d:ymd(new Date()), md:mm[0], mt:mm[1], ed:ee[0], et:ee[1], wd:wd, wt:ws.length });
+      const o = widgetData();
+      o.d = ymd(new Date());
+      const p = WB.update(o);
       if(p && p.catch) p.catch(() => {});
     }catch(e){}
   }, 400);
+}
+// شكل الودجيت (الشكل والثيم والشفافية) يتغيّر من الودجيت نفسه (أيقونة الإعدادات عليه أو ضغطة مطولة ← إعدادات)، وهنا رابط يفتح نفس الشاشة
+if(WB){
+  document.getElementById('wgLinkP').hidden = false;
+  document.getElementById('wgOpen').addEventListener('click', () => {
+    try{ const p = WB.openSettings(); if(p && p.catch) p.catch(() => {}); }catch(e){}
+  });
 }
 async function widgetLaunch(){
   try{
