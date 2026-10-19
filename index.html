@@ -1370,6 +1370,8 @@
   .streak svg{ color:var(--accent-text); flex-shrink:0; }
   body.focus .streak{ display:none; }
 
+  /* أثناء تبديل القسم نلغي انتقالات الألوان لحظيًا: لون القسم السابق (النيلي) كان أحيانًا يعلق لما التبديل يتكرر بسرعة */
+  body.no-tr, body.no-tr *, body.no-tr *::before, body.no-tr *::after{ transition-property:transform,opacity,height,width,padding,margin,margin-bottom,border-width,stroke-dasharray !important; }
 </style>
 <!-- Microsoft Clarity -->
 <script type="text/javascript">
@@ -1488,7 +1490,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.41</div>
+    <div class="about-ver">الإصدار 2.4.42</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -2506,6 +2508,14 @@ function pkey(item, i){ return item.cid ? item.cid : i; }
 
 function render(){
   if(mode !== 'tasbeeh' && body.classList.contains('focus')){ setFocus(false); exitFS(); }
+  if(body.dataset.mode !== mode){
+    // نلغي انتقالات الألوان لحظة التبديل فيظهر لون القسم الجديد مباشرة وما يعلقش لون القسم السابق
+    body.classList.add('no-tr');
+    const tok = (render._tok = (render._tok || 0) + 1);
+    const rmTr = () => { if(render._tok === tok) body.classList.remove('no-tr'); };
+    requestAnimationFrame(() => requestAnimationFrame(rmTr));
+    setTimeout(rmTr, 500);
+  }
   body.dataset.mode = mode;
   if(mode !== 'tasbeeh') body.classList.remove('has-wird');
   document.documentElement.style.setProperty('--accent', 'var(--accent-' + mode + ')');
@@ -3251,6 +3261,14 @@ render();
   setTimeout(check, 4000);
   document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') check(); });
 })();
+
+// ضمان إضافي: نعيد تثبيت لون القسم الحالي عند الرجوع للتطبيق
+function reassertMode(){
+  if(body.dataset.mode !== mode) body.dataset.mode = mode;
+  document.documentElement.style.setProperty('--accent', 'var(--accent-' + mode + ')');
+}
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') reassertMode(); });
+window.addEventListener('pageshow', reassertMode);
 
 // لو عدّى منتصف الليل والتطبيق مفتوح: نعيد التحميل (بدون شاشة البداية) عشان تتصفّر الأذكار والأوراد
 const LOADED_DAY = new Date().toDateString();
