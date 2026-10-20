@@ -8,3 +8,17 @@ CREATE TABLE IF NOT EXISTS subs (
 CREATE INDEX IF NOT EXISTS idx_subs_tz_m ON subs(tz, m_time);
 CREATE INDEX IF NOT EXISTS idx_subs_tz_e ON subs(tz, e_time);
 CREATE TABLE IF NOT EXISTS tzs (tz TEXT PRIMARY KEY);
+CREATE TABLE IF NOT EXISTS pairs (
+  id      TEXT PRIMARY KEY,
+  pub     TEXT NOT NULL,
+  blob    TEXT,
+  created INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS groups (
+  gid         TEXT PRIMARY KEY,
+  secret_hash TEXT NOT NULL,
+  ver         INTEGER NOT NULL,
+  blob        TEXT,
+  created     INTEGER NOT NULL,
+  updated     INTEGER NOT NULL
+);

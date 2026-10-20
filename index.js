@@ -75,10 +75,35 @@ function validEndpoint(ep) {
   } catch (e) { return false; }
 }
 
-async function readBody(request) {
+async function readBody(request, max = 4096) {
   const text = await request.text();
-  if (text.length > 4096) throw new Error('too large');
+  if (text.length > max) throw new Error('too large');
   return JSON.parse(text);
+}
+
+async function sha256hex(t) {
+  const h = new Uint8Array(await crypto.subtle.digest('SHA-256', enc.encode(t)));
+  return Array.from(h, (x) => x.toString(16).padStart(2, '0')).join('');
+}
+// تطبيق أندرويد (Capacitor) يعمل من https://localhost ويكلّم الموقع بعنوان كامل
+const ALLOWED_ORIGINS = ['https://localhost', 'https://toobaapp.com'];
+function withCors(res, origin) {
+  const r = new Response(res.body, res);
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    r.headers.set('Access-Control-Allow-Origin', origin);
+    r.headers.set('Access-Control-Allow-Headers', 'Content-Type, X-Secret');
+    r.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    r.headers.set('Access-Control-Max-Age', '86400');
+    r.headers.append('Vary', 'Origin');
+  }
+  return r;
+}
+async function cleanup(env, now) {
+  const s = Math.floor(now.getTime() / 1000);
+  await env.DB.batch([
+    env.DB.prepare('DELETE FROM pairs WHERE created < ?1').bind(s - 300),
+    env.DB.prepare('DELETE FROM groups WHERE updated < ?1').bind(s - 365 * 86400),
+  ]);
 }
 
 async function handleFetch(request, env) {
@@ -116,6 +141,73 @@ async function handleFetch(request, env) {
     if (typeof b.endpoint !== 'string') return json({ error: 'bad endpoint' }, 400);
     await env.DB.prepare('DELETE FROM subs WHERE endpoint = ?1').bind(b.endpoint).run();
     return json({ ok: true });
+  }
+
+  // ---------- الربط والمزامنة بين الأجهزة (الخادم لا يقرأ شيئًا: كله مشفّر على الأجهزة) ----------
+  const ID22 = /^[A-Za-z0-9_-]{22}$/, SEC43 = /^[A-Za-z0-9_-]{43}$/, PUB87 = /^[A-Za-z0-9_-]{87}$/, B64U = /^[A-Za-z0-9_-]+$/;
+  const nowS = () => Math.floor(Date.now() / 1000);
+
+  if (url.pathname === '/api/pair/new' && request.method === 'POST') {
+    let b; try { b = await readBody(request); } catch (e) { return json({ error: 'bad body' }, 400); }
+    if (!ID22.test(b.id || '') || !PUB87.test(b.pub || '')) return json({ error: 'bad' }, 400);
+    try { await env.DB.prepare('INSERT INTO pairs(id, pub, blob, created) VALUES(?1, ?2, NULL, ?3)').bind(b.id, b.pub, nowS()).run(); }
+    catch (e) { return json({ error: 'exists' }, 409); }
+    return json({ ok: true });
+  }
+  if (url.pathname === '/api/pair/send' && request.method === 'POST') {
+    let b; try { b = await readBody(request); } catch (e) { return json({ error: 'bad body' }, 400); }
+    if (!ID22.test(b.id || '') || !PUB87.test(b.eph || '') || !B64U.test(b.iv || '') || !B64U.test(b.ct || '') || b.ct.length > 1000 || b.iv.length > 40) return json({ error: 'bad' }, 400);
+    const row = await env.DB.prepare('SELECT blob, created FROM pairs WHERE id = ?1').bind(b.id).first();
+    if (!row || nowS() - row.created > 300) return json({ error: 'expired' }, 410);
+    if (row.blob) return json({ error: 'used' }, 409);
+    await env.DB.prepare('UPDATE pairs SET blob = ?2 WHERE id = ?1 AND blob IS NULL').bind(b.id, JSON.stringify({ eph: b.eph, iv: b.iv, ct: b.ct })).run();
+    return json({ ok: true });
+  }
+  if (url.pathname === '/api/pair/get' && request.method === 'GET') {
+    const id = url.searchParams.get('id') || '';
+    if (!ID22.test(id)) return json({ error: 'bad' }, 400);
+    const row = await env.DB.prepare('SELECT blob, created FROM pairs WHERE id = ?1').bind(id).first();
+    if (!row || nowS() - row.created > 300) return json({ ready: false, gone: true });
+    if (!row.blob) return json({ ready: false });
+    await env.DB.prepare('DELETE FROM pairs WHERE id = ?1').bind(id).run();   // يُسلَّم مرة واحدة ثم يُمسح
+    return json({ ready: true, blob: JSON.parse(row.blob) });
+  }
+  if (url.pathname === '/api/sync/create' && request.method === 'POST') {
+    let b; try { b = await readBody(request); } catch (e) { return json({ error: 'bad body' }, 400); }
+    if (!ID22.test(b.gid || '') || !SEC43.test(b.secret || '')) return json({ error: 'bad' }, 400);
+    try { await env.DB.prepare('INSERT INTO groups(gid, secret_hash, ver, blob, created, updated) VALUES(?1, ?2, 0, NULL, ?3, ?3)').bind(b.gid, await sha256hex(b.secret), nowS()).run(); }
+    catch (e) { return json({ error: 'exists' }, 409); }
+    return json({ ok: true });
+  }
+  if (url.pathname === '/api/sync') {
+    const secret = request.headers.get('X-Secret') || '';
+    if (!SEC43.test(secret)) return json({ error: 'auth' }, 401);
+    const hash = await sha256hex(secret);
+    if (request.method === 'GET') {
+      const gid = url.searchParams.get('gid') || '', since = parseInt(url.searchParams.get('since'), 10);
+      if (!ID22.test(gid)) return json({ error: 'bad' }, 400);
+      const g = await env.DB.prepare('SELECT secret_hash, ver, blob FROM groups WHERE gid = ?1').bind(gid).first();
+      if (!g) return json({ error: 'gone' }, 404);
+      if (g.secret_hash !== hash) return json({ error: 'auth' }, 401);
+      if (g.ver === since) return json({ same: true, ver: g.ver });
+      return json({ ver: g.ver, blob: g.blob });
+    }
+    if (request.method === 'PUT') {
+      let b; try { b = await readBody(request, 65536); } catch (e) { return json({ error: 'bad body' }, 400); }
+      if (!ID22.test(b.gid || '') || !Number.isInteger(b.base) || typeof b.blob !== 'string' || !/^[A-Za-z0-9_.-]+$/.test(b.blob)) return json({ error: 'bad' }, 400);
+      const g = await env.DB.prepare('SELECT secret_hash FROM groups WHERE gid = ?1').bind(b.gid).first();
+      if (!g) return json({ error: 'gone' }, 404);
+      if (g.secret_hash !== hash) return json({ error: 'auth' }, 401);
+      const r = await env.DB.prepare('UPDATE groups SET blob = ?3, ver = ver + 1, updated = ?4 WHERE gid = ?1 AND ver = ?2').bind(b.gid, b.base, b.blob, nowS()).run();
+      if (!r.meta || !r.meta.changes) return json({ error: 'conflict' }, 409);   // compare-and-set: جهاز آخر سبقك
+      return json({ ok: true, ver: b.base + 1 });
+    }
+    if (request.method === 'DELETE') {
+      const gid = url.searchParams.get('gid') || '';
+      if (!ID22.test(gid)) return json({ error: 'bad' }, 400);
+      await env.DB.prepare('DELETE FROM groups WHERE gid = ?1 AND secret_hash = ?2').bind(gid, hash).run();
+      return json({ ok: true });
+    }
   }
 
   return json({ error: 'not found' }, 404);
@@ -165,6 +257,15 @@ export async function runSchedule(env, now) {
 }
 
 export default {
-  fetch: (request, env) => handleFetch(request, env),
-  scheduled: (event, env, ctx) => { ctx.waitUntil(runSchedule(env, new Date(event.scheduledTime))); },
+  fetch: async (request, env) => {
+    const origin = request.headers.get('Origin');
+    if (request.method === 'OPTIONS') return withCors(new Response(null, { status: 204 }), origin);
+    let res;
+    try { res = await handleFetch(request, env); } catch (e) { res = json({ error: 'server' }, 500); }
+    return withCors(res, origin);
+  },
+  scheduled: (event, env, ctx) => {
+    const now = new Date(event.scheduledTime);
+    ctx.waitUntil(runSchedule(env, now).catch(() => {}).then(() => cleanup(env, now)).catch(() => {}));
+  },
 };
