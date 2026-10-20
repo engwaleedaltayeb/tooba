@@ -1,4 +1,4 @@
-const VERSION = 'tooba-v2.4.42';
+const VERSION = 'tooba-v2.4.43';
 const CORE = [
   '/', '/index.html', '/manifest.webmanifest',
   '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png', '/badge-96.png',
@@ -25,6 +25,8 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
+  // واجهات الخادم (المزامنة وغيرها) لا تُخزَّن أبدًا: لازم ترجع بيانات حيّة
+  if (url.origin === location.origin && url.pathname.startsWith('/api/')) return;
 
   // الصفحة نفسها: الشبكة أولًا، ولو مفيش نت من الكاش
   if (req.mode === 'navigate') {

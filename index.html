@@ -1370,6 +1370,26 @@
   .streak svg{ color:var(--accent-text); flex-shrink:0; }
   body.focus .streak{ display:none; }
 
+  /* الربط والمزامنة بين الأجهزة */
+  .sync-btn{ position:fixed; top:calc(var(--sa-top) + 14px); left:calc(var(--sa-left) + 62px); z-index:50; width:34px; height:34px; padding:0; border-radius:50%; border:1px solid var(--border); background:var(--surface); color:var(--text); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 3px var(--shadow); transition:background .5s ease, transform .15s ease; }
+  .sync-btn:active{ transform:scale(0.9); }
+  .sync-btn.on{ color:var(--accent-text); }
+  body[data-mode="tasbeeh"] .sync-btn{ left:calc(var(--sa-left) + 104px); }
+  .side-overlay{ direction:ltr; align-items:stretch; justify-content:flex-start; }
+  .side{ direction:rtl; width:min(88vw,380px); height:100%; background:var(--surface); box-shadow:4px 0 24px var(--shadow); padding:calc(var(--sa-top) + 22px) 24px calc(var(--sa-bottom) + 24px); overflow-y:auto; transform:translateX(-100%); transition:transform .35s cubic-bezier(.65,0,.35,1); display:flex; flex-direction:column; }
+  .side-overlay.open .side{ transform:translateX(0); }
+  .side-x{ align-self:flex-start; width:36px; height:36px; border-radius:50%; border:1px solid var(--border); background:transparent; color:var(--text-dim); display:flex; align-items:center; justify-content:center; cursor:pointer; margin-bottom:14px; flex-shrink:0; }
+  .sy{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:14px; }
+  .sy h2{ font-size:22px; font-weight:700; line-height:1.5; margin:4px 0 0; }
+  .sy p{ font-size:14.5px; line-height:1.9; color:var(--text-dim); }
+  .sy .sheet-close, .sy .done-btn{ margin-top:6px; }
+  .sy-ic{ color:var(--accent-text); }
+  .qrbox{ width:min(100%,260px); aspect-ratio:1; border-radius:18px; overflow:hidden; background:#fff; border:1px solid var(--border); box-shadow:0 1px 3px var(--shadow); }
+  .qrbox svg{ display:block; width:100%; height:100%; }
+  .sy-row{ display:flex; gap:10px; width:100%; }
+  .sy-row .done-btn{ flex:1; margin-top:0; padding:0 8px; }
+  .sy-ok{ color:var(--accent-text); }
+  .sy-time{ direction:ltr; unicode-bidi:isolate; display:inline-block; }
   /* أثناء تبديل القسم نلغي انتقالات الألوان لحظيًا: لون القسم السابق (النيلي) كان أحيانًا يعلق لما التبديل يتكرر بسرعة */
   body.no-tr, body.no-tr *, body.no-tr *::before, body.no-tr *::after{ transition-property:transform,opacity,height,width,padding,margin,margin-bottom,border-width,stroke-dasharray !important; }
 </style>
@@ -1387,6 +1407,9 @@
 <script>(function(){var el=document.getElementById("splash");if(!el)return;var done=false;function rm(){if(done)return;done=true;el.remove();}var rm_=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;try{if(sessionStorage.getItem("tooba-skip-splash")){sessionStorage.removeItem("tooba-skip-splash");rm();return;}}catch(e){}if(rm_){rm();return;}el.addEventListener("click",rm);setTimeout(rm,2600);var t0=Date.now();var t=el.querySelector(".splash-title");function showT(){if(t)t.classList.add("show");}var fl=(document.fonts&&document.fonts.load)?document.fonts.load("600 40px 'IBM Plex Sans Arabic'","\u0637\u0648\u0628\u0649"):Promise.resolve();var cap=new Promise(function(r){setTimeout(r,1000);});Promise.race([fl,cap]).then(function(){setTimeout(showT,Math.max(0,900-(Date.now()-t0)));});})();</script>
 <button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع الليلي"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
 <button class="reset-btn" id="resetBtn" aria-label="إعادة التعيين"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+<button class="sync-btn" id="syncBtn" aria-label="المزامنة بين الأجهزة"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><path d="M14 14h2.5v2.5H14z"/><path d="M20.5 14v2.5"/><path d="M14 20.5h2.5"/><path d="M20.5 20.5h-.01"/></svg></button>
+<div class="sheet-overlay side-overlay" id="syncOverlay"><div class="side"><button class="side-x" id="syncX" aria-label="إغلاق"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="sy" id="syBody"></div></div></div>
+<div class="sheet-overlay" id="pairOverlay"><div class="sheet"><div class="sheet-handle"></div><div class="sy" id="pairBody"></div></div></div>
 <div class="wrap">
   <div class="top-actions">
     <button class="install-btn" id="installBtn">
@@ -1490,7 +1513,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.42</div>
+    <div class="about-ver">الإصدار 2.4.43</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1662,7 +1685,7 @@ const STORAGE_KEY = 'tooba-progress-v1';
 })();
 
 ['morning','evening'].forEach(k => { if(!progress[k]) progress[k] = {}; });
-function saveProgress(){
+function saveProgress(){ syncTouch();
   try{
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       date: new Date().toDateString(),
@@ -1844,7 +1867,7 @@ try{
   if(raw && typeof raw === 'object'){ if(raw.date === new Date().toDateString()) tasbihCount = parseInt(raw.count, 10) || 0; }
   else tasbihCount = parseInt(raw, 10) || 0;   // قيمة قديمة قبل 2.4.3: تُحسب لليوم مرة واحدة
 }catch(e){}
-function saveTasbih(){ try{ localStorage.setItem(TASBIH_KEY, JSON.stringify({ date:new Date().toDateString(), count:tasbihCount })); }catch(e){} }
+function saveTasbih(){ syncTouch(); try{ localStorage.setItem(TASBIH_KEY, JSON.stringify({ date:new Date().toDateString(), count:tasbihCount })); }catch(e){} }
 const btnTasbih = document.getElementById('btnTasbih');
 const SEG_PTS = {
   a:'8,5 13,0 37,0 42,5 37,10 13,10',
@@ -1976,6 +1999,7 @@ function completeWird(){
     if(c > 0) wirdCounts[w.id] = c; else delete wirdCounts[w.id];
     saveWird();
     try{ if(skRaw === null) localStorage.removeItem(STREAK_KEY); else localStorage.setItem(STREAK_KEY, skRaw); }catch(e){}
+    syncTouch();
     render();
   }, 8);
 }
@@ -2056,7 +2080,7 @@ function setFocus(on){
 }
 let focusPushed = false;
 // زر الرجوع يقفل النافذة المنبثقة المفتوحة فقط بدل ما يقفل التطبيق
-const OV_IDS = ['aboutOverlay','wirdOverlay','zOverlay','rOverlay','sheetOverlay'];
+const OV_IDS = ['aboutOverlay','wirdOverlay','zOverlay','rOverlay','sheetOverlay','syncOverlay','pairOverlay'];
 const ovStack = [];
 let ovIgnore = 0;
 let ovNativeBack = false;
@@ -2159,7 +2183,7 @@ try{
   const r = JSON.parse(localStorage.getItem(CUSTOM_KEY));
   if(Array.isArray(r)) customWirds = r.filter(w => w && w.id && w.name && w.target > 0).slice(0, 10).map(w => ({ id:String(w.id), name:String(w.name), target:+w.target, custom:true }));
 }catch(e){}
-function saveCustom(){ pushWidget();
+function saveCustom(){ pushWidget(); syncTouch();
   try{ localStorage.setItem(CUSTOM_KEY, JSON.stringify(customWirds.map(w => ({ id:w.id, name:w.name, target:w.target })))); }catch(e){}
 }
 function allWirds(){ return WIRDS.concat(customWirds); }
@@ -2167,7 +2191,7 @@ const WIRD_TGT_KEY = 'tooba-wird-targets';
 let wirdTargets = {};
 try{ wirdTargets = JSON.parse(localStorage.getItem(WIRD_TGT_KEY)) || {}; }catch(e){}
 WIRDS.forEach(w => { w.def = w.target; const t = +wirdTargets[w.id]; if(t > 0) w.target = Math.min(Math.round(t), 10000); });
-function saveTargets(){ pushWidget(); try{ localStorage.setItem(WIRD_TGT_KEY, JSON.stringify(wirdTargets)); }catch(e){} }
+function saveTargets(){ pushWidget(); syncTouch(); try{ localStorage.setItem(WIRD_TGT_KEY, JSON.stringify(wirdTargets)); }catch(e){} }
 function esc(t){ return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 const WIRD_KEY = 'tooba-wird';
 let wirdCounts = {};
@@ -2176,7 +2200,7 @@ try{
   if(raw && raw.date === new Date().toDateString()) wirdCounts = raw.counts || {};
 }catch(e){}
 function saveWird(){
-  pushWidget();
+  pushWidget(); syncTouch();
   try{ localStorage.setItem(WIRD_KEY, JSON.stringify({ date:new Date().toDateString(), counts:wirdCounts })); }catch(e){}
 }
 // ---------- عدّاد الأيام المتتالية للأوراد: محلي وخاص، ولا يُشارَك ----------
@@ -2196,6 +2220,7 @@ function bumpStreak(){
   if(r.last === t) return;
   r.n = r.last === ymdYesterday() ? r.n + 1 : 1;
   r.last = t; r.best = Math.max(r.best || 0, r.n);
+  setTimeout(() => syncTouch(), 0);
   try{ localStorage.setItem(STREAK_KEY, JSON.stringify(r)); }catch(e){}
 }
 function streakOff(){ try{ return localStorage.getItem('tooba-streak-off') === '1'; }catch(e){ return false; } }
@@ -2499,7 +2524,7 @@ try{
     return { id:String(z.id), text:String(z.text), count:Math.min(Math.round(+z.count) || 1, 1000), modes:ms };
   });
 }catch(e){}
-function saveCustomZ(){ try{ localStorage.setItem(CZ_KEY, JSON.stringify(customAdhkar)); }catch(e){} }
+function saveCustomZ(){ syncTouch(); try{ localStorage.setItem(CZ_KEY, JSON.stringify(customAdhkar)); }catch(e){} }
 // الأذكار الخاصة تُضاف في آخر القائمة وتُحفظ بمعرّف ثابت، فلا تزحزح عدّادات الأذكار الأصلية
 function itemsOf(m){
   return data[m].concat(customAdhkar.filter(z => z.modes.includes(m)).map(z => ({ text:z.text, count:z.count, cid:z.id })));
@@ -3914,6 +3939,400 @@ rOff.addEventListener('click', async () => {
     new IntersectionObserver((es) => { inlineVis = es[0].isIntersecting; applyBanner(); }, { threshold:0.6 }).observe(inline);
   }
 })();
+
+// مولّد QR مصغّر (بايت، تصحيح M، إصدارات 1–10)
+function qrMake(text){
+  const bytes = Array.from(new TextEncoder().encode(text));
+  const EC = [0,10,16,26,18,24,16,18,22,22,26], NB = [0,1,1,1,2,2,4,4,4,5,5];
+  const raw = v => { let r = (16*v+128)*v+64; if(v >= 2){ const n = Math.floor(v/7)+2; r -= (25*n-10)*n-55; if(v >= 7) r -= 36; } return r >> 3; };
+  let ver = 1;
+  for(; ver <= 10; ver++){ if(4 + (ver < 10 ? 8 : 16) + 8*bytes.length <= (raw(ver) - EC[ver]*NB[ver]) * 8) break; }
+  if(ver > 10) return null;
+  const nData = raw(ver) - EC[ver]*NB[ver], size = ver*4 + 17;
+  const bits = [];
+  const put = (val, len) => { for(let i = len-1; i >= 0; i--) bits.push((val >>> i) & 1); };
+  put(4, 4); put(bytes.length, ver < 10 ? 8 : 16); bytes.forEach(b => put(b, 8));
+  put(0, Math.min(4, nData*8 - bits.length));
+  while(bits.length % 8) bits.push(0);
+  const data = [];
+  for(let i = 0; i < bits.length; i += 8) data.push(parseInt(bits.slice(i, i+8).join(''), 2));
+  for(let p = 0xEC; data.length < nData; p ^= 0xEC ^ 0x11) data.push(p);
+  const gmul = (x, y) => { let z = 0; for(let i = 7; i >= 0; i--){ z = (z << 1) ^ ((z >>> 7) * 0x11D); z ^= ((y >>> i) & 1) * x; } return z; };
+  const div = (() => { const r = new Array(EC[ver]).fill(0); r[EC[ver]-1] = 1; let root = 1; for(let i = 0; i < EC[ver]; i++){ for(let j = 0; j < EC[ver]; j++){ r[j] = gmul(r[j], root); if(j+1 < EC[ver]) r[j] ^= r[j+1]; } root = gmul(root, 2); } return r; })();
+  const rem = d => { const r = div.map(() => 0); d.forEach(b => { const f = b ^ r.shift(); r.push(0); div.forEach((c, i) => { r[i] ^= gmul(c, f); }); }); return r; };
+  const nb = NB[ver], rw = raw(ver), shortLen = Math.floor(rw / nb), nShort = nb - rw % nb, blocks = [];
+  for(let i = 0, k = 0; i < nb; i++){
+    const d = data.slice(k, k + shortLen - EC[ver] + (i < nShort ? 0 : 1)); k += d.length;
+    const e = rem(d); if(i < nShort) d.push(0); blocks.push(d.concat(e));
+  }
+  const all = [];
+  for(let i = 0; i < blocks[0].length; i++) blocks.forEach((b, j) => { if(i !== shortLen - EC[ver] || j >= nShort) all.push(b[i]); });
+  const M = Array.from({ length:size }, () => new Array(size).fill(false)), F = Array.from({ length:size }, () => new Array(size).fill(false));
+  const setFn = (x, y, d) => { if(x >= 0 && x < size && y >= 0 && y < size){ M[y][x] = d; F[y][x] = true; } };
+  for(let i = 0; i < size; i++){ setFn(6, i, i % 2 === 0); setFn(i, 6, i % 2 === 0); }
+  const finder = (x, y) => { for(let dy = -4; dy <= 4; dy++) for(let dx = -4; dx <= 4; dx++){ const d = Math.max(Math.abs(dx), Math.abs(dy)); setFn(x+dx, y+dy, d !== 2 && d !== 4); } };
+  finder(3, 3); finder(size-4, 3); finder(3, size-4);
+  if(ver > 1){
+    const n = Math.floor(ver/7) + 2, step = Math.ceil((ver*4+4) / (n*2-2)) * 2, pos = [6];
+    for(let p = size-7; pos.length < n; p -= step) pos.splice(1, 0, p);
+    for(let i = 0; i < n; i++) for(let j = 0; j < n; j++){
+      if((i === 0 && j === 0) || (i === 0 && j === n-1) || (i === n-1 && j === 0)) continue;
+      for(let dy = -2; dy <= 2; dy++) for(let dx = -2; dx <= 2; dx++) setFn(pos[i]+dx, pos[j]+dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1);
+    }
+  }
+  const fmt = mask => {
+    const d = (0 << 3) | mask; let r = d;
+    for(let i = 0; i < 10; i++) r = (r << 1) ^ ((r >>> 9) * 0x537);
+    const b = ((d << 10) | r) ^ 0x5412, g = i => ((b >>> i) & 1) !== 0;
+    for(let i = 0; i <= 5; i++) setFn(8, i, g(i));
+    setFn(8, 7, g(6)); setFn(8, 8, g(7)); setFn(7, 8, g(8));
+    for(let i = 9; i < 15; i++) setFn(14-i, 8, g(i));
+    for(let i = 0; i < 8; i++) setFn(size-1-i, 8, g(i));
+    for(let i = 8; i < 15; i++) setFn(8, size-15+i, g(i));
+    setFn(8, size-8, true);
+  };
+  fmt(0);
+  if(ver >= 7){
+    let r = ver; for(let i = 0; i < 12; i++) r = (r << 1) ^ ((r >>> 11) * 0x1F25);
+    const b = (ver << 12) | r;
+    for(let i = 0; i < 18; i++){ const g = ((b >>> i) & 1) !== 0, a = size-11 + i % 3, c = Math.floor(i/3); setFn(a, c, g); setFn(c, a, g); }
+  }
+  let bi = 0;
+  for(let right = size-1; right >= 1; right -= 2){
+    if(right === 6) right = 5;
+    for(let v = 0; v < size; v++) for(let j = 0; j < 2; j++){
+      const x = right - j, y = ((right+1) & 2) === 0 ? size-1-v : v;
+      if(!F[y][x] && bi < all.length*8){ M[y][x] = ((all[bi >>> 3] >>> (7 - (bi & 7))) & 1) !== 0; bi++; }
+    }
+  }
+  const MK = [(x,y)=>(x+y)%2===0,(x,y)=>y%2===0,(x,y)=>x%3===0,(x,y)=>(x+y)%3===0,(x,y)=>(Math.floor(x/3)+Math.floor(y/2))%2===0,(x,y)=>x*y%2+x*y%3===0,(x,y)=>(x*y%2+x*y%3)%2===0,(x,y)=>((x+y)%2+x*y%3)%2===0];
+  const apply = m => { for(let y = 0; y < size; y++) for(let x = 0; x < size; x++) if(!F[y][x] && MK[m](x, y)) M[y][x] = !M[y][x]; };
+  const penalty = () => {
+    let p = 0, dark = 0;
+    for(let t = 0; t < 2; t++) for(let a = 0; a < size; a++){
+      let run = 1;
+      for(let b = 1; b < size; b++){
+        const c = t ? M[b][a] : M[a][b], pr = t ? M[b-1][a] : M[a][b-1];
+        if(c === pr){ run++; if(run === 5) p += 3; else if(run > 5) p++; } else run = 1;
+      }
+    }
+    for(let y = 0; y < size; y++) for(let x = 0; x < size; x++){
+      if(M[y][x]) dark++;
+      if(x < size-1 && y < size-1 && M[y][x] === M[y][x+1] && M[y][x] === M[y+1][x] && M[y][x] === M[y+1][x+1]) p += 3;
+    }
+    return p + Math.floor(Math.abs(dark*20 - size*size*10) / (size*size)) * 10;
+  };
+  let best = 0, bp = Infinity;
+  for(let m = 0; m < 8; m++){ apply(m); fmt(m); const p = penalty(); if(p < bp){ bp = p; best = m; } apply(m); }
+  apply(best); fmt(best);
+  return M;
+}
+function qrSvg(text){
+  const M = qrMake(text); if(!M) return '';
+  const n = M.length, q = 4;
+  let d = '';
+  for(let y = 0; y < n; y++) for(let x = 0; x < n; x++) if(M[y][x]) d += 'M' + (x+q) + ' ' + (y+q) + 'h1v1h-1z';
+  return '<svg viewBox="0 0 ' + (n+2*q) + ' ' + (n+2*q) + '" shape-rendering="crispEdges" role="img" aria-label="QR"><rect width="100%" height="100%" fill="#fff"/><path d="' + d + '" fill="#000"/></svg>';
+}
+// ---------- الربط والمزامنة بين الأجهزة بالـQR (مشفّرة من طرف لطرف، الخادم لا يقرأ شيئًا) ----------
+const SYNC_CFG = 'tooba-sync', SYNC_STATE = 'tooba-sync-state';
+const SY_API = NATIVE ? 'https://toobaapp.com' : '';
+const SY = {};
+let syncApplying = false, syncBusy = false, syncTimer = null;
+const syncBtn = document.getElementById('syncBtn'), syncOverlay = document.getElementById('syncOverlay'), syBodyEl = document.getElementById('syBody');
+const pairOverlay = document.getElementById('pairOverlay'), pairBody = document.getElementById('pairBody');
+function u8b64u(u){ let s = ''; for(let i = 0; i < u.length; i++) s += String.fromCharCode(u[i]); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+function rndB64u(n){ return u8b64u(crypto.getRandomValues(new Uint8Array(n))); }
+function stab(o){ if(o && typeof o === 'object'){ if(Array.isArray(o)) return '[' + o.map(stab).join(',') + ']'; return '{' + Object.keys(o).sort().map(k => JSON.stringify(k) + ':' + stab(o[k])).join(',') + '}'; } return JSON.stringify(o); }
+function syCfg(){ try{ const c = JSON.parse(localStorage.getItem(SYNC_CFG)); return c && c.gid && c.secret && c.key ? c : null; }catch(e){ return null; } }
+function syCfgSave(c){ try{ if(c) localStorage.setItem(SYNC_CFG, JSON.stringify(c)); else { localStorage.removeItem(SYNC_CFG); localStorage.removeItem(SYNC_STATE); } }catch(e){} syncPaintBtn(); }
+function syState(){ try{ return JSON.parse(localStorage.getItem(SYNC_STATE)) || {}; }catch(e){ return {}; } }
+function syStateSave(s){ try{ localStorage.setItem(SYNC_STATE, JSON.stringify(s)); }catch(e){} }
+function syncPaintBtn(){ syncBtn.classList.toggle('on', !!syCfg()); }
+syncPaintBtn();
+
+// لقطة من كل ما يُزامَن (التواريخ داخل المفاتيح اليومية فتتصفّر مع اليوم الجديد)
+function syncSnapshot(){
+  const o = {}, d = ymd(new Date());
+  ['morning', 'evening'].forEach(m => Object.keys(progress[m]).forEach(k => { o['p:' + d + ':' + m + ':' + k] = progress[m][k]; }));
+  Object.keys(wirdCounts).forEach(k => { o['w:' + d + ':' + k] = wirdCounts[k]; });
+  if(tasbihCount > 0) o['t:' + d] = tasbihCount;
+  Object.keys(wirdTargets).forEach(k => { o['wt:' + k] = wirdTargets[k]; });
+  customWirds.forEach(w => { o['cw:' + w.id] = { name:w.name, target:w.target }; });
+  customAdhkar.forEach(z => { o['cz:' + z.id] = { text:z.text, count:z.count, modes:z.modes }; });
+  const s = loadStreak(); if(s.last) o.st = { n:s.n, last:s.last, best:s.best || 0 };
+  return o;
+}
+// يُنادى من كل دوال الحفظ: يقارن اللقطة بالحالة السابقة ويسجّل وقت آخر تعديل لكل مفتاح (ما نغيّرش شكل المفاتيح في localStorage)
+function syncTouch(seedT){
+  if(!window.__syncReady || syncApplying || !syCfg()) return;
+  const st = syState(), cur = syncSnapshot(), now = typeof seedT === 'number' ? seedT : Date.now(), d = ymd(new Date());
+  let ch = false;
+  Object.keys(cur).forEach(k => { const o = st[k]; if(!o || stab(o.v) !== stab(cur[k])){ st[k] = { v:cur[k], t:now }; ch = true; } });
+  Object.keys(st).forEach(k => {
+    if(k in cur) return;
+    if(/^(p|w|t):/.test(k) && k.split(':')[1] !== d){ delete st[k]; ch = true; return; }
+    if(st[k].v !== null){ st[k] = { v:null, t:now }; ch = true; }
+    else if(st[k].t > 0 && Date.now() - st[k].t > 30 * 864e5){ delete st[k]; ch = true; }   // شواهد الحذف تعيش 30 يومًا
+  });
+  if(ch){ syStateSave(st); syncSchedule(); }
+}
+function syncSchedule(){ clearTimeout(syncTimer); syncTimer = setTimeout(() => syncNow(), 2000); }
+// الدمج: آخر تعديل يكسب لكل مفتاح، والأيام المتتالية يكسب فيها الأحدث ثم الأكبر
+function syncMergeState(a, b){
+  const o = {}, d = ymd(new Date());
+  new Set(Object.keys(a).concat(Object.keys(b))).forEach(k => {
+    if(/^(p|w|t):/.test(k) && k.split(':')[1] !== d) return;
+    const x = a[k], y = b[k];
+    if(!x || !y){ o[k] = x || y; return; }
+    if(k === 'st' && x.v && y.v){
+      const w = (x.v.last !== y.v.last ? x.v.last > y.v.last : x.v.n >= y.v.n) ? x : y;
+      o[k] = { v:Object.assign({}, w.v, { best:Math.max(x.v.best || 0, y.v.best || 0) }), t:Math.max(x.t, y.t) };
+      return;
+    }
+    o[k] = x.t !== y.t ? (x.t > y.t ? x : y) : (stab(x.v) >= stab(y.v) ? x : y);
+  });
+  return o;
+}
+function syncApply(st){
+  syncApplying = true;
+  try{
+    const d = ymd(new Date()), cw = [], cz = [], byId = (p, q) => p.id < q.id ? -1 : 1;
+    progress = { morning:{}, evening:{} }; wirdCounts = {}; tasbihCount = 0; wirdTargets = {};
+    Object.keys(st).forEach(k => {
+      const v = st[k].v; if(v === null || v === undefined) return;
+      const a = k.split(':');
+      if(a[0] === 'p'){ if(a[1] === d && progress[a[2]]) progress[a[2]][a.slice(3).join(':')] = v; }
+      else if(a[0] === 'w'){ if(a[1] === d) wirdCounts[a.slice(2).join(':')] = v; }
+      else if(a[0] === 't'){ if(a[1] === d) tasbihCount = +v || 0; }
+      else if(a[0] === 'wt') wirdTargets[a.slice(1).join(':')] = v;
+      else if(a[0] === 'cw') cw.push({ id:a.slice(1).join(':'), name:String(v.name), target:+v.target, custom:true });
+      else if(a[0] === 'cz'){ const ms = (v.modes || []).filter(m => m === 'morning' || m === 'evening'); cz.push({ id:a.slice(1).join(':'), text:String(v.text), count:Math.min(Math.round(+v.count) || 1, 1000), modes:ms.length ? ms : ['morning', 'evening'] }); }
+      else if(k === 'st'){ try{ localStorage.setItem(STREAK_KEY, JSON.stringify(v)); }catch(e){} }
+    });
+    customWirds = cw.filter(w => w.name && w.target > 0).sort(byId).slice(0, 10);
+    customAdhkar = cz.filter(z => z.text).sort(byId).slice(0, 20);
+    WIRDS.forEach(w => { const t = +wirdTargets[w.id]; w.target = t > 0 ? Math.min(Math.round(t), 10000) : w.def; });
+    if(selWird && !selWirdObj()) selWird = null;
+    saveProgress(); saveWird(); saveTasbih(); saveCustom(); saveCustomZ(); saveTargets();
+    lastDone.morning = null; lastDone.evening = null;
+    render();
+  }finally{ syncApplying = false; }
+}
+async function syGK(c){ return crypto.subtle.importKey('raw', b64uToU8(c.key), 'AES-GCM', false, ['encrypt', 'decrypt']); }
+async function syEnc(c, obj){
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name:'AES-GCM', iv }, await syGK(c), new TextEncoder().encode(JSON.stringify(obj))));
+  return u8b64u(iv) + '.' + u8b64u(ct);
+}
+async function syDec(c, blob){
+  const p = blob.split('.');
+  const pt = await crypto.subtle.decrypt({ name:'AES-GCM', iv:b64uToU8(p[0]) }, await syGK(c), b64uToU8(p[1]));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+// مزامنة: سحب ← دمج ← (لو فيه جديد عندنا) رفع بشرط الإصدار؛ لو جهاز آخر سبقنا (409) نعيد السحب والدمج
+async function syncNow(){
+  const c = syCfg();
+  if(!c || syncBusy || !window.__syncReady) return false;
+  syncBusy = true;
+  let ok = false;
+  try{
+    for(let tries = 0; tries < 3; tries++){
+      const r = await fetch(SY_API + '/api/sync?gid=' + c.gid + '&since=' + c.ver, { headers:{ 'X-Secret':c.secret } });
+      if(r.status === 401 || r.status === 404){ SY.lost = true; syCfgSave(null); break; }
+      if(!r.ok) throw new Error('http');
+      const j = await r.json();
+      let st = syState(), rem = {};
+      if(!j.same){
+        if(j.blob) rem = (await syDec(c, j.blob)).s || {};
+        const m = syncMergeState(st, rem);
+        if(stab(m) !== stab(st)){ syStateSave(m); st = m; syncApply(st); }
+        c.ver = j.ver;
+      }
+      if(c.ver === 0 || (j.same ? stab(st) !== c.sent : stab(st) !== stab(rem))){
+        const pr = await fetch(SY_API + '/api/sync', { method:'PUT', headers:{ 'Content-Type':'application/json', 'X-Secret':c.secret }, body:JSON.stringify({ gid:c.gid, base:c.ver, blob:await syEnc(c, { s:st }) }) });
+        if(pr.status === 409) continue;
+        if(!pr.ok) throw new Error('http');
+        c.ver = (await pr.json()).ver;
+      }
+      c.sent = stab(st);
+      c.last = Date.now(); syCfgSave(c); ok = true; break;
+    }
+  }catch(e){ ok = false; }
+  syncBusy = false;
+  if(syncOverlay.classList.contains('open') && !SY.id) syShow(syCfg() ? 'linked' : 'idle');
+  return ok;
+}
+// ---------- واجهة الربط ----------
+const SY_ICON = '<svg class="sy-ic" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><path d="M14 14h2.5v2.5H14z"/><path d="M20.5 14v2.5"/><path d="M14 20.5h2.5"/></svg>';
+const SY_OKI = '<svg class="sy-ic sy-ok" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M7.6 12.6l3 3 5.8-6.4"/></svg>';
+const SY_BTN = (act, txt, cls) => '<button class="' + (cls || 'sheet-close') + '" data-act="' + act + '"><span>' + txt + '</span></button>';
+function syShow(s){
+  SY.state = s; const c = syCfg(); let h = '';
+  if(s === 'idle') h = SY_ICON + '<h2>زامن بياناتك على جهاز آخر</h2><p>بياناتك تتشفّر على جهازك ولا يقرأها أحد غيرك.</p><p>على الجهاز الجديد اضغط «تفعيل المزامنة»، ثم امسح الكود بكاميرا جهازك القديم الذي عليه تقدّمك.</p>' + SY_BTN('start', 'تفعيل المزامنة') + (SY.lost ? '<p>تم إلغاء الربط لأن بيانات المزامنة حُذفت من الخادم.</p>' : '');
+  else if(s === 'wait') h = SY_ICON + '<h2>جارٍ تجهيز الكود…</h2>';
+  else if(s === 'qr') h = '<h2>امسح الكود من جهازك الآخر</h2><div class="qrbox">' + SY.svg + '</div><p>افتح كاميرا الجهاز الذي عليه بياناتك وامسح الكود، فيفتح طوبى ويطلب تأكيدك. الكود مؤقت لمدة 5 دقائق.</p><div class="sy-row">' + SY_BTN('copy', 'نسخ الرابط', 'done-btn') + SY_BTN('share', 'مشاركة', 'done-btn') + '</div>';
+  else if(s === 'done') h = SY_OKI + '<h2>تمت المزامنة</h2><p>تقدّمك الآن مرتبط بين الجهازين.</p>';
+  else if(s === 'expired' || s === 'err') h = SY_ICON + '<h2>' + (s === 'expired' ? 'انتهت مدة الكود' : 'تعذّر الاتصال الآن') + '</h2><p>' + (s === 'expired' ? 'الكود يعيش 5 دقائق فقط.' : 'تأكد من الإنترنت وحاول مرة أخرى.') + '</p>' + SY_BTN('start', 'إعادة المحاولة');
+  else if(s === 'linked' && c){
+    const t = c.last ? new Date(c.last).toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' }) : '—';
+    h = SY_OKI + '<h2>مرتبط</h2><p>آخر مزامنة: <span class="sy-time">' + t + '</span><br>أي تقدّم على الأجهزة المربوطة يتحدّث تلقائيًا.</p>' + SY_BTN('now', syncBusy ? 'جارٍ المزامنة…' : 'مزامنة الآن') +
+      '<p>لربط جهاز جديد: افتح طوبى عليه واضغط زر المزامنة، ثم امسح الكود بكاميرا هذا الجهاز.</p>' +
+      SY_BTN('unlink', 'إلغاء الربط على هذا الجهاز', 'done-btn wird-del') + SY_BTN('wipe', 'حذف بيانات المزامنة من الخادم', 'done-btn wird-del');
+  } else return syShow('idle');
+  syBodyEl.innerHTML = h;
+}
+function openSync(){
+  SY.armed = null;
+  if(syCfg()){ syShow('linked'); syncNow(); }
+  else if(SY.id && SY.svg && Date.now() < SY.until) syShow('qr');
+  else syShow('idle');
+  syncOverlay.classList.add('open');
+}
+syncBtn.addEventListener('click', () => { haptic('tap'); openSync(); });
+document.getElementById('syncX').addEventListener('click', () => syncOverlay.classList.remove('open'));
+syncOverlay.addEventListener('click', (e) => { if(e.target === syncOverlay) syncOverlay.classList.remove('open'); });
+
+// الجهاز الجديد: يعرض QR ثم ينتظر استلام المفاتيح المشفّرة
+async function syncStartPair(){
+  syShow('wait');
+  try{
+    const kp = await crypto.subtle.generateKey({ name:'ECDH', namedCurve:'P-256' }, true, ['deriveKey']);
+    const pub = u8b64u(new Uint8Array(await crypto.subtle.exportKey('raw', kp.publicKey)));
+    const id = rndB64u(16);
+    const r = await fetch(SY_API + '/api/pair/new', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ id, pub }) });
+    if(!r.ok) throw new Error('http');
+    SY.kp = kp; SY.id = id; SY.until = Date.now() + 300000;
+    SY.link = 'https://toobaapp.com/#pair=' + id + '.' + pub;
+    SY.svg = qrSvg(SY.link);
+    if(!SY.svg) throw new Error('qr');
+    syShow('qr');
+    syncPoll(id);
+  }catch(e){ SY.id = null; syShow('err'); }
+}
+async function syncPoll(id){
+  while(SY.id === id && syncOverlay.classList.contains('open') && Date.now() < SY.until){
+    await new Promise(r => setTimeout(r, 2000));
+    if(SY.id !== id) return;
+    try{
+      const j = await (await fetch(SY_API + '/api/pair/get?id=' + id)).json();
+      if(j.ready){ await syncReceive(j.blob, id); return; }
+      if(j.gone) break;
+    }catch(e){}
+  }
+  if(SY.id === id){
+    const open = syncOverlay.classList.contains('open');
+    SY.id = null; SY.svg = null;
+    if(open) syShow('expired');
+  }
+}
+async function syncReceive(b, id){
+  try{
+    const priv = SY.kp.privateKey;
+    const pub = await crypto.subtle.importKey('raw', b64uToU8(b.eph), { name:'ECDH', namedCurve:'P-256' }, false, []);
+    const key = await crypto.subtle.deriveKey({ name:'ECDH', public:pub }, priv, { name:'AES-GCM', length:256 }, false, ['decrypt']);
+    const pt = await crypto.subtle.decrypt({ name:'AES-GCM', iv:b64uToU8(b.iv), additionalData:new TextEncoder().encode(id) }, key, b64uToU8(b.ct));
+    const g = JSON.parse(new TextDecoder().decode(pt));
+    if(typeof g.gid !== 'string' || typeof g.secret !== 'string' || typeof g.key !== 'string') throw new Error('bad');
+    SY.id = null; SY.kp = null; SY.svg = null;
+    const had = Object.keys(syState()).length > 0;
+    syCfgSave({ gid:g.gid, secret:g.secret, key:g.key, ver:0, last:0 });
+    if(!had) syncTouch(0);   // بيانات هذا الجهاز الجديد أضعف من بيانات الجهاز القديم عند التعارض
+    syShow('wait');
+    const ok = await syncNow();
+    haptic('done');
+    syShow(ok ? 'done' : 'err');
+    if(ok) setTimeout(() => { if(syncOverlay.classList.contains('open') && SY.state === 'done') syShow('linked'); }, 1800);
+  }catch(e){ SY.id = null; syShow('err'); }
+}
+async function syCopy(btn){
+  try{ await navigator.clipboard.writeText(SY.link); const l = btn.querySelector('span'); l.textContent = 'تم النسخ ✓'; setTimeout(() => { l.textContent = 'نسخ الرابط'; }, 1600); }catch(e){}
+}
+syBodyEl.addEventListener('click', async (e) => {
+  const b = e.target.closest && e.target.closest('[data-act]');
+  if(!b) return;
+  const a = b.dataset.act;
+  haptic('tap');
+  if(a === 'start') return syncStartPair();
+  if(a === 'copy') return syCopy(b);
+  if(a === 'share'){
+    try{ if(navigator.share) await navigator.share({ title:'ربط طوبى', text:'افتح هذا الرابط على جهازك الذي عليه بياناتك:', url:SY.link }); else syCopy(b.previousElementSibling || b); }catch(err){}
+    return;
+  }
+  if(a === 'now'){ b.querySelector('span').textContent = 'جارٍ المزامنة…'; await syncNow(); return syShow(syCfg() ? 'linked' : 'idle'); }
+  if(a === 'unlink' || a === 'wipe'){
+    if(SY.armed !== a){ SY.armed = a; b.querySelector('span').textContent = 'اضغط مرة أخرى للتأكيد'; return; }
+    SY.armed = null;
+    const c = syCfg();
+    if(a === 'wipe' && c){ try{ await fetch(SY_API + '/api/sync?gid=' + c.gid, { method:'DELETE', headers:{ 'X-Secret':c.secret } }); }catch(err){} }
+    syCfgSave(null);
+    syShow('idle');
+  }
+});
+
+// الجهاز القديم: يفتح رابط الـQR (كاميرا الجوال أو رابط منسوخ) ← تأكيد إجباري ← يرسل المفاتيح مشفّرة بمفتاح الجهاز الجديد
+function syncParseLink(u){ const m = /[#&]pair=([A-Za-z0-9_-]{22})\.([A-Za-z0-9_-]{87})/.exec(u || ''); return m ? { id:m[1], pub:m[2] } : null; }
+function pairShow(s, msg){
+  let h = '';
+  if(s === 'confirm') h = SY_ICON + '<h2>ربط جهاز جديد</h2><p>ترسل أذكارك وأوراد جهازك إلى جهاز جديد؟ لا تؤكد إلا إذا كنت أنت من عرض الكود على جهازك الآخر.</p>' + SY_BTN('send', 'تأكيد وإرسال') + SY_BTN('cancel', 'إلغاء', 'done-btn');
+  else if(s === 'busy') h = SY_ICON + '<h2>جارٍ الإرسال…</h2>';
+  else if(s === 'ok') h = SY_OKI + '<h2>تم ربط الجهاز</h2><p>سيتحدّث تقدّمك بين الجهازين تلقائيًا.</p>' + SY_BTN('cancel', 'تمام');
+  else h = SY_ICON + '<h2>' + (msg || 'تعذّر الربط') + '</h2>' + SY_BTN('cancel', 'تمام');
+  pairBody.innerHTML = h;
+}
+function handlePairUrl(u){
+  const p = syncParseLink(u);
+  if(!p) return false;
+  if(SY.incoming && SY.incoming.id === p.id && pairOverlay.classList.contains('open')) return true;
+  SY.incoming = p;
+  try{ if(location.hash) history.replaceState(null, '', location.pathname + location.search); }catch(e){}
+  pairShow('confirm');
+  pairOverlay.classList.add('open');
+  return true;
+}
+async function syncSend(){
+  const p = SY.incoming;
+  pairShow('busy');
+  try{
+    let c = syCfg();
+    if(!c){
+      c = { gid:rndB64u(16), secret:rndB64u(32), key:rndB64u(32), ver:0, last:0 };
+      const r = await fetch(SY_API + '/api/sync/create', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ gid:c.gid, secret:c.secret }) });
+      if(!r.ok) throw new Error('http');
+      syCfgSave(c);
+      if(!Object.keys(syState()).length) syncTouch(Date.now());
+    }
+    const kp = await crypto.subtle.generateKey({ name:'ECDH', namedCurve:'P-256' }, true, ['deriveKey']);
+    const eph = new Uint8Array(await crypto.subtle.exportKey('raw', kp.publicKey));
+    const pub = await crypto.subtle.importKey('raw', b64uToU8(p.pub), { name:'ECDH', namedCurve:'P-256' }, false, []);
+    const key = await crypto.subtle.deriveKey({ name:'ECDH', public:pub }, kp.privateKey, { name:'AES-GCM', length:256 }, false, ['encrypt']);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = new Uint8Array(await crypto.subtle.encrypt({ name:'AES-GCM', iv, additionalData:new TextEncoder().encode(p.id) }, key, new TextEncoder().encode(JSON.stringify({ gid:c.gid, secret:c.secret, key:c.key }))));
+    const r2 = await fetch(SY_API + '/api/pair/send', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ id:p.id, eph:u8b64u(eph), iv:u8b64u(iv), ct:u8b64u(ct) }) });
+    if(r2.status === 410 || r2.status === 409){ pairShow('err', 'انتهت صلاحية الكود، اعرض كودًا جديدًا'); return; }
+    if(!r2.ok) throw new Error('http');
+    haptic('done'); pairShow('ok'); syncNow();
+  }catch(e){ pairShow('err', 'تعذّر الربط، تأكد من الإنترنت'); }
+}
+pairBody.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-act]');
+  if(!b) return;
+  if(b.dataset.act === 'send') syncSend(); else pairOverlay.classList.remove('open');
+});
+pairOverlay.addEventListener('click', (e) => { if(e.target === pairOverlay) pairOverlay.classList.remove('open'); });
+window.addEventListener('hashchange', () => handlePairUrl(location.hash));
+if(NATIVE){
+  try{
+    const AppP2 = nativePlugin('App');
+    AppP2.addListener('appUrlOpen', (ev) => { handlePairUrl(ev && ev.url); });
+    if(AppP2.getLaunchUrl) AppP2.getLaunchUrl().then((r) => { if(r && r.url) handlePairUrl(r.url); }).catch(() => {});
+  }catch(e){}
+}
+setInterval(() => { if(document.visibilityState === 'visible' && syCfg()) syncNow(); }, 30000);
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && syCfg()) setTimeout(syncNow, 500); });
+window.__syncReady = true;
+setTimeout(() => { if(syCfg()) syncNow(); }, 3000);
+handlePairUrl(location.hash);
 
 // العمل بدون إنترنت (على الدومين الحقيقي بس)
 if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname)){
