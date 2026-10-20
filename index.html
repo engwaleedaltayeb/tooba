@@ -1513,7 +1513,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.43</div>
+    <div class="about-ver">الإصدار 2.4.44</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -2144,7 +2144,8 @@ if(NATIVE){
 focusBtn.addEventListener('click', () => {
   const on = !body.classList.contains('focus');
   setFocus(on);
-  if(on) enterFS(); else exitFS();
+  // الوضع الهادئ يملأ الصفحة نفسها فقط، بدون ملء شاشة المتصفح
+  if(!on) exitFS();
 });
 // لو المستخدم خرج من ملء الشاشة بإيماءة النظام، نرجع للعرض العادي
 ['fullscreenchange','webkitfullscreenchange'].forEach(ev => document.addEventListener(ev, () => {
