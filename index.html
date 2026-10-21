@@ -1371,18 +1371,20 @@
   body.focus .streak{ display:none; }
 
   /* الربط والمزامنة بين الأجهزة */
-  .sync-btn{ position:fixed; top:calc(var(--sa-top) + 14px); left:calc(var(--sa-left) + 62px); z-index:50; width:34px; height:34px; padding:0; border-radius:50%; border:1px solid var(--border); background:var(--surface); color:var(--text); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 3px var(--shadow); transition:background .5s ease, transform .15s ease; }
-  .sync-btn:active{ transform:scale(0.9); }
-  .sync-btn.on{ color:var(--accent-text); }
-  body[data-mode="tasbeeh"] .sync-btn{ left:calc(var(--sa-left) + 104px); }
-  .side-overlay{ direction:ltr; align-items:stretch; justify-content:flex-start; }
-  .side{ direction:rtl; width:min(88vw,380px); height:100%; background:var(--surface); box-shadow:4px 0 24px var(--shadow); padding:calc(var(--sa-top) + 22px) 24px calc(var(--sa-bottom) + 24px); overflow-y:auto; transform:translateX(-100%); transition:transform .35s cubic-bezier(.65,0,.35,1); display:flex; flex-direction:column; }
-  .side-overlay.open .side{ transform:translateX(0); }
-  .side-x{ align-self:flex-start; width:36px; height:36px; border-radius:50%; border:1px solid var(--border); background:transparent; color:var(--text-dim); display:flex; align-items:center; justify-content:center; cursor:pointer; margin-bottom:14px; flex-shrink:0; }
+  #syncBtn{ display:flex; align-items:center; justify-content:center; }
+  #syncBtn.on{ color:var(--bell-on); border-color:color-mix(in srgb, var(--bell-on) 45%, transparent); background:color-mix(in srgb, var(--bell-on) 12%, var(--surface)); }
+  [data-mode="evening"] #syncBtn.on{ color:#6c85d6; border-color:color-mix(in srgb, #6c85d6 45%, transparent); background:color-mix(in srgb, #6c85d6 12%, var(--surface)); }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) [data-mode="evening"] #syncBtn.on{ color:#8ba0e8; border-color:color-mix(in srgb, #8ba0e8 45%, transparent); background:color-mix(in srgb, #8ba0e8 14%, var(--surface)); }
+  }
+  :root[data-theme="dark"] [data-mode="evening"] #syncBtn.on{ color:#8ba0e8; border-color:color-mix(in srgb, #8ba0e8 45%, transparent); background:color-mix(in srgb, #8ba0e8 14%, var(--surface)); }
+  body.focus[data-mode="tasbeeh"] #syncBtn{ display:none; }
   .sy{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:14px; }
   .sy h2{ font-size:22px; font-weight:700; line-height:1.5; margin:4px 0 0; }
   .sy p{ font-size:14.5px; line-height:1.9; color:var(--text-dim); }
   .sy .sheet-close, .sy .done-btn{ margin-top:6px; }
+  .sy .sheet-steps{ width:100%; text-align:start; margin:2px 0 4px; }
+  .sy-note{ font-size:13px !important; line-height:1.8 !important; }
   .sy-ic{ color:var(--accent-text); }
   .qrbox{ width:min(100%,260px); aspect-ratio:1; border-radius:18px; overflow:hidden; background:#fff; border:1px solid var(--border); box-shadow:0 1px 3px var(--shadow); }
   .qrbox svg{ display:block; width:100%; height:100%; }
@@ -1407,8 +1409,7 @@
 <script>(function(){var el=document.getElementById("splash");if(!el)return;var done=false;function rm(){if(done)return;done=true;el.remove();}var rm_=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;try{if(sessionStorage.getItem("tooba-skip-splash")){sessionStorage.removeItem("tooba-skip-splash");rm();return;}}catch(e){}if(rm_){rm();return;}el.addEventListener("click",rm);setTimeout(rm,2600);var t0=Date.now();var t=el.querySelector(".splash-title");function showT(){if(t)t.classList.add("show");}var fl=(document.fonts&&document.fonts.load)?document.fonts.load("600 40px 'IBM Plex Sans Arabic'","\u0637\u0648\u0628\u0649"):Promise.resolve();var cap=new Promise(function(r){setTimeout(r,1000);});Promise.race([fl,cap]).then(function(){setTimeout(showT,Math.max(0,900-(Date.now()-t0)));});})();</script>
 <button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع الليلي"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
 <button class="reset-btn" id="resetBtn" aria-label="إعادة التعيين"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
-<button class="sync-btn" id="syncBtn" aria-label="المزامنة بين الأجهزة"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><path d="M14 14h2.5v2.5H14z"/><path d="M20.5 14v2.5"/><path d="M14 20.5h2.5"/><path d="M20.5 20.5h-.01"/></svg></button>
-<div class="sheet-overlay side-overlay" id="syncOverlay"><div class="side"><button class="side-x" id="syncX" aria-label="إغلاق"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="sy" id="syBody"></div></div></div>
+<div class="sheet-overlay" id="syncOverlay"><div class="sheet" style="max-height:92vh;overflow-y:auto;"><div class="sheet-handle"></div><div class="sy" id="syBody"></div></div></div>
 <div class="sheet-overlay" id="pairOverlay"><div class="sheet"><div class="sheet-handle"></div><div class="sy" id="pairBody"></div></div></div>
 <div class="wrap">
   <div class="top-actions">
@@ -1446,6 +1447,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3.5" width="8" height="17" rx="2"/><path d="M4.5 8v8"/><path d="M19.5 8v8"/><path d="M2 10.5v3"/><path d="M22 10.5v3"/><path class="hslash" d="M3.5 3L20.5 21"/></svg>
     </button>
     <button id="bellBtn" aria-label="تذكير بأوقات الأذكار" aria-pressed="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><path class="hslash" d="M3.5 3L20.5 21"/></svg></button>
+    <button id="syncBtn" aria-label="نقل تقدّمك إلى جهاز جديد"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><path d="M14 14h2.5v2.5H14z"/><path d="M20.5 14v2.5"/><path d="M14 20.5h2.5"/><path d="M20.5 20.5h-.01"/></svg></button>
     <button id="wedit" class="dis" aria-label="تعديل العدد"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
     <button id="doneBtn" class="dis" aria-label="إتمام الورد"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12l4 4L15 7"/><path d="M9 12l4 4L22 7"/></svg></button>
   </div>
@@ -1513,7 +1515,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.44</div>
+    <div class="about-ver">الإصدار 2.4.47</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -4168,18 +4170,21 @@ async function syncNow(){
 const SY_ICON = '<svg class="sy-ic" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><path d="M14 14h2.5v2.5H14z"/><path d="M20.5 14v2.5"/><path d="M14 20.5h2.5"/></svg>';
 const SY_OKI = '<svg class="sy-ic sy-ok" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M7.6 12.6l3 3 5.8-6.4"/></svg>';
 const SY_BTN = (act, txt, cls) => '<button class="' + (cls || 'sheet-close') + '" data-act="' + act + '"><span>' + txt + '</span></button>';
+const SY_STEPS = a => '<ol class="sheet-steps">' + a.map((t, i) => '<li><b>' + (i + 1) + '</b><span>' + t + '</span></li>').join('') + '</ol>';
 function syShow(s){
   SY.state = s; const c = syCfg(); let h = '';
-  if(s === 'idle') h = SY_ICON + '<h2>زامن بياناتك على جهاز آخر</h2><p>بياناتك تتشفّر على جهازك ولا يقرأها أحد غيرك.</p><p>على الجهاز الجديد اضغط «تفعيل المزامنة»، ثم امسح الكود بكاميرا جهازك القديم الذي عليه تقدّمك.</p>' + SY_BTN('start', 'تفعيل المزامنة') + (SY.lost ? '<p>تم إلغاء الربط لأن بيانات المزامنة حُذفت من الخادم.</p>' : '');
+  if(s === 'idle') h = SY_ICON + '<h2>' + (SY.lost ? 'تم فصل هذا الجهاز' : 'تم الفصل') + '</h2><p>' + (SY.lost ? 'النسخة المحفوظة على الخادم اتحذفت.' : 'تقدّمك على هذا الجهاز بقي كما هو.') + ' يمكنك نقل تقدّمك إلى جهاز جديد في أي وقت.</p>' + SY_BTN('start', 'نقل تقدّمك إلى جهاز جديد');
   else if(s === 'wait') h = SY_ICON + '<h2>جارٍ تجهيز الكود…</h2>';
-  else if(s === 'qr') h = '<h2>امسح الكود من جهازك الآخر</h2><div class="qrbox">' + SY.svg + '</div><p>افتح كاميرا الجهاز الذي عليه بياناتك وامسح الكود، فيفتح طوبى ويطلب تأكيدك. الكود مؤقت لمدة 5 دقائق.</p><div class="sy-row">' + SY_BTN('copy', 'نسخ الرابط', 'done-btn') + SY_BTN('share', 'مشاركة', 'done-btn') + '</div>';
-  else if(s === 'done') h = SY_OKI + '<h2>تمت المزامنة</h2><p>تقدّمك الآن مرتبط بين الجهازين.</p>';
-  else if(s === 'expired' || s === 'err') h = SY_ICON + '<h2>' + (s === 'expired' ? 'انتهت مدة الكود' : 'تعذّر الاتصال الآن') + '</h2><p>' + (s === 'expired' ? 'الكود يعيش 5 دقائق فقط.' : 'تأكد من الإنترنت وحاول مرة أخرى.') + '</p>' + SY_BTN('start', 'إعادة المحاولة');
+  else if(s === 'qr') h = '<h2>انقل تقدّمك إلى جهاز جديد</h2><p>هذا الكود يظهر على الجهاز الجديد. من جهازك القديم الذي عليه تقدّمك:</p><div class="qrbox">' + SY.svg + '</div>' +
+    SY_STEPS(['افتح الكاميرا العادية في جهازك القديم ووجّهها على الكود.', 'اضغط الرابط الذي يظهر، ثم أكّد الإرسال داخل طوبى.']) +
+    '<p class="sy-note">الكود صالح لمدة 5 دقائق. لا تستطيع المسح؟ انسخ الرابط وافتحه على جهازك القديم. لازم يكون محدّثًا لآخر إصدار، وبياناتك مشفّرة ولا يقرأها أحد غيرك.</p><div class="sy-row">' + SY_BTN('copy', 'نسخ الرابط', 'done-btn') + SY_BTN('share', 'مشاركة', 'done-btn') + '</div>';
+  else if(s === 'done') h = SY_OKI + '<h2>تم نقل تقدّمك</h2><p>أذكارك وأورادك وصلت لهذا الجهاز، وأي تقدّم جديد يتحدّث بين الجهازين تلقائيًا.</p>';
+  else if(s === 'expired' || s === 'err') h = SY_ICON + '<h2>' + (s === 'expired' ? 'انتهت مدة الكود' : 'تعذّر الاتصال الآن') + '</h2><p>' + (s === 'expired' ? 'الكود صالح لمدة 5 دقائق فقط.' : 'تأكد من الإنترنت وحاول مرة أخرى.') + '</p>' + SY_BTN('start', s === 'expired' ? 'إظهار كود جديد' : 'إعادة المحاولة');
   else if(s === 'linked' && c){
     const t = c.last ? new Date(c.last).toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' }) : '—';
-    h = SY_OKI + '<h2>مرتبط</h2><p>آخر مزامنة: <span class="sy-time">' + t + '</span><br>أي تقدّم على الأجهزة المربوطة يتحدّث تلقائيًا.</p>' + SY_BTN('now', syncBusy ? 'جارٍ المزامنة…' : 'مزامنة الآن') +
-      '<p>لربط جهاز جديد: افتح طوبى عليه واضغط زر المزامنة، ثم امسح الكود بكاميرا هذا الجهاز.</p>' +
-      SY_BTN('unlink', 'إلغاء الربط على هذا الجهاز', 'done-btn wird-del') + SY_BTN('wipe', 'حذف بيانات المزامنة من الخادم', 'done-btn wird-del');
+    h = SY_OKI + '<h2>أجهزتك مرتبطة</h2><p>آخر مزامنة: <span class="sy-time">' + t + '</span><br>تقدّمك يتحدّث تلقائيًا بين أجهزتك.</p>' + SY_BTN('now', syncBusy ? 'جارٍ المزامنة…' : 'مزامنة الآن') +
+      '<p>لإضافة جهاز آخر:</p>' + SY_STEPS(['على الجهاز الجديد: افتح طوبى واضغط زر المزامنة ثم «إظهار الكود».', 'امسح الكود بكاميرا هذا الجهاز، ثم أكّد الإرسال.']) +
+      SY_BTN('unlink', 'فصل هذا الجهاز عن المزامنة', 'done-btn wird-del') + SY_BTN('wipe', 'حذف النسخة المشفّرة من الخادم', 'done-btn wird-del');
   } else return syShow('idle');
   syBodyEl.innerHTML = h;
 }
@@ -4187,11 +4192,10 @@ function openSync(){
   SY.armed = null;
   if(syCfg()){ syShow('linked'); syncNow(); }
   else if(SY.id && SY.svg && Date.now() < SY.until) syShow('qr');
-  else syShow('idle');
+  else syncStartPair();
   syncOverlay.classList.add('open');
 }
 syncBtn.addEventListener('click', () => { haptic('tap'); openSync(); });
-document.getElementById('syncX').addEventListener('click', () => syncOverlay.classList.remove('open'));
 syncOverlay.addEventListener('click', (e) => { if(e.target === syncOverlay) syncOverlay.classList.remove('open'); });
 
 // الجهاز الجديد: يعرض QR ثم ينتظر استلام المفاتيح المشفّرة
@@ -4275,10 +4279,10 @@ syBodyEl.addEventListener('click', async (e) => {
 function syncParseLink(u){ const m = /[#&]pair=([A-Za-z0-9_-]{22})\.([A-Za-z0-9_-]{87})/.exec(u || ''); return m ? { id:m[1], pub:m[2] } : null; }
 function pairShow(s, msg){
   let h = '';
-  if(s === 'confirm') h = SY_ICON + '<h2>ربط جهاز جديد</h2><p>ترسل أذكارك وأوراد جهازك إلى جهاز جديد؟ لا تؤكد إلا إذا كنت أنت من عرض الكود على جهازك الآخر.</p>' + SY_BTN('send', 'تأكيد وإرسال') + SY_BTN('cancel', 'إلغاء', 'done-btn');
+  if(s === 'confirm') h = SY_ICON + '<h2>انقل تقدّمك إلى الجهاز الجديد؟</h2><p>سيستلم الجهاز الجديد أذكارك وأورادك وتقدّمك اليوم. لا تؤكد إلا إذا كنت أنت من عرض الكود على جهازك الجديد.</p>' + SY_BTN('send', 'تأكيد وإرسال') + SY_BTN('cancel', 'إلغاء', 'done-btn');
   else if(s === 'busy') h = SY_ICON + '<h2>جارٍ الإرسال…</h2>';
-  else if(s === 'ok') h = SY_OKI + '<h2>تم ربط الجهاز</h2><p>سيتحدّث تقدّمك بين الجهازين تلقائيًا.</p>' + SY_BTN('cancel', 'تمام');
-  else h = SY_ICON + '<h2>' + (msg || 'تعذّر الربط') + '</h2>' + SY_BTN('cancel', 'تمام');
+  else if(s === 'ok') h = SY_OKI + '<h2>تم نقل تقدّمك</h2><p>الجهاز الجديد استلم بياناتك، وسيتحدّث التقدّم بين الجهازين تلقائيًا.</p>' + SY_BTN('cancel', 'تمام');
+  else h = SY_ICON + '<h2>' + (msg || 'تعذّر النقل') + '</h2>' + SY_BTN('cancel', 'تمام');
   pairBody.innerHTML = h;
 }
 function handlePairUrl(u){
@@ -4313,7 +4317,7 @@ async function syncSend(){
     if(r2.status === 410 || r2.status === 409){ pairShow('err', 'انتهت صلاحية الكود، اعرض كودًا جديدًا'); return; }
     if(!r2.ok) throw new Error('http');
     haptic('done'); pairShow('ok'); syncNow();
-  }catch(e){ pairShow('err', 'تعذّر الربط، تأكد من الإنترنت'); }
+  }catch(e){ pairShow('err', 'تعذّر النقل، تأكد من الإنترنت'); }
 }
 pairBody.addEventListener('click', (e) => {
   const b = e.target.closest && e.target.closest('[data-act]');
