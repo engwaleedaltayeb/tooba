@@ -1391,6 +1391,7 @@
   .sy-row{ display:flex; gap:10px; width:100%; }
   .sy-row .done-btn{ flex:1; margin-top:0; padding:0 8px; }
   .sy-ok{ color:var(--accent-text); }
+  .sy p.sy-stat{ color:var(--accent-text); font-size:14px; line-height:1.8; }
   .sy-time{ direction:ltr; unicode-bidi:isolate; display:inline-block; }
   /* أثناء تبديل القسم نلغي انتقالات الألوان لحظيًا: لون القسم السابق (النيلي) كان أحيانًا يعلق لما التبديل يتكرر بسرعة */
   body.no-tr, body.no-tr *, body.no-tr *::before, body.no-tr *::after{ transition-property:transform,opacity,height,width,padding,margin,margin-bottom,border-width,stroke-dasharray !important; }
@@ -1515,7 +1516,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.47</div>
+    <div class="about-ver">الإصدار 2.4.49</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -4163,7 +4164,7 @@ async function syncNow(){
     }
   }catch(e){ ok = false; }
   syncBusy = false;
-  if(syncOverlay.classList.contains('open') && !SY.id) syShow(syCfg() ? 'linked' : 'idle');
+  if(syncOverlay.classList.contains('open')){ if(!syCfg() && SY.lost) syShow('idle'); else if(SY.state === 'linked' && syCfg()) syShow('linked'); }
   return ok;
 }
 // ---------- واجهة الربط ----------
@@ -4175,15 +4176,16 @@ function syShow(s){
   SY.state = s; const c = syCfg(); let h = '';
   if(s === 'idle') h = SY_ICON + '<h2>' + (SY.lost ? 'تم فصل هذا الجهاز' : 'تم الفصل') + '</h2><p>' + (SY.lost ? 'النسخة المحفوظة على الخادم اتحذفت.' : 'تقدّمك على هذا الجهاز بقي كما هو.') + ' يمكنك نقل تقدّمك إلى جهاز جديد في أي وقت.</p>' + SY_BTN('start', 'نقل تقدّمك إلى جهاز جديد');
   else if(s === 'wait') h = SY_ICON + '<h2>جارٍ تجهيز الكود…</h2>';
-  else if(s === 'qr') h = '<h2>انقل تقدّمك إلى جهاز جديد</h2><p>هذا الكود يظهر على الجهاز الجديد. من جهازك القديم الذي عليه تقدّمك:</p><div class="qrbox">' + SY.svg + '</div>' +
-    SY_STEPS(['افتح الكاميرا العادية في جهازك القديم ووجّهها على الكود.', 'اضغط الرابط الذي يظهر، ثم أكّد الإرسال داخل طوبى.']) +
-    '<p class="sy-note">الكود صالح لمدة 5 دقائق. لا تستطيع المسح؟ انسخ الرابط وافتحه على جهازك القديم. لازم يكون محدّثًا لآخر إصدار، وبياناتك مشفّرة ولا يقرأها أحد غيرك.</p><div class="sy-row">' + SY_BTN('copy', 'نسخ الرابط', 'done-btn') + SY_BTN('share', 'مشاركة', 'done-btn') + '</div>';
+  else if(s === 'qr'){
+    h = '<h2>انقل تقدّمك إلى جهاز جديد</h2><p>هذا الكود يظهر على الجهاز الجديد. من جهازك القديم الذي عليه تقدّمك:</p><div class="qrbox">' + SY.svg + '</div>' +
+      SY_STEPS(['افتح الكاميرا العادية في جهازك القديم ووجّهها على الكود.', 'اضغط الرابط الذي يظهر، ثم أكّد الإرسال داخل طوبى.']) +
+      '<p class="sy-note">الكود صالح لمدة 5 دقائق. لا تستطيع المسح؟ انسخ الرابط وافتحه على جهازك القديم. لازم يكون محدّثًا لآخر إصدار، وبياناتك مشفّرة ولا يقرأها أحد غيرك.</p><div class="sy-row">' + SY_BTN('copy', 'نسخ الرابط', 'done-btn') + SY_BTN('share', 'مشاركة', 'done-btn') + '</div>';
+  }
   else if(s === 'done') h = SY_OKI + '<h2>تم نقل تقدّمك</h2><p>أذكارك وأورادك وصلت لهذا الجهاز، وأي تقدّم جديد يتحدّث بين الجهازين تلقائيًا.</p>';
   else if(s === 'expired' || s === 'err') h = SY_ICON + '<h2>' + (s === 'expired' ? 'انتهت مدة الكود' : 'تعذّر الاتصال الآن') + '</h2><p>' + (s === 'expired' ? 'الكود صالح لمدة 5 دقائق فقط.' : 'تأكد من الإنترنت وحاول مرة أخرى.') + '</p>' + SY_BTN('start', s === 'expired' ? 'إظهار كود جديد' : 'إعادة المحاولة');
   else if(s === 'linked' && c){
     const t = c.last ? new Date(c.last).toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' }) : '—';
-    h = SY_OKI + '<h2>أجهزتك مرتبطة</h2><p>آخر مزامنة: <span class="sy-time">' + t + '</span><br>تقدّمك يتحدّث تلقائيًا بين أجهزتك.</p>' + SY_BTN('now', syncBusy ? 'جارٍ المزامنة…' : 'مزامنة الآن') +
-      '<p>لإضافة جهاز آخر:</p>' + SY_STEPS(['على الجهاز الجديد: افتح طوبى واضغط زر المزامنة ثم «إظهار الكود».', 'امسح الكود بكاميرا هذا الجهاز، ثم أكّد الإرسال.']) +
+    h = SY_OKI + '<h2>أجهزتك مرتبطة</h2><p>آخر مزامنة: <span class="sy-time">' + t + '</span><br>تقدّمك يتحدّث تلقائيًا بين أجهزتك.</p>' +
       SY_BTN('unlink', 'فصل هذا الجهاز عن المزامنة', 'done-btn wird-del') + SY_BTN('wipe', 'حذف النسخة المشفّرة من الخادم', 'done-btn wird-del');
   } else return syShow('idle');
   syBodyEl.innerHTML = h;
@@ -4264,13 +4266,12 @@ syBodyEl.addEventListener('click', async (e) => {
     try{ if(navigator.share) await navigator.share({ title:'ربط طوبى', text:'افتح هذا الرابط على جهازك الذي عليه بياناتك:', url:SY.link }); else syCopy(b.previousElementSibling || b); }catch(err){}
     return;
   }
-  if(a === 'now'){ b.querySelector('span').textContent = 'جارٍ المزامنة…'; await syncNow(); return syShow(syCfg() ? 'linked' : 'idle'); }
   if(a === 'unlink' || a === 'wipe'){
     if(SY.armed !== a){ SY.armed = a; b.querySelector('span').textContent = 'اضغط مرة أخرى للتأكيد'; return; }
     SY.armed = null;
     const c = syCfg();
     if(a === 'wipe' && c){ try{ await fetch(SY_API + '/api/sync?gid=' + c.gid, { method:'DELETE', headers:{ 'X-Secret':c.secret } }); }catch(err){} }
-    syCfgSave(null);
+    syCfgSave(null); SY.id = null; SY.svg = null;
     syShow('idle');
   }
 });
