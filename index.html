@@ -1395,7 +1395,7 @@
   .sy .sheet-steps{ width:100%; text-align:start; margin:2px 0 4px; }
   .sy-note{ font-size:13px !important; line-height:1.8 !important; }
   .sy-ic{ color:var(--accent-text); }
-  .qrbox{ width:min(82%,260px); aspect-ratio:1; padding:0; border-radius:28px; overflow:hidden; background:#fff; }
+  .qrbox{ width:min(64%,225px); aspect-ratio:1; padding:0; border-radius:28px; overflow:hidden; background:#fff; }
   .qrbox svg{ display:block; width:100%; height:100%; }
   .sy-row{ display:flex; gap:10px; width:100%; }
   .sy-row .done-btn{ flex:1; margin-top:0; padding:0 8px; }
@@ -1438,7 +1438,24 @@
     .sy-hero .syp, .sy-hero .sypy, .sy-hero .sypr{ animation:none !important; }
     .sy-hero .sypl, .sy-hero .syB1, .sy-hero .syB2{ animation:none !important; }
     .sy-hero .syB2{ opacity:0; }
+    .sy-hero2 .sylr{ animation:none !important; opacity:0; }
   }
+  /* شاشة «أجهزتك مرتبطة»: أنيميشن أهدأ بتبادل البتلات في الاتجاهين + قائمة الأجهزة */
+  .sy-hero2 .syp, .sy-hero2 .sypy, .sy-hero2 .sypr{ animation-duration:4.4s; }
+  .sy-hero2 .syp.rv{ animation-name:sypXr; }
+  .sy-hero2 .sylr{ fill:none; stroke:currentColor; stroke-width:1.6; transform-box:fill-box; transform-origin:center; animation:sylPulse 2.6s ease-out infinite; }
+  @keyframes sypXr{ 0%{ transform:translate(236px,62px); } 100%{ transform:translate(86px,62px); } }
+  @keyframes sylPulse{ 0%{ transform:scale(1); opacity:.55; } 100%{ transform:scale(2.1); opacity:0; } }
+  .sy-dl{ align-self:stretch; text-align:start; font-size:13.5px; font-weight:600; color:var(--text-dim); margin:6px 2px 0; }
+  .sy-devs{ display:flex; flex-direction:column; gap:10px; width:100%; }
+  .sy-dev{ display:flex; align-items:center; gap:12px; width:100%; padding:12px 14px; border:1px solid var(--border); border-radius:16px; background:var(--bg); text-align:start; }
+  .sy-dev-i{ width:40px; height:40px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:var(--accent-text); background:color-mix(in srgb, var(--accent) 12%, transparent); }
+  .sy-dev-b{ flex:1; min-width:0; }
+  .sy-dev-n{ font-size:15px; font-weight:600; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .sy-dev-s{ font-size:12.5px; color:var(--text-dim); margin-top:2px; }
+  .sy-dev-me{ font-size:12.5px; font-weight:600; color:var(--accent-text); padding:5px 12px; border-radius:999px; background:color-mix(in srgb, var(--accent) 12%, transparent); white-space:nowrap; }
+  .sy-dev-x{ height:36px; padding:0 14px; border-radius:999px; border:1px solid color-mix(in srgb, var(--reset) 45%, transparent); background:transparent; color:var(--reset); font-family:inherit; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap; transition:transform .15s ease; }
+  .sy-dev-x:active{ transform:scale(0.94); }
   /* أثناء تبديل القسم نلغي انتقالات الألوان لحظيًا: لون القسم السابق (النيلي) كان أحيانًا يعلق لما التبديل يتكرر بسرعة */
   body.no-tr, body.no-tr *, body.no-tr *::before, body.no-tr *::after{ transition-property:transform,opacity,height,width,padding,margin,margin-bottom,border-width,stroke-dasharray !important; }
 </style>
@@ -1562,7 +1579,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.53</div>
+    <div class="about-ver">الإصدار 2.4.55</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -4085,7 +4102,7 @@ function qrSvg(text){
   return '<svg viewBox="0 0 ' + (n+2*q) + ' ' + (n+2*q) + '" shape-rendering="crispEdges" role="img" aria-label="QR"><rect width="100%" height="100%" fill="#fff"/><path d="' + d + '" fill="#000"/></svg>';
 }
 // ---------- الربط والمزامنة بين الأجهزة بالـQR (مشفّرة من طرف لطرف، الخادم لا يقرأ شيئًا) ----------
-const SYNC_CFG = 'tooba-sync', SYNC_STATE = 'tooba-sync-state';
+const SYNC_CFG = 'tooba-sync', SYNC_STATE = 'tooba-sync-state', DEVKEY = 'tooba-device';
 const SY_API = NATIVE ? 'https://toobaapp.com' : '';
 const SY = {};
 let syncApplying = false, syncBusy = false, syncTimer = null;
@@ -4095,7 +4112,21 @@ function u8b64u(u){ let s = ''; for(let i = 0; i < u.length; i++) s += String.fr
 function rndB64u(n){ return u8b64u(crypto.getRandomValues(new Uint8Array(n))); }
 function stab(o){ if(o && typeof o === 'object'){ if(Array.isArray(o)) return '[' + o.map(stab).join(',') + ']'; return '{' + Object.keys(o).sort().map(k => JSON.stringify(k) + ':' + stab(o[k])).join(',') + '}'; } return JSON.stringify(o); }
 function syCfg(){ try{ const c = JSON.parse(localStorage.getItem(SYNC_CFG)); return c && c.gid && c.secret && c.key ? c : null; }catch(e){ return null; } }
-function syCfgSave(c){ try{ if(c) localStorage.setItem(SYNC_CFG, JSON.stringify(c)); else { localStorage.removeItem(SYNC_CFG); localStorage.removeItem(SYNC_STATE); } }catch(e){} syncPaintBtn(); }
+function syCfgSave(c){ try{ if(c) localStorage.setItem(SYNC_CFG, JSON.stringify(c)); else { localStorage.removeItem(SYNC_CFG); localStorage.removeItem(SYNC_STATE); localStorage.removeItem(DEVKEY); } }catch(e){} syncPaintBtn(); }
+// هوية هذا الجهاز داخل المجموعة (تتولّد من جديد عند كل ربط، وتُمسح عند الفصل)
+function devGuess(){
+  const ua = navigator.userAgent;
+  const tablet = /iPad/.test(ua) || (ua.includes('Macintosh') && 'ontouchend' in document), mobile = /Android|iPhone|iPod/i.test(ua);
+  const os = /iPhone|iPod/.test(ua) ? 'آيفون' : tablet ? 'آيباد' : /Android/.test(ua) ? 'أندرويد' : /Windows/.test(ua) ? 'ويندوز' : /Mac/.test(ua) ? 'ماك' : /Linux|CrOS/.test(ua) ? 'لينكس' : 'جهاز';
+  const br = /Edg\//.test(ua) ? 'إيدج' : /OPR\/|Opera/.test(ua) ? 'أوبرا' : /Firefox|FxiOS/.test(ua) ? 'فايرفوكس' : /Chrome|CriOS/.test(ua) ? 'كروم' : /Safari/.test(ua) ? 'سفاري' : '';
+  return { n:NATIVE ? os + ' · التطبيق' : os + (br ? ' · ' + br : ''), k:(NATIVE || mobile || tablet) ? 'phone' : 'desktop' };
+}
+function devInfo(){
+  let d = null;
+  try{ d = JSON.parse(localStorage.getItem(DEVKEY)); }catch(e){}
+  if(!d || !d.id){ d = Object.assign({ id:rndB64u(6), seen:Date.now() }, devGuess()); try{ localStorage.setItem(DEVKEY, JSON.stringify(d)); }catch(e){} }
+  return d;
+}
 function syState(){ try{ return JSON.parse(localStorage.getItem(SYNC_STATE)) || {}; }catch(e){ return {}; } }
 function syStateSave(s){ try{ localStorage.setItem(SYNC_STATE, JSON.stringify(s)); }catch(e){} }
 function syncPaintBtn(){ syncBtn.classList.toggle('on', !!syCfg()); }
@@ -4111,6 +4142,7 @@ function syncSnapshot(){
   customWirds.forEach(w => { o['cw:' + w.id] = { name:w.name, target:w.target }; });
   customAdhkar.forEach(z => { o['cz:' + z.id] = { text:z.text, count:z.count, modes:z.modes }; });
   const s = loadStreak(); if(s.last) o.st = { n:s.n, last:s.last, best:s.best || 0 };
+  if(syCfg()){ const dv = devInfo(); o['dv:' + dv.id] = { n:dv.n, k:dv.k, l:dv.seen }; }
   return o;
 }
 // يُنادى من كل دوال الحفظ: يقارن اللقطة بالحالة السابقة ويسجّل وقت آخر تعديل لكل مفتاح (ما نغيّرش شكل المفاتيح في localStorage)
@@ -4120,7 +4152,7 @@ function syncTouch(seedT){
   let ch = false;
   Object.keys(cur).forEach(k => { const o = st[k]; if(!o || stab(o.v) !== stab(cur[k])){ st[k] = { v:cur[k], t:now }; ch = true; } });
   Object.keys(st).forEach(k => {
-    if(k in cur) return;
+    if(k in cur || /^d[vx]:/.test(k)) return;
     if(/^(p|w|t):/.test(k) && k.split(':')[1] !== d){ delete st[k]; ch = true; return; }
     if(st[k].v !== null){ st[k] = { v:null, t:now }; ch = true; }
     else if(st[k].t > 0 && Date.now() - st[k].t > 30 * 864e5){ delete st[k]; ch = true; }   // شواهد الحذف تعيش 30 يومًا
@@ -4184,6 +4216,8 @@ async function syDec(c, blob){
 async function syncNow(){
   const c = syCfg();
   if(!c || syncBusy || !window.__syncReady) return false;
+  try{ const dv = devInfo(); if(Date.now() - dv.seen > 36e5){ dv.seen = Date.now(); localStorage.setItem(DEVKEY, JSON.stringify(dv)); } }catch(e){}
+  syncTouch(); clearTimeout(syncTimer);
   syncBusy = true;
   let ok = false;
   try{
@@ -4199,6 +4233,7 @@ async function syncNow(){
         if(stab(m) !== stab(st)){ syStateSave(m); st = m; syncApply(st); }
         c.ver = j.ver;
       }
+      { const dx = st['dx:' + devInfo().id]; if(!SY.leaving && dx && dx.v === 1){ SY.kicked = true; SY.lost = false; syCfgSave(null); break; } }
       if(c.ver === 0 || (j.same ? stab(st) !== c.sent : stab(st) !== stab(rem))){
         const pr = await fetch(SY_API + '/api/sync', { method:'PUT', headers:{ 'Content-Type':'application/json', 'X-Secret':c.secret }, body:JSON.stringify({ gid:c.gid, base:c.ver, blob:await syEnc(c, { s:st }) }) });
         if(pr.status === 409) continue;
@@ -4210,7 +4245,7 @@ async function syncNow(){
     }
   }catch(e){ ok = false; }
   syncBusy = false;
-  if(syncOverlay.classList.contains('open')){ if(!syCfg() && SY.lost) syShow('idle'); else if(SY.state === 'linked' && syCfg()) syShow('linked'); }
+  if(syncOverlay.classList.contains('open')){ if(!syCfg() && (SY.lost || SY.kicked)) syShow('idle'); else if(SY.state === 'linked' && syCfg()) syShow('linked'); }
   return ok;
 }
 // ---------- واجهة الربط ----------
@@ -4226,11 +4261,43 @@ const SY_HERO = (() => {
     '<g class="syB2"><rect class="dv" x="224" y="28" width="76" height="52" rx="6"/><path class="dv" d="M212 90h100"/><use class="sypl" href="#syl" x="250" y="42" width="24" height="24" style="transform-box:fill-box;transform-origin:center"/></g>' +
     fl + '</svg>';
 })();
+const SY_LHERO = (() => {
+  const sym = SY_HERO.match(/<symbol[\s\S]*?<\/symbol>/)[0];
+  const fl = [[24,0,''],[34,-2.2,''],[28,-1.1,' rv'],[20,-3.3,' rv']].map(a => '<g class="syp' + a[2] + '" style="--dl:' + a[1] + 's"><g class="sypy" style="--h:' + a[0] + 'px;--dl:' + a[1] + 's"><g class="sypr" style="--dl:' + a[1] + 's"><use href="#syl" x="-8" y="-8" width="16" height="16"/></g></g></g>').join('');
+  return '<svg class="sy-hero sy-hero2" viewBox="0 0 324 120" aria-hidden="true"><defs>' + sym + '</defs>' +
+    '<path class="dv" d="M82 62H224" stroke-dasharray="2 7" opacity=".35"/>' +
+    '<rect class="dv" x="22" y="18" width="46" height="84" rx="10"/><path class="dv" d="M38 26h14"/><use href="#syl" x="34" y="48" width="22" height="22"/>' +
+    '<g class="syB1"><rect class="dv" x="239" y="18" width="46" height="84" rx="10"/><path class="dv" d="M255 26h14"/><use href="#syl" x="250" y="48" width="24" height="24"/></g>' +
+    '<g class="syB2"><rect class="dv" x="224" y="28" width="76" height="52" rx="6"/><path class="dv" d="M212 90h100"/><use href="#syl" x="250" y="42" width="24" height="24"/></g>' +
+    '<g><circle class="sylr" cx="162" cy="90" r="11"/><circle cx="162" cy="90" r="11" fill="currentColor"/><path d="M157.5 90.3l3 3 5.5-6" fill="none" stroke="var(--surface)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></g>' + fl + '</svg>';
+})();
+const SY_DICO = {
+  phone:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>',
+  desktop:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M8 20h8"/><path d="M12 16.5V20"/></svg>'
+};
+function syAgo(l){
+  const h = Math.floor((Date.now() - (l || 0)) / 36e5);
+  if(h < 2) return 'نشط مؤخرًا';
+  if(h < 24) return 'آخر اتصال قبل ' + (h === 2 ? 'ساعتين' : h <= 10 ? h + ' ساعات' : h + ' ساعة');
+  const d = Math.floor(h / 24);
+  return 'آخر اتصال قبل ' + (d === 1 ? 'يوم' : d === 2 ? 'يومين' : d <= 10 ? d + ' أيام' : d + ' يومًا');
+}
+function syDevList(){
+  const me = devInfo(), st = syState();
+  const list = Object.keys(st).filter(k => /^dv:/.test(k) && st[k].v && !(st['dx:' + k.slice(3)] && st['dx:' + k.slice(3)].v === 1)).map(k => Object.assign({ id:k.slice(3) }, st[k].v));
+  if(!list.some(d => d.id === me.id)) list.push({ id:me.id, n:me.n, k:me.k, l:me.seen });
+  list.sort((a, b) => (b.id === me.id) - (a.id === me.id) || (b.l || 0) - (a.l || 0));
+  return '<div class="sy-dl">الأجهزة المرتبطة (' + list.length + ')</div><div class="sy-devs">' + list.map(d => {
+    const self = d.id === me.id, key = 'kick:' + d.id;
+    return '<div class="sy-dev"><span class="sy-dev-i">' + (SY_DICO[d.k] || SY_DICO.phone) + '</span><div class="sy-dev-b"><div class="sy-dev-n">' + esc(d.n || 'جهاز') + '</div><div class="sy-dev-s">' + (self ? 'نشط الآن' : syAgo(d.l)) + '</div></div>' +
+      (self ? '<span class="sy-dev-me">هذا الجهاز</span>' : '<button class="sy-dev-x" data-act="kick" data-id="' + esc(d.id) + '">' + (SY.armed === key ? 'تأكيد الفصل' : 'فصل') + '</button>') + '</div>';
+  }).join('') + '</div>';
+}
 const SY_BTN = (act, txt, cls) => '<button class="' + (cls || 'sheet-close') + '" data-act="' + act + '"><span>' + txt + '</span></button>';
 const SY_STEPS = a => '<ol class="sheet-steps">' + a.map((t, i) => '<li><b>' + (i + 1) + '</b><span>' + t + '</span></li>').join('') + '</ol>';
 function syShow(s){
   SY.state = s; const c = syCfg(); let h = ''; syBodyEl.classList.toggle('qrv', s === 'qr');
-  if(s === 'idle') h = SY_ICON + '<h2>' + (SY.lost ? 'تم فصل هذا الجهاز' : 'تم الفصل') + '</h2><p>' + (SY.lost ? 'النسخة المحفوظة على الخادم اتحذفت.' : 'تقدّمك على هذا الجهاز بقي كما هو.') + ' يمكنك نقل تقدّمك إلى جهاز جديد في أي وقت.</p>' + SY_BTN('start', 'نقل تقدّمك إلى جهاز جديد');
+  if(s === 'idle') h = SY_ICON + '<h2>' + (SY.lost || SY.kicked ? 'تم فصل هذا الجهاز' : 'تم الفصل') + '</h2><p>' + (SY.kicked ? 'تم فصله من جهاز آخر، وتقدّمك على هذا الجهاز بقي كما هو.' : SY.lost ? 'النسخة المحفوظة على الخادم اتحذفت.' : 'تقدّمك على هذا الجهاز بقي كما هو.') + ' يمكنك نقل تقدّمك إلى جهاز جديد في أي وقت.</p>' + SY_BTN('start', 'نقل تقدّمك إلى جهاز جديد');
   else if(s === 'wait') h = SY_ICON + '<h2>جارٍ تجهيز الكود…</h2>';
   else if(s === 'qr'){
     h = SY_HERO + '<h2>زامن تقدّمك</h2><p class="sy-sub">لنقل بياناتك وأذكارك إلى هذا الجهاز بسهولة</p><div class="qrbox">' + SY.svg + '</div>' +
@@ -4241,8 +4308,8 @@ function syShow(s){
   else if(s === 'expired' || s === 'err') h = SY_ICON + '<h2>' + (s === 'expired' ? 'انتهت مدة الكود' : 'تعذّر الاتصال الآن') + '</h2><p>' + (s === 'expired' ? 'الكود صالح لمدة 5 دقائق فقط.' : 'تأكد من الإنترنت وحاول مرة أخرى.') + '</p>' + SY_BTN('start', s === 'expired' ? 'إظهار كود جديد' : 'إعادة المحاولة');
   else if(s === 'linked' && c){
     const t = c.last ? new Date(c.last).toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' }) : '—';
-    h = SY_OKI + '<h2>أجهزتك مرتبطة</h2><p>آخر مزامنة: <span class="sy-time">' + t + '</span><br>تقدّمك يتحدّث تلقائيًا بين أجهزتك.</p>' +
-      SY_BTN('unlink', 'فصل هذا الجهاز عن المزامنة', 'done-btn wird-del') + SY_BTN('wipe', 'حذف النسخة المشفّرة من الخادم', 'done-btn wird-del');
+    h = SY_LHERO + '<h2>أجهزتك مرتبطة</h2><p>آخر مزامنة: <span class="sy-time">' + t + '</span><br>تقدّمك يتحدّث تلقائيًا بين أجهزتك.</p>' + syDevList() +
+      SY_BTN('unlink', SY.armed === 'unlink' ? 'اضغط مرة أخرى للتأكيد' : 'فصل هذا الجهاز عن المزامنة', 'done-btn wird-del') + SY_BTN('wipe', SY.armed === 'wipe' ? 'اضغط مرة أخرى للتأكيد' : 'حذف النسخة المشفّرة من الخادم', 'done-btn wird-del');
   } else return syShow('idle');
   syBodyEl.innerHTML = h;
 }
@@ -4299,6 +4366,7 @@ async function syncReceive(b, id){
     if(typeof g.gid !== 'string' || typeof g.secret !== 'string' || typeof g.key !== 'string') throw new Error('bad');
     SY.id = null; SY.kp = null; SY.svg = null;
     const had = Object.keys(syState()).length > 0;
+    SY.lost = false; SY.kicked = false;
     syCfgSave({ gid:g.gid, secret:g.secret, key:g.key, ver:0, last:0 });
     if(!had) syncTouch(0);   // بيانات هذا الجهاز الجديد أضعف من بيانات الجهاز القديم عند التعارض
     syShow('wait');
@@ -4322,11 +4390,29 @@ syBodyEl.addEventListener('click', async (e) => {
     try{ if(navigator.share) await navigator.share({ title:'ربط طوبى', text:'افتح هذا الرابط على جهازك الذي عليه بياناتك:', url:SY.link }); else syCopy(b.previousElementSibling || b); }catch(err){}
     return;
   }
+  if(a === 'kick'){
+    const id = b.dataset.id, key = 'kick:' + id;
+    if(SY.armed !== key){ SY.armed = key; b.textContent = 'تأكيد الفصل'; return; }
+    SY.armed = null;
+    const st = syState(); st['dx:' + id] = { v:1, t:Date.now() }; syStateSave(st);
+    syncSchedule(); haptic('done'); syShow('linked');
+    return;
+  }
   if(a === 'unlink' || a === 'wipe'){
     if(SY.armed !== a){ SY.armed = a; b.querySelector('span').textContent = 'اضغط مرة أخرى للتأكيد'; return; }
-    SY.armed = null;
+    SY.armed = null; SY.lost = false; SY.kicked = false;
     const c = syCfg();
     if(a === 'wipe' && c){ try{ await fetch(SY_API + '/api/sync?gid=' + c.gid, { method:'DELETE', headers:{ 'X-Secret':c.secret } }); }catch(err){} }
+    else if(c){
+      // نعلّم هذا الجهاز «مفصولًا» ونرفعها قبل المسح، فيختفي من قائمة باقي الأجهزة
+      try{
+        const me = devInfo(), st = syState(); st['dx:' + me.id] = { v:1, t:Date.now() }; syStateSave(st);
+        for(let i = 0; i < 10 && syncBusy; i++) await new Promise(r => setTimeout(r, 300));
+        SY.leaving = true;
+        await Promise.race([syncNow(), new Promise(r => setTimeout(r, 4000))]);
+      }catch(err){}
+      SY.leaving = false;
+    }
     syCfgSave(null); SY.id = null; SY.svg = null;
     syShow('idle');
   }
