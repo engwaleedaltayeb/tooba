@@ -1579,7 +1579,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.56</div>
+    <div class="about-ver">الإصدار 2.4.57</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1737,6 +1737,8 @@ let mode = "morning";
 let bannerLockUntil = 0;
 let progress = { morning:{}, evening:{} };
 
+// يوم تحميل الصفحة: كل ما يتحفظ يُوسَم بيه (مش بتاريخ لحظة الحفظ)، عشان لو الصفحة فضلت مفتوحة بعد منتصف الليل ما يتحسبش تقدّم أمس كأنه تقدّم اليوم
+const BOOT_DAY = new Date().toDateString();
 const STORAGE_KEY = 'tooba-progress-v1';
 (function loadProgress(){
   try{
@@ -1754,7 +1756,7 @@ const STORAGE_KEY = 'tooba-progress-v1';
 function saveProgress(){ syncTouch();
   try{
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      date: new Date().toDateString(),
+      date: BOOT_DAY,
       progress
     }));
   }catch(e){ /* لو التخزين مش متاح، نكمل عادي من غير حفظ */ }
@@ -1933,7 +1935,7 @@ try{
   if(raw && typeof raw === 'object'){ if(raw.date === new Date().toDateString()) tasbihCount = parseInt(raw.count, 10) || 0; }
   else tasbihCount = parseInt(raw, 10) || 0;   // قيمة قديمة قبل 2.4.3: تُحسب لليوم مرة واحدة
 }catch(e){}
-function saveTasbih(){ syncTouch(); try{ localStorage.setItem(TASBIH_KEY, JSON.stringify({ date:new Date().toDateString(), count:tasbihCount })); }catch(e){} }
+function saveTasbih(){ syncTouch(); try{ localStorage.setItem(TASBIH_KEY, JSON.stringify({ date:BOOT_DAY, count:tasbihCount })); }catch(e){} }
 const btnTasbih = document.getElementById('btnTasbih');
 const SEG_PTS = {
   a:'8,5 13,0 37,0 42,5 37,10 13,10',
@@ -2268,7 +2270,7 @@ try{
 }catch(e){}
 function saveWird(){
   pushWidget(); syncTouch();
-  try{ localStorage.setItem(WIRD_KEY, JSON.stringify({ date:new Date().toDateString(), counts:wirdCounts })); }catch(e){}
+  try{ localStorage.setItem(WIRD_KEY, JSON.stringify({ date:BOOT_DAY, counts:wirdCounts })); }catch(e){}
 }
 // ---------- عدّاد الأيام المتتالية للأوراد: محلي وخاص، ولا يُشارَك ----------
 const STREAK_KEY = 'tooba-streak';
@@ -4146,8 +4148,9 @@ function syncSnapshot(){
   return o;
 }
 // يُنادى من كل دوال الحفظ: يقارن اللقطة بالحالة السابقة ويسجّل وقت آخر تعديل لكل مفتاح (ما نغيّرش شكل المفاتيح في localStorage)
+function dayStale(){ return new Date().toDateString() !== BOOT_DAY; }   // عدّى منتصف الليل والصفحة لسه ما اتحدّثتش: لا نزامن بيانات أمس تحت تاريخ اليوم
 function syncTouch(seedT){
-  if(!window.__syncReady || syncApplying || !syCfg()) return;
+  if(!window.__syncReady || syncApplying || !syCfg() || dayStale()) return;
   const st = syState(), cur = syncSnapshot(), now = typeof seedT === 'number' ? seedT : Date.now(), d = ymd(new Date());
   let ch = false;
   Object.keys(cur).forEach(k => { const o = st[k]; if(!o || stab(o.v) !== stab(cur[k])){ st[k] = { v:cur[k], t:now }; ch = true; } });
@@ -4215,7 +4218,7 @@ async function syDec(c, blob){
 // مزامنة: سحب ← دمج ← (لو فيه جديد عندنا) رفع بشرط الإصدار؛ لو جهاز آخر سبقنا (409) نعيد السحب والدمج
 async function syncNow(){
   const c = syCfg();
-  if(!c || syncBusy || !window.__syncReady) return false;
+  if(!c || syncBusy || !window.__syncReady || dayStale()) return false;
   try{ const dv = devInfo(); if(Date.now() - dv.seen > 36e5){ dv.seen = Date.now(); localStorage.setItem(DEVKEY, JSON.stringify(dv)); } }catch(e){}
   syncTouch(); clearTimeout(syncTimer);
   syncBusy = true;
