@@ -1593,7 +1593,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.58</div>
+    <div class="about-ver">الإصدار 2.4.60</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -4324,7 +4324,7 @@ const SY_BTN = (act, txt, cls) => '<button class="' + (cls || 'sheet-close') + '
 const SY_STEPS = a => '<ol class="sheet-steps">' + a.map((t, i) => '<li><b>' + (i + 1) + '</b><span>' + t + '</span></li>').join('') + '</ol>';
 function syShow(s){
   SY.state = s; const c = syCfg(); let h = ''; syBodyEl.classList.toggle('qrv', s === 'qr');
-  if(s === 'idle') h = SY_DHERO + '<h2>' + (SY.lost || SY.kicked ? 'تم فصل هذا الجهاز' : 'تم الفصل') + '</h2><p>' + (SY.kicked ? 'تم فصله من جهاز آخر، وتقدّمك على هذا الجهاز بقي كما هو.' : SY.lost ? 'النسخة المحفوظة على الخادم اتحذفت.' : 'تقدّمك على هذا الجهاز بقي كما هو.') + '</p>' + SY_BTN('close', 'تمام');
+  if(s === 'idle') h = SY_DHERO + '<h2>' + (SY.lost || SY.kicked ? 'تم فصل هذا الجهاز' : 'تم الفصل') + '</h2><p>' + (SY.alone ? 'لم يبق أي جهاز آخر مرتبط، فتم فصل هذا الجهاز أيضًا، وتقدّمك عليه بقي كما هو.' : SY.kicked ? 'تم فصله من جهاز آخر، وتقدّمك على هذا الجهاز بقي كما هو.' : SY.lost ? 'النسخة المحفوظة على الخادم اتحذفت.' : 'تقدّمك على هذا الجهاز بقي كما هو.') + '</p>' + SY_BTN('close', 'تمام');
   else if(s === 'wait') h = SY_ICON + '<h2>جارٍ تجهيز الكود…</h2>';
   else if(s === 'qr'){
     h = SY_HERO + '<h2>زامن تقدّمك</h2><p class="sy-sub">لنقل بياناتك وأذكارك إلى هذا الجهاز بسهولة</p><div class="qrbox">' + SY.svg + '</div>' +
@@ -4336,7 +4336,7 @@ function syShow(s){
   else if(s === 'linked' && c){
     const t = c.last ? new Date(c.last).toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' }) : '—';
     h = SY_LHERO + '<h2>أجهزتك مرتبطة</h2><p>آخر مزامنة: <span class="sy-time">' + t + '</span><br>تقدّمك يتحدّث تلقائيًا بين أجهزتك.</p>' + syDevList() +
-      SY_BTN('unlink', SY.armed === 'unlink' ? 'اضغط مرة أخرى للتأكيد' : 'فصل هذا الجهاز عن المزامنة', 'done-btn wird-del') + SY_BTN('wipe', SY.armed === 'wipe' ? 'اضغط مرة أخرى للتأكيد' : 'حذف النسخة المشفّرة من الخادم', 'done-btn wird-del');
+      SY_BTN('wipe', SY.armed === 'wipe' ? 'اضغط مرة أخرى للتأكيد' : 'حذف النسخة المشفّرة من الخادم', 'done-btn wird-del');
   } else return syShow('idle');
   syBodyEl.innerHTML = h;
 }
@@ -4352,6 +4352,7 @@ syncOverlay.addEventListener('click', (e) => { if(e.target === syncOverlay) sync
 
 // الجهاز الجديد: يعرض QR ثم ينتظر استلام المفاتيح المشفّرة
 async function syncStartPair(){
+  SY.alone = false;
   syShow('wait');
   try{
     const kp = await crypto.subtle.generateKey({ name:'ECDH', namedCurve:'P-256' }, true, ['deriveKey']);
@@ -4393,7 +4394,7 @@ async function syncReceive(b, id){
     if(typeof g.gid !== 'string' || typeof g.secret !== 'string' || typeof g.key !== 'string') throw new Error('bad');
     SY.id = null; SY.kp = null; SY.svg = null;
     const had = Object.keys(syState()).length > 0;
-    SY.lost = false; SY.kicked = false;
+    SY.lost = false; SY.kicked = false; SY.alone = false;
     syCfgSave({ gid:g.gid, secret:g.secret, key:g.key, ver:0, last:0 });
     if(!had) syncTouch(0);   // بيانات هذا الجهاز الجديد أضعف من بيانات الجهاز القديم عند التعارض
     syShow('wait');
@@ -4402,6 +4403,22 @@ async function syncReceive(b, id){
     syShow(ok ? 'done' : 'err');
     if(ok) setTimeout(() => { if(syncOverlay.classList.contains('open') && SY.state === 'done') syShow('linked'); }, 1800);
   }catch(e){ SY.id = null; syShow('err'); }
+}
+// يفصل هذا الجهاز: يعلّم نفسه «مفصولًا» ويرفعها (فيعرف باقي الأجهزة ويختفي من قوائمهم) ثم يمسح الربط محليًا
+async function syLeave(alone){
+  SY.armed = null; SY.lost = false; SY.kicked = false; SY.alone = !!alone;
+  const c = syCfg();
+  if(c){
+    try{
+      const me = devInfo(), st = syState(); st['dx:' + me.id] = { v:1, t:Date.now() }; syStateSave(st);
+      for(let i = 0; i < 10 && syncBusy; i++) await new Promise(r => setTimeout(r, 300));
+      SY.leaving = true;
+      await Promise.race([syncNow(), new Promise(r => setTimeout(r, 4000))]);
+    }catch(err){}
+    SY.leaving = false;
+  }
+  syCfgSave(null); SY.id = null; SY.svg = null;
+  syShow('idle');
 }
 async function syCopy(btn){
   try{ await navigator.clipboard.writeText(SY.link); const l = btn.querySelector('span'); l.textContent = 'تم النسخ ✓'; setTimeout(() => { l.textContent = 'نسخ الرابط'; }, 1600); }catch(e){}
@@ -4423,7 +4440,12 @@ syBodyEl.addEventListener('click', async (e) => {
     if(SY.armed !== key){ SY.armed = key; b.textContent = 'تأكيد الفصل'; return; }
     SY.armed = null;
     const st = syState(); st['dx:' + id] = { v:1, t:Date.now() }; syStateSave(st);
-    syncSchedule(); haptic('done'); syShow('linked');
+    haptic('done');
+    // لو مبقاش في المجموعة أي جهاز غير هذا الجهاز، يتفصل هو كمان تلقائيًا
+    const me = devInfo();
+    const left = Object.keys(st).filter(k => /^dv:/.test(k) && k.slice(3) !== me.id && st[k].v && !(st['dx:' + k.slice(3)] && st['dx:' + k.slice(3)].v === 1));
+    if(!left.length){ await syLeave(true); return; }
+    syncSchedule(); syShow('linked');
     return;
   }
   if(a === 'unlink' || a === 'wipe'){
