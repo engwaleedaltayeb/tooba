@@ -1374,6 +1374,29 @@
   .streak[hidden]{ display:none; }
   .streak svg{ color:var(--accent-text); flex-shrink:0; }
   body.focus .streak{ display:none; }
+  /* إحصاءات النقرات: تظهر في العدّ الحر فقط، مكان البروجريس */
+  .tstats{ display:none; grid-template-columns:minmax(0,1fr) minmax(0,1.55fr); gap:12px; margin:0 0 18px; }
+  body[data-mode="tasbeeh"]:not(.has-wird):not(.focus):not(.no-stats) .tstats{ display:grid; }
+  .tcard{ background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:14px 14px 12px; box-shadow:0 1px 2px var(--shadow); display:flex; flex-direction:column; min-width:0; }
+  .tc-total{ justify-content:center; }
+  .tc-l{ font-size:12.5px; color:var(--text-dim); font-weight:500; }
+  .tc-n{ margin-top:8px; font-family:system-ui, sans-serif; font-weight:700; color:var(--accent-text); font-variant-numeric:tabular-nums; direction:ltr; unicode-bidi:isolate; text-align:right; white-space:nowrap; line-height:1.1; }
+  .tc-s{ font-size:12px; color:var(--text-dim); margin-top:6px; line-height:1.5; }
+  #tcChart{ display:block; width:100%; max-width:260px; margin:6px auto 0; overflow:visible; }
+  .tc-week .tc-s{ text-align:center; margin-top:4px; }
+  .tc-head{ display:flex; align-items:center; justify-content:space-between; gap:6px; }
+  .t-eye{ width:30px; height:30px; margin-block:-6px; border-radius:50%; border:1px solid var(--border); background:transparent; color:var(--text-dim); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:transform .15s ease, color .2s ease, border-color .2s ease; }
+  .t-eye:active{ transform:scale(0.9); }
+  .t-eye:hover{ color:var(--accent-text); border-color:var(--accent); }
+  .tmin{ display:none; grid-column:1 / -1; align-items:center; justify-content:space-between; width:100%; height:44px; padding-inline:16px 6px; border-radius:999px; border:1px solid var(--border); background:var(--surface); box-shadow:0 1px 3px var(--shadow); color:var(--text-dim); font-family:inherit; font-size:13.5px; font-weight:500; cursor:pointer; transition:transform .15s ease; }
+  .tmin:active{ transform:scale(0.985); }
+  .tmin .t-eye{ margin-block:0; pointer-events:none; }
+  .tstats.min{ grid-template-columns:minmax(0,1fr); margin-bottom:14px; }
+  .tstats.min .tcard{ display:none; }
+  .tstats.min .tmin{ display:flex; }
+  .tstats:not(.min) .tcard{ animation:tsIn .3s ease both; }
+  @keyframes tsIn{ from{ opacity:0; transform:translateY(-6px); } to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce){ .tstats:not(.min) .tcard{ animation:none; } }
 
   /* الربط والمزامنة بين الأجهزة */
   #syncBtn{
@@ -1545,6 +1568,12 @@
     </div>
   </div>
 
+  <div class="tstats" id="tstats">
+    <button class="tmin" id="tMin" aria-label="إظهار الإحصاءات"><span>إحصاءات السبحة</span><span class="t-eye"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span></button>
+    <div class="tcard tc-total"><div class="tc-l">نقراتك اليوم</div><div class="tc-n" id="tcTotal">0</div><div class="tc-s">في السبحة والأوراد</div></div>
+    <div class="tcard tc-week"><div class="tc-head"><div class="tc-l">هذا الأسبوع</div><button class="t-eye" id="tEye" aria-label="إخفاء الإحصاءات"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.9 9.9a3 3 0 1 0 4.2 4.2"/><path d="M10.7 5.1A10.4 10.4 0 0 1 12 5c7 0 10 7 10 7a13.2 13.2 0 0 1-1.7 2.7"/><path d="M6.6 6.6A13.5 13.5 0 0 0 2 12s3 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M2 2l20 20"/></svg></button></div><svg id="tcChart" viewBox="0 0 150 88" role="img" aria-label="منحنى نقرات الأسبوع"></svg><div class="tc-s" id="tcDays"></div></div>
+  </div>
+
   <div class="wstrip" id="wirdTitle" aria-hidden="true"></div>
 
   <div class="list" id="list"></div>
@@ -1592,13 +1621,14 @@
       <p>للملاحظات أو التبليغ عن خطأ في نص أو سند:<br><a class="about-mail" href="mailto:tooba.app.support@gmail.com">tooba.app.support@gmail.com</a></p>
       <p><a class="about-priv" href="https://toobaapp.com/privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a></p>
       <p><button class="about-link" id="streakToggle"></button></p>
+      <p><button class="about-link" id="statsToggle"></button></p>
       <p id="wgLinkP" hidden><button class="about-link" id="wgOpen">تخصيص الودجيت</button></p>
     </div>
     <button class="done-btn about-share" id="aboutShare">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.61</div>
+    <div class="about-ver">الإصدار 2.4.64</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1954,6 +1984,106 @@ try{
   if(raw && typeof raw === 'object'){ if(raw.date === new Date().toDateString()) tasbihCount = parseInt(raw.count, 10) || 0; }
   else tasbihCount = parseInt(raw, 10) || 0;   // قيمة قديمة قبل 2.4.3: تُحسب لليوم مرة واحدة
 }catch(e){}
+// ---------- إحصاءات النقرات: الإجمالي + منحنى الأسبوع (السبت أول الأسبوع) ----------
+// كل جهاز يكتب عدّه في مفاتيحه هو (n:<جهاز>:<يوم> و nb:<جهاز>)، والإجمالي يجمع كل الأجهزة، فمفيش تضارب في المزامنة
+const TAPS_KEY = 'tooba-taps';
+let taps = { id:null, days:{}, old:0 };
+try{ const r = JSON.parse(localStorage.getItem(TAPS_KEY)); if(r && r.id) taps = { id:String(r.id), days:(r.days && typeof r.days === 'object') ? r.days : {}, old:+r.old || 0 }; }catch(e){}
+if(!taps.id) taps.id = rndB64u(6);
+function tapSave(){ try{ localStorage.setItem(TAPS_KEY, JSON.stringify(taps)); }catch(e){} }
+// الأيام الأقدم من 14 يوم تتجمّع في رقم واحد عشان حجم البيانات ما يكبرش
+function tapRoll(){
+  const c = new Date(); c.setDate(c.getDate() - 14);
+  const cut = ymd(c);
+  Object.keys(taps.days).forEach(k => { if(k < cut){ taps.old += taps.days[k] || 0; delete taps.days[k]; } });
+}
+tapRoll(); tapSave();
+// تُنادى قبل saveWird/saveTasbih (اللي بتنادي syncTouch)
+function tapAdd(n){
+  if(!n) return;
+  tapRoll();
+  const d = ymd(new Date());
+  taps.days[d] = (taps.days[d] || 0) + n;   // ممكن يبقى سالب (تصفير على جهاز غير الجهاز اللي عدّ)، والمجموع بين الأجهزة بيتوازن والعرض بيقصّه عند صفر
+  tapSave();
+}
+function tapStats(){
+  const days = {}; let total = taps.old;
+  Object.keys(taps.days).forEach(k => { const v = +taps.days[k] || 0; days[k] = (days[k] || 0) + v; total += v; });
+  if(window.__syncReady && syCfg()){
+    const st = syState();
+    Object.keys(st).forEach(k => {
+      const v = st[k] && st[k].v; if(!v) return;
+      const a = k.split(':');
+      if(a[1] === taps.id) return;
+      if(a[0] === 'n'){ days[a[2]] = (days[a[2]] || 0) + (+v || 0); total += +v || 0; }
+      else if(a[0] === 'nb') total += +v || 0;
+    });
+  }
+  return { total, days };
+}
+function weekDays(){
+  const t = new Date(), back = (t.getDay() + 1) % 7, out = [];
+  for(let i = 0; i < 7; i++) out.push(ymd(new Date(t.getFullYear(), t.getMonth(), t.getDate() - back + i)));
+  return { days:out, today:back };
+}
+const TS_LBL = ['س','ح','ن','ث','ر','خ','ج'];
+function tapPath(p){
+  const cy = y => Math.max(20, Math.min(64, y));
+  let d = 'M' + p[0][0].toFixed(1) + ' ' + p[0][1].toFixed(1);
+  for(let i = 0; i < p.length - 1; i++){
+    const a = p[i - 1] || p[i], b = p[i], c = p[i + 1], e = p[i + 2] || c;
+    d += 'C' + (b[0] + (c[0] - a[0]) / 6).toFixed(1) + ' ' + cy(b[1] + (c[1] - a[1]) / 6).toFixed(1) + ' ' + (c[0] - (e[0] - b[0]) / 6).toFixed(1) + ' ' + cy(c[1] - (e[1] - b[1]) / 6).toFixed(1) + ' ' + c[0].toFixed(1) + ' ' + c[1].toFixed(1);
+  }
+  return d;
+}
+function paintTapStats(){
+  const box = document.getElementById('tstats');
+  if(!box || mode !== 'tasbeeh' || selWird || tapMinOn()) return;
+  const s = tapStats(), wk = weekDays();
+  const L = 12, R = 138, TOP = 22, BASE = 64, step = (R - L) / 6;
+  const vals = []; for(let i = 0; i <= wk.today; i++) vals.push(Math.max(0, s.days[wk.days[i]] || 0));
+  const mx = Math.max.apply(null, vals.concat([1]));
+  // الزمن بيمشي من اليمين لليسار (السبت على اليمين)
+  const pts = vals.map((v, i) => [R - i * step, BASE - v / mx * (BASE - TOP)]);
+  let g = '<defs><linearGradient id="tsg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--accent-text);stop-opacity:.28"/><stop offset="1" style="stop-color:var(--accent-text);stop-opacity:0"/></linearGradient></defs>';
+  g += '<line x1="' + L + '" x2="' + R + '" y1="' + BASE + '" y2="' + BASE + '" stroke-width="1" style="stroke:color-mix(in srgb, var(--text-dim) 28%, transparent)"/>';
+  if(pts.length > 1){
+    const line = tapPath(pts);
+    g += '<path d="' + line + 'L' + pts[pts.length - 1][0].toFixed(1) + ' ' + BASE + 'L' + pts[0][0].toFixed(1) + ' ' + BASE + 'Z" fill="url(#tsg)"/>';
+    g += '<path d="' + line + '" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--accent-text)"/>';
+  }
+  pts.forEach((p, i) => {
+    const x = p[0].toFixed(1), y = p[1].toFixed(1), tod = i === wk.today;
+    if(tod) g += '<circle cx="' + x + '" cy="' + y + '" r="8" style="fill:var(--accent-text);opacity:.18"/>';
+    g += vals[i] > 0
+      ? '<circle cx="' + x + '" cy="' + y + '" r="' + (tod ? 4.2 : 3) + '" style="fill:var(--accent-text)"/>'
+      : '<circle cx="' + x + '" cy="' + y + '" r="2.6" stroke-width="1.4" style="fill:var(--surface);stroke:var(--text-dim)"/>';
+  });
+  const tv = vals[wk.today];
+  if(tv > 0) g += '<text x="' + pts[wk.today][0].toFixed(1) + '" y="' + (pts[wk.today][1] - 11).toFixed(1) + '" text-anchor="middle" font-size="10" font-weight="700" style="fill:var(--accent-text);font-family:system-ui,sans-serif">' + tv.toLocaleString('en-US') + '</text>';
+  for(let i = 0; i < 7; i++){
+    const tod = i === wk.today;
+    g += '<text x="' + (R - i * step).toFixed(1) + '" y="82" text-anchor="middle" font-size="11"' + (tod ? ' font-weight="700"' : '') + ' style="fill:' + (tod ? 'var(--accent-text)' : 'var(--text-dim)') + (i > wk.today ? ';opacity:.45' : '') + '">' + TS_LBL[i] + '</text>';
+  }
+  document.getElementById('tcChart').innerHTML = g;
+  const tt = document.getElementById('tcTotal'), ts = Math.max(0, s.days[wk.days[wk.today]] || 0).toLocaleString('en-US');
+  tt.textContent = ts;
+  tt.style.fontSize = ts.length <= 5 ? '28px' : ts.length <= 7 ? '22px' : '18px';
+  const n = vals.filter(v => v > 0).length;
+  document.getElementById('tcDays').textContent = n ? 'ذكرت في ' + n + ' من 7 أيام' : 'ابدأ اليوم وبارك الله فيك';
+}
+const statsToggle = document.getElementById('statsToggle');
+function statsOff(){ try{ return localStorage.getItem('tooba-stats-off') === '1'; }catch(e){ return false; } }
+function paintStatsToggle(){ body.classList.toggle('no-stats', statsOff()); statsToggle.textContent = statsOff() ? 'إظهار إحصاءات السبحة' : 'إخفاء إحصاءات السبحة'; }
+statsToggle.addEventListener('click', () => { try{ localStorage.setItem('tooba-stats-off', statsOff() ? '0' : '1'); }catch(e){} paintStatsToggle(); });
+paintStatsToggle();
+// طيّ الصف كله (الكارتين) بزر العين، والحالة محلية على الجهاز
+function tapMinOn(){ try{ return localStorage.getItem('tooba-stats-min') === '1'; }catch(e){ return false; } }
+function paintTapMin(){ const b = document.getElementById('tstats'); if(b) b.classList.toggle('min', tapMinOn()); }
+function toggleTapMin(){ try{ localStorage.setItem('tooba-stats-min', tapMinOn() ? '0' : '1'); }catch(e){} haptic('tap'); paintTapMin(); paintTapStats(); }
+document.getElementById('tEye').addEventListener('click', toggleTapMin);
+document.getElementById('tMin').addEventListener('click', toggleTapMin);
+paintTapMin();
 function saveTasbih(){ syncTouch(); try{ localStorage.setItem(TASBIH_KEY, JSON.stringify({ date:BOOT_DAY, count:tasbihCount })); }catch(e){} }
 const btnTasbih = document.getElementById('btnTasbih');
 const SEG_PTS = {
@@ -2033,6 +2163,7 @@ function drawTasbih(bump){
   if(dn) dn.classList.toggle('dis', !(w && n < w.target));
   const trb = document.getElementById('tReset');
   if(trb) trb.classList.toggle('dis', !(n > 0));
+  paintTapStats();
   if(bump && !reduceMotion){
     // نفس إحساس رقم البروجريس الصغير (نفس المدة والنطة الناعمة)، بحجم أهدأ لأن الرقم كبير
     if(row._bump) row._bump.cancel();
@@ -2053,6 +2184,7 @@ document.addEventListener('click', (e) => {
     const c = wirdCounts[w.id] || 0;
     if(c >= 99999) return;
     wirdCounts[w.id] = c + 1;
+    tapAdd(1);
     saveWird();
     haptic(c + 1 === w.target ? 'long' : 'tap');
     if(c + 1 === w.target){ bumpStreak(); paintStreak(); }
@@ -2061,7 +2193,7 @@ document.addEventListener('click', (e) => {
     paintWirdProgress(c);
     return;
   }
-  tasbihCount++;
+  tasbihCount++; tapAdd(1);
   saveTasbih();
   haptic(tasbihCount % 100 === 0 ? 'long' : tasbihCount % 33 === 0 ? 'mile' : 'tap');
   drawTasbih(true);
@@ -2076,6 +2208,7 @@ function completeWird(){
   let skRaw = null;
   try{ skRaw = localStorage.getItem(STREAK_KEY); }catch(e){}
   wirdCounts[w.id] = w.target;
+  tapAdd(w.target - c);
   saveWird();
   haptic('long');
   bumpStreak(); paintStreak();
@@ -2083,6 +2216,7 @@ function completeWird(){
   paintChips();
   paintWirdProgress(c);
   showUndo('tasbeeh', null, c, 'تم إتمام الورد', () => {
+    tapAdd(-(w.target - c));
     if(c > 0) wirdCounts[w.id] = c; else delete wirdCounts[w.id];
     saveWird();
     try{ if(skRaw === null) localStorage.removeItem(STREAK_KEY); else localStorage.setItem(STREAK_KEY, skRaw); }catch(e){}
@@ -3249,6 +3383,7 @@ function doReset(){
   if(mode === 'tasbeeh'){
     const sw = selWirdObj();
     const prevN = sw ? (wirdCounts[sw.id] || 0) : tasbihCount;
+    tapAdd(-prevN);   // التصفير يشيل النقرات من الإجمالي والمنحنى (والتراجع يرجّعها)
     if(sw){ delete wirdCounts[sw.id]; saveWird(); }
     else {
       tasbihCount = 0;
@@ -3256,6 +3391,7 @@ function doReset(){
     }
     render();
     if(prevN > 0) showUndo('tasbeeh', null, prevN, 'تم تصفير العدّاد', () => {
+      tapAdd(prevN);
       if(sw){ wirdCounts[sw.id] = prevN; saveWird(); }
       else { tasbihCount = prevN; saveTasbih(); }
       render();
@@ -4163,6 +4299,8 @@ function syncSnapshot(){
   customWirds.forEach(w => { o['cw:' + w.id] = { name:w.name, target:w.target }; });
   customAdhkar.forEach(z => { o['cz:' + z.id] = { text:z.text, count:z.count, modes:z.modes }; });
   const s = loadStreak(); if(s.last) o.st = { n:s.n, last:s.last, best:s.best || 0 };
+  Object.keys(taps.days).forEach(k => { if(taps.days[k]) o['n:' + taps.id + ':' + k] = taps.days[k]; });
+  if(taps.old) o['nb:' + taps.id] = taps.old;
   if(syCfg()){ const dv = devInfo(); o['dv:' + dv.id] = { n:dv.n, k:dv.k, l:dv.seen }; }
   return o;
 }
@@ -4267,6 +4405,7 @@ async function syncNow(){
     }
   }catch(e){ ok = false; }
   syncBusy = false;
+  try{ paintTapStats(); }catch(e){}
   if(syncOverlay.classList.contains('open')){ if(!syCfg() && (SY.lost || SY.kicked)) syShow('idle'); else if(SY.state === 'linked' && syCfg()) syShow('linked'); }
   return ok;
 }
@@ -4534,6 +4673,7 @@ if(NATIVE){
 setInterval(() => { if(document.visibilityState === 'visible' && syCfg()) syncNow(); }, 30000);
 document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && syCfg()) setTimeout(syncNow, 500); });
 window.__syncReady = true;
+paintTapStats();
 setTimeout(() => { if(syCfg()) syncNow(); }, 3000);
 handlePairUrl(location.hash);
 
