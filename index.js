@@ -30,6 +30,14 @@ function json(data, status = 200) {
   });
 }
 
+// حد المعدّل (Workers Rate Limiting). لو الإعداد مش موجود في wrangler.toml بيتجاهل ولا يكسر شيئًا
+async function limited(env, name, key) {
+  const lim = env[name];
+  if (!lim || !key) return false;
+  try { const r = await lim.limit({ key }); return !r.success; } catch (e) { return false; }
+}
+const WRITE_PATHS = new Set(['/api/pair/new', '/api/pair/send', '/api/sync/create', '/api/subscribe', '/api/unsubscribe']);
+
 async function importVapidKey(env) {
   const pub = b64uToBytes(env.VAPID_PUBLIC); // 65 بايت: 0x04 | x | y
   const jwk = {
@@ -108,6 +116,17 @@ async function cleanup(env, now) {
 
 async function handleFetch(request, env) {
   const url = new URL(request.url);
+
+  // ---------- حد المعدّل ----------
+  // الكتابة والربط: لكل IP. الاستعلام الدوري (pair/get وsync): لكل كود ربط أو سرّ مجموعة، عشان الشبكات المشتركة (CGNAT) ما تتأثرش
+  const ip = request.headers.get('CF-Connecting-IP') || '';
+  if (WRITE_PATHS.has(url.pathname) && request.method === 'POST') {
+    if (await limited(env, 'RL_WRITE', ip)) return json({ error: 'rate' }, 429);
+  } else if (url.pathname === '/api/pair/get') {
+    if (await limited(env, 'RL_POLL', 'p:' + (url.searchParams.get('id') || ip))) return json({ error: 'rate' }, 429);
+  } else if (url.pathname === '/api/sync') {
+    if (await limited(env, 'RL_POLL', 's:' + (request.headers.get('X-Secret') || ip))) return json({ error: 'rate' }, 429);
+  }
 
   if (url.pathname === '/api/key' && request.method === 'GET') {
     return new Response(env.VAPID_PUBLIC, {

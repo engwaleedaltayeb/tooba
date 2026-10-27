@@ -12,3 +12,18 @@ crons = ["* * * * *"]
 binding = "DB"
 database_name = "tooba-push"
 database_id = "9883eafc-c37e-48da-a961-e10feaf4bf07"
+
+# حد المعدّل: الكتابة والربط 15 طلب/دقيقة لكل IP، والاستعلام الدوري 60 طلب/دقيقة لكل كود أو سرّ
+[[ratelimits]]
+name = "RL_WRITE"
+namespace_id = "1001"
+[ratelimits.simple]
+limit = 15
+period = 60
+
+[[ratelimits]]
+name = "RL_POLL"
+namespace_id = "1002"
+[ratelimits.simple]
+limit = 60
+period = 60
