@@ -1,8 +1,10 @@
-const VERSION = 'tooba-v2.4.64';
+const VERSION = 'tooba-v2.4.65';
 const CORE = [
   '/', '/index.html', '/manifest.webmanifest',
   '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png', '/badge-96.png',
-  '/apple-touch-icon.png', '/favicon.ico', '/favicon-32.png', '/favicon-64.png'
+  '/apple-touch-icon.png', '/favicon.ico', '/favicon-32.png', '/favicon-64.png',
+  '/fonts/plex-400.woff', '/fonts/plex-500.woff', '/fonts/plex-600.woff',
+  '/fonts/naskh-400.woff', '/fonts/naskh-700.woff', '/fonts/amiri-700.woff'
 ];
 
 self.addEventListener('install', (e) => {
