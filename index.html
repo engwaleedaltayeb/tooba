@@ -1237,6 +1237,18 @@
   /* ظهور متتابع ناعم للعناصر بعد الانترو (يُفعّله سكريبت شاشة البداية بـbody.intro-go ويشيله بعد انتهائه). المفتاح هنا هو from فقط: ينتهي على قيم العنصر الطبيعية */
   @keyframes rvIn{ from{ opacity:0; transform:translateY(18px) scale(.985); } }
   @keyframes rvFade{ from{ opacity:0; } }
+  /* ترتيب الأذكار */
+  .ord-link{ display:flex; align-items:center; justify-content:center; gap:7px; margin:10px auto 0; padding:10px 14px; background:none; border:none; color:var(--text-dim); font-family:inherit; font-size:14px; font-weight:500; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:opacity .15s ease; }
+  .ord-link:active{ opacity:.55; }
+  .ord-list{ position:relative; flex:1 1 auto; min-height:0; max-height:min(58vh, 520px); overflow-y:auto; overscroll-behavior:contain; margin:0 -8px 14px; padding:2px 8px; }
+  .ord-row{ display:flex; align-items:center; gap:6px; height:54px; padding:0 4px 0 12px; margin-bottom:8px; background:var(--bg); border:1px solid var(--border); border-radius:14px; position:relative; -webkit-user-select:none; user-select:none; transition:box-shadow .2s ease, background .2s ease, border-color .2s ease; }
+  .ord-row.done .ord-t{ opacity:.5; }
+  .ord-grip{ flex:none; width:44px; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-dim); touch-action:none; cursor:grab; -webkit-tap-highlight-color:transparent; }
+  .ord-t{ flex:1; min-width:0; font-family:'Noto Naskh Arabic', serif; font-size:16px; line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text); }
+  .ord-c{ flex:none; min-width:28px; padding-left:6px; text-align:center; font-size:12.5px; color:var(--text-dim); display:flex; align-items:center; justify-content:center; }
+  .ord-row.lift{ z-index:3; background:var(--surface); border-color:var(--accent-text); box-shadow:0 10px 28px var(--shadow); cursor:grabbing; }
+  .ord-reset{ display:block; width:100%; margin-top:6px; padding:12px; background:none; border:none; color:var(--text-dim); font-family:inherit; font-size:14px; font-weight:500; cursor:pointer; }
+  .ord-reset[hidden]{ display:none; }
   body.intro-go header .kicker, body.intro-go header h1, body.intro-go .toggle, body.intro-go .font-ctrl,
   body.intro-go .progress, body.intro-go .wstrip, body.intro-go #list > *, body.intro-go .hint, body.intro-go .about-wrap{
     animation:rvIn .85s cubic-bezier(.2,.8,.3,1) backwards; animation-delay:calc(var(--i, 0) * 80ms);
@@ -1510,6 +1522,20 @@
   .sy-hero3 .sylx{ transform-box:fill-box; transform-origin:center; animation:sylxPulse 3.6s ease-in-out infinite; }
   @keyframes sylxPulse{ 0%,100%{ opacity:.55; } 50%{ opacity:1; } }
   @media (prefers-reduced-motion: reduce){ .sy-hero3 .sypd, .sy-hero3 .sylx{ animation:none !important; } }
+  /* شاشة تعذّر الاتصال / انتهاء الكود: الورقة تطير من الجهاز تجاه الجهاز التاني، تصطدم بعلامة الانقطاع فتهتز وترجع بهدوء */
+  .sy-hero4 .sypb{ opacity:0; animation:sypBounce 3.2s linear infinite; animation-delay:var(--dl,0s); }
+  @keyframes sypBounce{
+    0%{ opacity:0; transform:translate(86px,62px) scale(.3) rotate(0deg); }
+    12%{ opacity:1; transform:translate(97px,55px) scale(1) rotate(35deg); }
+    36%{ opacity:1; transform:translate(121px,47px) scale(1.1) rotate(120deg); }
+    58%{ opacity:1; transform:translate(135px,56px) scale(1) rotate(200deg); }
+    64%{ opacity:1; transform:translate(138px,60px) scale(.9) rotate(215deg); }
+    82%{ opacity:.55; transform:translate(112px,66px) scale(.8) rotate(80deg); }
+    100%{ opacity:0; transform:translate(90px,64px) scale(.5) rotate(-20deg); }
+  }
+  .sy-hero4 .syex{ transform-box:fill-box; transform-origin:center; animation:syeShake 1.6s ease-in-out infinite; }
+  @keyframes syeShake{ 0%,100%{ opacity:.6; transform:translateX(0); } 28%{ opacity:1; } 30%{ transform:translateX(-2.5px); } 34%{ transform:translateX(2.5px); } 38%{ transform:translateX(-1.2px); } 42%{ transform:translateX(0); } 60%{ opacity:.6; } }
+  @media (prefers-reduced-motion: reduce){ .sy-hero4 .sypb, .sy-hero4 .syex{ animation:none !important; } .sy-hero4 .syex{ opacity:1; } }
   .sy-dl{ align-self:stretch; text-align:start; font-size:13.5px; font-weight:600; color:var(--text-dim); margin:6px 2px 0; }
   .sy-devs{ display:flex; flex-direction:column; gap:10px; width:100%; }
   .sy-dev{ display:flex; align-items:center; gap:12px; width:100%; padding:12px 14px; border:1px solid var(--border); border-radius:16px; background:var(--bg); text-align:start; }
@@ -1649,7 +1675,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.74</div>
+    <div class="about-ver">الإصدار 2.4.76</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -1683,6 +1709,17 @@
     <button class="sheet-close" id="zSave">حفظ</button>
     <button class="done-btn wird-del" id="zDel" hidden><span id="zDelLabel">حذف الذكر أو الدعاء</span></button>
     <div class="r-done" id="zDone" aria-hidden="true"><span class="rt-icon zd-icon"><svg class="zd-ring" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle class="zd-circle" cx="12" cy="12" r="9.5" pathLength="100"/><path class="zd-check" pathLength="100" d="M7.6 12.6l3 3 5.8-6.4"/></svg></span><div class="rd-text" id="zDoneText"></div></div>
+  </div>
+</div>
+
+<div class="sheet-overlay" id="ordOverlay">
+  <div class="sheet" style="max-height:92vh;display:flex;flex-direction:column;">
+    <div class="sheet-handle"></div>
+    <h2 id="ordTitle">ترتيب الأذكار</h2>
+    <div class="zsheet-note">اسحب المقبض لتغيير مكان الذكر، ويُحفظ الترتيب تلقائيًا.</div>
+    <div class="ord-list" id="ordList"></div>
+    <button class="sheet-close" id="ordDone">تم</button>
+    <button class="ord-reset" id="ordReset" hidden><span id="ordResetLabel">استرجاع الترتيب الأصلي</span></button>
   </div>
 </div>
 
@@ -2318,7 +2355,7 @@ function setFocus(on){
 }
 let focusPushed = false;
 // زر الرجوع يقفل النافذة المنبثقة المفتوحة فقط بدل ما يقفل التطبيق
-const OV_IDS = ['aboutOverlay','wirdOverlay','zOverlay','rOverlay','sheetOverlay','syncOverlay','pairOverlay'];
+const OV_IDS = ['aboutOverlay','wirdOverlay','zOverlay','rOverlay','sheetOverlay','syncOverlay','pairOverlay','ordOverlay'];
 const ovStack = [];
 let ovIgnore = 0;
 let ovNativeBack = false;
@@ -2854,6 +2891,19 @@ function itemsOf(m){
   return data[m].concat(customAdhkar.filter(z => z.modes.includes(m)).map(z => ({ text:z.text, count:z.count, cid:z.id })));
 }
 function pkey(item, i){ return item.cid ? item.cid : i; }
+// ترتيب الأذكار المخصّص: مصفوفة مفاتيح (pkey كنص) لكل قسم، منفصلة عن الأذكار والتقدّم (ما بتغيّرش أي مفتاح تخزين قديم)
+const ORD_KEY = 'tooba-order';
+let ORDER = { morning:[], evening:[] };
+try{ const r = JSON.parse(localStorage.getItem(ORD_KEY)); if(r) ['morning', 'evening'].forEach(m => { if(Array.isArray(r[m])) ORDER[m] = r[m].map(String).slice(0, 80); }); }catch(e){}
+function saveOrder(){ syncTouch(); try{ localStorage.setItem(ORD_KEY, JSON.stringify(ORDER)); }catch(e){} }
+// الأذكار بالترتيب المعروض: المرتّب أولًا، وأي ذكر جديد (مثلًا ذكر خاص أضفته) يتضاف في الآخر
+function orderedOf(m){
+  const base = itemsOf(m).map((item, i) => ({ item, i, k:String(pkey(item, i)) }));
+  const o = ORDER[m];
+  if(!o || !o.length) return base;
+  const pos = new Map(o.map((k, j) => [k, j]));
+  return base.filter(x => pos.has(x.k)).sort((a, b) => pos.get(a.k) - pos.get(b.k)).concat(base.filter(x => !pos.has(x.k)));
+}
 
 function render(){
   if(mode !== 'tasbeeh' && body.classList.contains('focus')){ setFocus(false); exitFS(); }
@@ -2887,7 +2937,7 @@ function render(){
 
   const items = itemsOf(mode);
   listEl.innerHTML = '';
-  items.forEach((item, i) => {
+  orderedOf(mode).forEach(({ item, i }) => {
     const k = pkey(item, i);
     const remaining = progress[mode][k] ?? item.count;
     if(remaining <= 0) return; // الأذكار المكتملة تختفي من القائمة
@@ -3020,8 +3070,113 @@ function render(){
     empty.querySelector('#remindBtn').addEventListener('click', (e) => shareOrCopy(e.currentTarget, remindText, 'أذكار الصباح والمساء'));
   }
   listEl.insertAdjacentHTML('beforeend', '<button class="wird-add" id="addZikrBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span>إضافة ذكر أو دعاء خاص</span></button>');
+  listEl.insertAdjacentHTML('beforeend', '<button class="ord-link" id="ordBtn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4v16"/><path d="M4.5 7.5L8 4l3.5 3.5"/><path d="M16 20V4"/><path d="M12.5 16.5L16 20l3.5-3.5"/></svg><span>ترتيب الأذكار</span></button>');
   updateProgress();
 }
+
+// ---------- ترتيب الأذكار: نافذة بسحب المقبض، الترتيب يُحفظ فورًا ويتزامن ----------
+(function(){
+  const ov = document.getElementById('ordOverlay'), list = document.getElementById('ordList');
+  const doneBtn = document.getElementById('ordDone'), resetBtn = document.getElementById('ordReset'), resetLbl = document.getElementById('ordResetLabel');
+  let om = 'morning', dirty = false, armed = false, armT = 0, drag = null, raf = 0;
+  const plain = (h) => { const d = document.createElement('div'); d.innerHTML = h; return (d.textContent || '').replace(/\s+/g, ' ').trim(); };
+  const GRIP = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>';
+  const CHK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const paintReset = () => { resetBtn.hidden = !ORDER[om].length; };
+  const disarm = () => { armed = false; clearTimeout(armT); resetLbl.textContent = 'استرجاع الترتيب الأصلي'; };
+  function build(){
+    list.innerHTML = '';
+    orderedOf(om).forEach(({ item, i, k }) => {
+      const done = (progress[om][pkey(item, i)] ?? item.count) <= 0;
+      const row = document.createElement('div');
+      row.className = 'ord-row' + (done ? ' done' : '');
+      row.dataset.k = k;
+      row.innerHTML = '<div class="ord-grip" aria-label="اسحب لتغيير الترتيب">' + GRIP + '</div><div class="ord-t"' + (item.cid ? ' data-clarity-mask="true"' : '') + '></div><div class="ord-c"></div>';
+      row.querySelector('.ord-t').textContent = (item.cid ? String(item.text).replace(/\s+/g, ' ') : plain(item.text)).slice(0, 90);
+      const c = row.querySelector('.ord-c');
+      if(done) c.innerHTML = CHK; else if(item.count > 1) c.textContent = '×' + item.count;
+      list.appendChild(row);
+    });
+    paintReset();
+  }
+  const persist = () => { ORDER[om] = Array.from(list.children).map(r => r.dataset.k); saveOrder(); dirty = true; paintReset(); };
+  // الصف المسحوب يتبقى تحت الإصبع، والجار اللي يتجاوزه يزحزح بحركة ناعمة (نحرّك الجار مش الصف عشان المسك يفضل ثابت)
+  const swap = (sib, sibAfterRow) => {
+    const row = drag.row, t0 = sib.offsetTop;
+    if(sibAfterRow) row.after(sib); else row.before(sib);
+    const t1 = sib.offsetTop;
+    if(!reduceMotion && sib.animate) sib.animate([{ transform:'translateY(' + (t0 - t1) + 'px)' }, { transform:'translateY(0)' }], { duration:200, easing:'cubic-bezier(.2,.8,.3,1)' });
+    haptic('tap');
+  };
+  const place = () => {
+    const d = drag; if(!d) return;
+    const row = d.row, h = row.offsetHeight;
+    let dy = d.last - d.y0 + (list.scrollTop - d.s0);
+    dy = Math.max(-d.top0, Math.min(list.scrollHeight - h - d.top0, dy));
+    const center = d.top0 + dy + h / 2;
+    for(let n = 0; n < 3; n++){
+      const prev = row.previousElementSibling, next = row.nextElementSibling;
+      if(prev && center < prev.offsetTop + prev.offsetHeight / 2) swap(prev, true);
+      else if(next && center > next.offsetTop + next.offsetHeight / 2) swap(next, false);
+      else break;
+    }
+    row.style.transform = 'translateY(' + (d.top0 + dy - row.offsetTop) + 'px)';
+  };
+  const tick = () => {
+    if(!drag) return;
+    const r = list.getBoundingClientRect(), y = drag.last, EDGE = 56;
+    let v = 0;
+    if(y < r.top + EDGE) v = -Math.ceil((r.top + EDGE - y) / 5);
+    else if(y > r.bottom - EDGE) v = Math.ceil((y - (r.bottom - EDGE)) / 5);
+    v = Math.max(-14, Math.min(14, v));
+    if(v) list.scrollTop += v;
+    place();
+    raf = requestAnimationFrame(tick);
+  };
+  const onMove = (e) => { if(!drag || e.pointerId !== drag.id) return; e.preventDefault(); drag.last = e.clientY; };
+  const onEnd = (e) => {
+    if(!drag || e.pointerId !== drag.id) return;
+    cancelAnimationFrame(raf);
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onEnd);
+    window.removeEventListener('pointercancel', onEnd);
+    const row = drag.row; drag = null;
+    row.style.transition = reduceMotion ? 'none' : 'transform .22s cubic-bezier(.2,.8,.3,1)';
+    row.style.transform = '';
+    setTimeout(() => { row.classList.remove('lift'); row.style.transition = ''; }, 240);
+    persist();
+  };
+  // منع سحب المقبض من إنه يقفل النافذة (سحب لتحت)
+  list.addEventListener('touchstart', (e) => { if(e.target.closest && e.target.closest('.ord-grip')) e.stopPropagation(); }, { passive:true });
+  list.addEventListener('pointerdown', (e) => {
+    const g = e.target.closest && e.target.closest('.ord-grip');
+    if(!g || drag) return;
+    if(e.pointerType === 'mouse' && e.button !== 0) return;
+    e.preventDefault(); e.stopPropagation();
+    const row = g.parentElement;
+    drag = { row, id:e.pointerId, y0:e.clientY, s0:list.scrollTop, top0:row.offsetTop, last:e.clientY };
+    row.classList.add('lift');
+    haptic('tap');
+    window.addEventListener('pointermove', onMove, { passive:false });
+    window.addEventListener('pointerup', onEnd);
+    window.addEventListener('pointercancel', onEnd);
+    raf = requestAnimationFrame(tick);
+  });
+  document.addEventListener('click', (e) => {
+    if(!(e.target.closest && e.target.closest('#ordBtn')) || mode === 'tasbeeh') return;
+    om = mode; dirty = false; disarm();
+    document.getElementById('ordTitle').textContent = 'ترتيب أذكار ' + (om === 'evening' ? 'المساء' : 'الصباح');
+    build(); list.scrollTop = 0;
+    ov.classList.add('open');
+  });
+  doneBtn.addEventListener('click', () => ov.classList.remove('open'));
+  resetBtn.addEventListener('click', () => {
+    if(!armed){ armed = true; resetLbl.textContent = 'اضغط مرة أخرى للتأكيد'; clearTimeout(armT); armT = setTimeout(disarm, 4000); return; }
+    disarm(); ORDER[om] = []; saveOrder(); dirty = true; build(); haptic('done');
+  });
+  // لما تتقفل النافذة بأي طريقة (تم، الرجوع، السحب، الخلفية) نعيد رسم القائمة لو اتغيّر الترتيب
+  new MutationObserver(() => { if(!ov.classList.contains('open') && dirty){ dirty = false; disarm(); render(); } }).observe(ov, { attributes:true, attributeFilter:['class'] });
+})();
 
 // ---------- إكمال الذكر: سلايد لليسار + مهلة تراجع 5 ثواني ----------
 const UNDO_SECONDS = 5;
@@ -4480,6 +4635,7 @@ function syncSnapshot(){
   Object.keys(wirdTargets).forEach(k => { o['wt:' + k] = wirdTargets[k]; });
   customWirds.forEach(w => { o['cw:' + w.id] = { name:w.name, target:w.target }; });
   customAdhkar.forEach(z => { o['cz:' + z.id] = { text:z.text, count:z.count, modes:z.modes }; });
+  ['morning', 'evening'].forEach(m => { if(ORDER[m].length) o['or:' + m] = ORDER[m]; });
   const s = loadStreak(); if(s.last) o.st = { n:s.n, last:s.last, best:s.best || 0 };
   Object.keys(taps.days).forEach(k => { if(taps.days[k]) o['n:' + taps.id + ':' + k] = taps.days[k]; });
   if(taps.old) o['nb:' + taps.id] = taps.old;
@@ -4521,7 +4677,7 @@ function syncMergeState(a, b){
 function syncApply(st){
   syncApplying = true;
   try{
-    const d = ymd(new Date()), cw = [], cz = [], byId = (p, q) => p.id < q.id ? -1 : 1;
+    const d = ymd(new Date()), cw = [], cz = [], ord = { morning:[], evening:[] }, byId = (p, q) => p.id < q.id ? -1 : 1;
     progress = { morning:{}, evening:{} }; wirdCounts = {}; tasbihCount = 0; wirdTargets = {};
     Object.keys(st).forEach(k => {
       const v = st[k].v; if(v === null || v === undefined) return;
@@ -4532,13 +4688,15 @@ function syncApply(st){
       else if(a[0] === 'wt') wirdTargets[a.slice(1).join(':')] = v;
       else if(a[0] === 'cw') cw.push({ id:a.slice(1).join(':'), name:String(v.name), target:+v.target, custom:true });
       else if(a[0] === 'cz'){ const ms = (v.modes || []).filter(m => m === 'morning' || m === 'evening'); cz.push({ id:a.slice(1).join(':'), text:String(v.text), count:Math.min(Math.round(+v.count) || 1, 1000), modes:ms.length ? ms : ['morning', 'evening'] }); }
+      else if(a[0] === 'or'){ if(ord[a[1]] && Array.isArray(v)) ord[a[1]] = v.map(String).slice(0, 80); }
       else if(k === 'st'){ try{ localStorage.setItem(STREAK_KEY, JSON.stringify(v)); }catch(e){} }
     });
+    ORDER = ord;
     customWirds = cw.filter(w => w.name && w.target > 0).sort(byId).slice(0, 10);
     customAdhkar = cz.filter(z => z.text).sort(byId).slice(0, 20);
     WIRDS.forEach(w => { const t = +wirdTargets[w.id]; w.target = t > 0 ? Math.min(Math.round(t), 10000) : w.def; });
     if(selWird && !selWirdObj()) selWird = null;
-    saveProgress(); saveWird(); saveTasbih(); saveCustom(); saveCustomZ(); saveTargets();
+    saveProgress(); saveWird(); saveTasbih(); saveCustom(); saveCustomZ(); saveTargets(); saveOrder();
     lastDone.morning = null; lastDone.evening = null;
     render();
   }finally{ syncApplying = false; }
@@ -4604,6 +4762,18 @@ const SY_HERO = (() => {
     '<g class="syB2"><rect class="dv" x="224" y="28" width="76" height="52" rx="6"/><path class="dv" d="M212 90h100"/><use class="sypl" href="#syl" x="250" y="42" width="24" height="24" style="transform-box:fill-box;transform-origin:center"/></g>' +
     fl + '</svg>';
 })();
+const SY_EHERO = (kind) => {
+  const sym = SY_HERO.match(/<symbol[\s\S]*?<\/symbol>/)[0];
+  const fl = [0, -1.6].map(d => '<g class="sypb" style="--dl:' + d + 's"><use href="#syl" x="-9" y="-9" width="18" height="18"/></g>').join('');
+  const gl = kind === 'expired'
+    ? '<path d="M162 55.5V62l4.5 2.8" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+    : '<path d="M162 56v7" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round"/><circle cx="162" cy="67.6" r="1.2" fill="var(--text-dim)" stroke="var(--text-dim)" stroke-width="1"/>';
+  return '<svg class="sy-hero sy-hero4" viewBox="0 0 324 120" aria-hidden="true"><defs>' + sym + '</defs>' +
+    '<path class="dv" d="M82 62H134" stroke-dasharray="2 7" opacity=".35"/><path class="dv" d="M190 62H224" stroke-dasharray="2 7" opacity=".35"/>' +
+    '<rect class="dv" x="22" y="18" width="46" height="84" rx="10"/><path class="dv" d="M38 26h14"/><use href="#syl" x="34" y="48" width="22" height="22"/>' +
+    '<g opacity=".45"><rect class="dv" x="239" y="18" width="46" height="84" rx="10"/><path class="dv" d="M255 26h14"/><use href="#syl" x="250" y="48" width="24" height="24" opacity=".5"/></g>' +
+    '<g class="syex"><circle cx="162" cy="62" r="11" fill="none" stroke="var(--text-dim)" stroke-width="2"/>' + gl + '</g>' + fl + '</svg>';
+};
 const SY_LHERO = (() => {
   const sym = SY_HERO.match(/<symbol[\s\S]*?<\/symbol>/)[0];
   const fl = [[24,0,''],[34,-2.2,''],[28,-1.1,' rv'],[20,-3.3,' rv']].map(a => '<g class="syp' + a[2] + '" style="--dl:' + a[1] + 's"><g class="sypy" style="--h:' + a[0] + 'px;--dl:' + a[1] + 's"><g class="sypr" style="--dl:' + a[1] + 's"><use href="#syl" x="-8" y="-8" width="16" height="16"/></g></g></g>').join('');
@@ -4658,7 +4828,7 @@ function syShow(s){
       '<p class="sy-note">الكود صالح لمدة 5 دقائق. لا تستطيع المسح؟ انسخ الرابط وافتحه على جهازك الآخر. لازم يكون محدّثًا لآخر إصدار، وبياناتك مشفّرة ولا يقرأها أحد غيرك.</p><div class="sy-row">' + SY_BTN('copy', 'نسخ الرابط', 'done-btn') + SY_BTN('share', 'مشاركة', 'done-btn') + '</div>';
   }
   else if(s === 'done') h = SY_OKI + '<h2>تم نقل تقدّمك</h2><p>أذكارك وأورادك وصلت لهذا الجهاز، وأي تقدّم جديد يتحدّث بين الجهازين تلقائيًا.</p>';
-  else if(s === 'expired' || s === 'err') h = SY_ICON + '<h2>' + (s === 'expired' ? 'انتهت مدة الكود' : 'تعذّر الاتصال الآن') + '</h2><p>' + (s === 'expired' ? 'الكود صالح لمدة 5 دقائق فقط.' : 'تأكد من الإنترنت وحاول مرة أخرى.') + '</p>' + SY_BTN('start', s === 'expired' ? 'إظهار كود جديد' : 'إعادة المحاولة');
+  else if(s === 'expired' || s === 'err') h = SY_EHERO(s) + '<h2>' + (s === 'expired' ? 'انتهت مدة الكود' : 'تعذّر الاتصال الآن') + '</h2><p>' + (s === 'expired' ? 'الكود صالح لمدة 5 دقائق فقط.' : (SY.rate ? 'محاولات كتيرة في وقت قصير، استنى دقيقة وحاول مرة أخرى.' : 'تأكد من الإنترنت وحاول مرة أخرى.')) + '</p>' + SY_BTN('start', s === 'expired' ? 'إظهار كود جديد' : 'إعادة المحاولة');
   else if(s === 'linked' && c){
     const t = c.last ? new Date(c.last).toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' }) : '—';
     h = SY_LHERO + '<h2>أجهزتك مرتبطة</h2><p>آخر مزامنة: <span class="sy-time">' + t + '</span><br>تقدّمك يتحدّث تلقائيًا بين أجهزتك.</p>' + syDevList() +
@@ -4676,15 +4846,39 @@ function openSync(){
 syncBtn.addEventListener('click', () => { haptic('tap'); openSync(); });
 syncOverlay.addEventListener('click', (e) => { if(e.target === syncOverlay) syncOverlay.classList.remove('open'); });
 
+// الشبكات بتقطع لحظات (أخطاء مؤقتة من الخادم أو المتصفح): نعيد المحاولة قبل ما نظهر «تعذّر الاتصال»
+async function syFetchRetry(url, opt, tries){
+  let last = null;
+  for(let n = 0; n < (tries || 3); n++){
+    try{
+      const r = await fetch(url, opt);
+      if(r.ok || (r.status >= 400 && r.status < 500 && r.status !== 429 && r.status !== 408)) return r;
+      last = r;
+    }catch(e){ last = null; }
+    if(n < (tries || 3) - 1) await new Promise(res => setTimeout(res, 500 * (n + 1) * (n + 1)));
+  }
+  if(last) return last;
+  throw new Error('net');
+}
+// مزامنة مع إعادة محاولة: syncNow بترجع false فوراً لو مزامنة تانية شغّالة (أو الصفحة لسه مجهّزة)
+async function syncRetryNow(){
+  for(let n = 0; n < 4; n++){
+    if(await syncNow()) return true;
+    if(!syCfg()) return false;
+    await new Promise(r => setTimeout(r, 700 * (n + 1)));
+  }
+  return false;
+}
 // الجهاز الجديد: يعرض QR ثم ينتظر استلام المفاتيح المشفّرة
 async function syncStartPair(){
-  SY.alone = false;
+  SY.alone = false; SY.rate = false;
   syShow('wait');
   try{
     const kp = await crypto.subtle.generateKey({ name:'ECDH', namedCurve:'P-256' }, true, ['deriveKey']);
     const pub = u8b64u(new Uint8Array(await crypto.subtle.exportKey('raw', kp.publicKey)));
     const id = rndB64u(16);
-    const r = await fetch(SY_API + '/api/pair/new', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ id, pub }) });
+    const r = await syFetchRetry(SY_API + '/api/pair/new', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ id, pub }) });
+    if(r.status === 429) SY.rate = true;
     if(!r.ok) throw new Error('http');
     SY.kp = kp; SY.id = id; SY.until = Date.now() + 300000;
     SY.link = 'https://toobaapp.com/#pair=' + id + '.' + pub;
@@ -4724,8 +4918,9 @@ async function syncReceive(b, id){
     syCfgSave({ gid:g.gid, secret:g.secret, key:g.key, ver:0, last:0 });
     if(!had) syncTouch(0);   // بيانات هذا الجهاز الجديد أضعف من بيانات الجهاز القديم عند التعارض
     syShow('wait');
-    const ok = await syncNow();
+    const ok = await syncRetryNow();
     haptic('done');
+    if(!ok && syCfg()){ syncSchedule(); syShow('linked'); return; }   // الربط تم والمزامنة الأولى هتعاد تلقائيًا: ما نظهرش خطأ وهمي
     syShow(ok ? 'done' : 'err');
     if(ok) setTimeout(() => { if(syncOverlay.classList.contains('open') && SY.state === 'done') syShow('linked'); }, 1800);
   }catch(e){ SY.id = null; syShow('err'); }
