@@ -1693,7 +1693,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.80</div>
+    <div class="about-ver">الإصدار 2.4.82</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -4877,9 +4877,35 @@ function syShow(s){
   } else return syShow('idle');
   syBodyEl.innerHTML = h;
 }
+// جهاز «مرتبط بنفسه» (مفيش جهاز تاني في مجموعته): نفكّ الربط الفاضي بهدوء ونفتح التبويبين العاديين (إرسال/استقبال) بدل شاشة «مرتبط».
+// بنتأكد بمزامنة ناجحة الأول (مش مجرد قائمة محلية قديمة)، وبنحتفظ ببيانات الجهاز بتوقيتاتها فتتدمج لما ينضم لجهاز تاني.
+async function syAloneOpen(){
+  syShow('wait');
+  let ok = false;
+  try{ ok = await syncRetryNow(); }catch(e){}
+  if(!syncOverlay.classList.contains('open')) return;
+  const c = syCfg();
+  if(!c){ if(SY.state === 'wait') syShow(SY.lost || SY.kicked ? 'idle' : 'linked'); return; }
+  const me = devInfo().id;
+  if(!ok || syDevs().some(d => d.id !== me)){ syShow('linked'); return; }   // فيه أجهزة تانية أو المزامنة فشلت: نعرض الشاشة العادية
+  try{ await fetch(SY_API + '/api/sync?gid=' + c.gid, { method:'DELETE', headers:{ 'X-Secret':c.secret } }); }catch(e){}
+  let tid = ''; try{ tid = (JSON.parse(localStorage.getItem('tooba-taps')) || {}).id || ''; }catch(e){}
+  const st = syState(), keep = {};
+  Object.keys(st).forEach(k => {
+    if(/^(dv|dx):/.test(k)) return;
+    if(/^nb?:/.test(k) && !(k === 'nb:' + tid || k.indexOf('n:' + tid + ':') === 0)) return;
+    keep[k] = st[k];
+  });
+  syCfgSave(null); syStateSave(keep);
+  if(syncOverlay.classList.contains('open')) syStartShow();
+}
 function openSync(){
   SY.armed = null;
-  if(syCfg()){ syShow('linked'); syncNow(); }
+  if(syCfg()){
+    const c0 = syCfg(), me0 = devInfo().id;
+    if(c0.last && !syDevs().some(d => d.id !== me0)) syAloneOpen();
+    else{ syShow('linked'); syncNow(); }
+  }
   else if(SY.pre){ SY.tab = 'scan'; syShow('scan'); }
   else if(SY.id && SY.svg && Date.now() < SY.until) syShow('qr');
   else syStartShow();   // التبويب الافتراضي دايمًا «إرسال البيانات» (عرض الكود)، والمسح بالضغط على «استقبال البيانات»
