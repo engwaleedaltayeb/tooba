@@ -1688,7 +1688,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.78</div>
+    <div class="about-ver">الإصدار 2.4.79</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -4840,11 +4840,11 @@ function syDevList(){
 }
 const SY_BTN = (act, txt, cls) => '<button class="' + (cls || 'sheet-close') + '" data-act="' + act + '"><span>' + txt + '</span></button>';
 const SY_STEPS = a => '<ol class="sheet-steps">' + a.map((t, i) => '<li><b>' + (i + 1) + '</b><span>' + t + '</span></li>').join('') + '</ol>';
-const SY_TABS = (t) => '<div class="sy-tabs"><button data-act="tab-show"' + (t === 'show' ? ' class="on"' : '') + '>عرض كود</button><button data-act="tab-scan"' + (t === 'scan' ? ' class="on"' : '') + '>مسح كود</button></div>';
+const SY_TABS = (t) => '<div class="sy-tabs"><button data-act="tab-show"' + (t === 'show' ? ' class="on"' : '') + '>إرسال البيانات</button><button data-act="tab-scan"' + (t === 'scan' ? ' class="on"' : '') + '>استقبال البيانات</button></div>';
 function syShow(s){
   SY.state = s; const c = syCfg(); let h = ''; syBodyEl.classList.toggle('qrv', s === 'qr'); if(s !== 'scan') syStopCam();
   if(s === 'idle') h = SY_DHERO + '<h2>' + (SY.lost || SY.kicked ? 'تم فصل هذا الجهاز' : 'تم الفصل') + '</h2><p>' + (SY.alone ? 'لم يبق أي جهاز آخر مرتبط، فتم فصل هذا الجهاز أيضًا، وتقدّمك عليه بقي كما هو.' : SY.kicked ? 'تم فصله من جهاز آخر، وتقدّمك على هذا الجهاز بقي كما هو.' : SY.lost ? 'النسخة المحفوظة على الخادم اتحذفت.' : 'تقدّمك على هذا الجهاز بقي كما هو.') + '</p>' + SY_BTN('close', 'تمام');
-  else if(s === 'wait') h = SY_ICON + '<h2>جارٍ تجهيز الكود…</h2>';
+  else if(s === 'wait') h = (c ? '' : SY_TABS('show')) + SY_ICON + '<h2>جارٍ تجهيز الكود…</h2>';
   else if(s === 'join') h = SY_ICON + '<h2>جارٍ استلام تقدّمك…</h2>';
   else if(s === 'qr'){
     h = (c ? '' : SY_TABS('show')) + SY_HERO + '<h2>زامن تقدّمك</h2><p class="sy-sub">يمسح جهازك الجديد هذا الكود فيستلم تقدّمك فورًا</p><div class="qrbox">' + SY.svg + '</div>' +
@@ -4875,8 +4875,7 @@ function openSync(){
   if(syCfg()){ syShow('linked'); syncNow(); }
   else if(SY.pre){ SY.tab = 'scan'; syShow('scan'); }
   else if(SY.id && SY.svg && Date.now() < SY.until) syShow('qr');
-  else if(syHasData()) syStartShow();
-  else syStartScan();
+  else syStartShow();   // التبويب الافتراضي دايمًا «إرسال البيانات» (عرض الكود)، والمسح بالضغط على «استقبال البيانات»
   syncOverlay.classList.add('open');
 }
 syncBtn.addEventListener('click', () => { haptic('tap'); openSync(); });
