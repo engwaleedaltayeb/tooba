@@ -1456,6 +1456,19 @@
   .sy .sheet-close, .sy .done-btn{ margin-top:6px; }
   .sy .sheet-steps{ width:100%; text-align:start; margin:2px 0 4px; }
   .sy-note{ font-size:13px !important; line-height:1.8 !important; }
+.sy-tabs{ align-self:stretch; display:flex; gap:4px; padding:4px; border-radius:14px; background:color-mix(in srgb, var(--text) 7%, transparent); margin:0 0 18px; }
+.sy-tabs button{ flex:1; height:38px; border:none; border-radius:11px; background:transparent; color:var(--text-dim); font-family:inherit; font-size:14.5px; font-weight:600; cursor:pointer; transition:background .2s ease, color .2s ease; -webkit-tap-highlight-color:transparent; }
+.sy-tabs button.on{ background:var(--bg); color:var(--text); box-shadow:0 1px 4px var(--shadow); }
+.sy-cam{ width:min(70%,240px); aspect-ratio:1; border-radius:24px; overflow:hidden; background:#000; margin:2px 0 14px; }
+.sy-cam video{ width:100%; height:100%; object-fit:cover; display:block; }
+.sy-paste-row{ align-self:stretch; display:flex; gap:8px; margin-top:14px; }
+.sy-paste{ flex:1; min-width:0; height:46px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); padding:0 12px; font-size:13.5px; font-family:inherit; text-align:left; -webkit-user-select:text; user-select:text; }
+.sy-pbtn{ width:auto !important; flex:none; height:46px; margin:0 !important; padding:0 22px; }
+.sy-hero5 .vf{ animation:syVf 2.4s ease-in-out infinite; }
+.sy-hero5 .sysl{ animation:sySlide 2.4s ease-in-out infinite; }
+@keyframes syVf{ 0%,100%{ opacity:.55; } 50%{ opacity:1; } }
+@keyframes sySlide{ 0%,100%{ transform:translateY(-36px); opacity:.15; } 50%{ transform:translateY(36px); opacity:1; } }
+@media (prefers-reduced-motion: reduce){ .sy-hero5 .vf, .sy-hero5 .sysl{ animation:none !important; } }
   .sy-ic{ color:var(--accent-text); }
   .qrbox{ width:min(64%,225px); aspect-ratio:1; padding:0; border-radius:28px; overflow:hidden; background:#fff; }
   .qrbox svg{ display:block; width:100%; height:100%; }
@@ -1675,7 +1688,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.76</div>
+    <div class="about-ver">الإصدار 2.4.78</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -4599,7 +4612,13 @@ function qrSvg(text){
 const SYNC_CFG = 'tooba-sync', SYNC_STATE = 'tooba-sync-state', DEVKEY = 'tooba-device';
 const SY_API = NATIVE ? 'https://toobaapp.com' : '';
 const SY = {};
-let syncApplying = false, syncBusy = false, syncTimer = null;
+let syncApplying = false, syncBusy = false, syncBusyAt = 0, syncTimer = null;
+// fetch مع مهلة: طلب معلّق (شبكة بتتغيّر، نوم الجهاز...) كان بيفضل ماسك syncBusy للأبد ويوقّف المزامنة لحد إعادة التحميل
+function syFetchT(url, opt, ms){
+  const ac = typeof AbortController === 'function' ? new AbortController() : null;
+  const t = setTimeout(() => { try{ ac && ac.abort(); }catch(e){} }, ms || 20000);
+  return fetch(url, Object.assign({}, opt, ac ? { signal:ac.signal } : {})).finally(() => clearTimeout(t));
+}
 const syncBtn = document.getElementById('syncBtn'), syncOverlay = document.getElementById('syncOverlay'), syBodyEl = document.getElementById('syBody');
 const pairOverlay = document.getElementById('pairOverlay'), pairBody = document.getElementById('pairBody');
 function u8b64u(u){ let s = ''; for(let i = 0; i < u.length; i++) s += String.fromCharCode(u[i]); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
@@ -4715,14 +4734,15 @@ async function syDec(c, blob){
 // مزامنة: سحب ← دمج ← (لو فيه جديد عندنا) رفع بشرط الإصدار؛ لو جهاز آخر سبقنا (409) نعيد السحب والدمج
 async function syncNow(){
   const c = syCfg();
+  if(syncBusy && Date.now() - syncBusyAt > 60000) syncBusy = false;   // مزامنة علقت: نكمل من جديد
   if(!c || syncBusy || !window.__syncReady || dayStale()) return false;
   try{ const dv = devInfo(); if(Date.now() - dv.seen > 36e5){ dv.seen = Date.now(); localStorage.setItem(DEVKEY, JSON.stringify(dv)); } }catch(e){}
   syncTouch(); clearTimeout(syncTimer);
-  syncBusy = true;
+  syncBusy = true; syncBusyAt = Date.now();
   let ok = false;
   try{
     for(let tries = 0; tries < 3; tries++){
-      const r = await fetch(SY_API + '/api/sync?gid=' + c.gid + '&since=' + c.ver, { headers:{ 'X-Secret':c.secret } });
+      const r = await syFetchT(SY_API + '/api/sync?gid=' + c.gid + '&since=' + c.ver, { headers:{ 'X-Secret':c.secret } });
       if(r.status === 401 || r.status === 404){ SY.lost = true; syCfgSave(null); break; }
       if(!r.ok) throw new Error('http');
       const j = await r.json();
@@ -4735,7 +4755,7 @@ async function syncNow(){
       }
       { const dx = st['dx:' + devInfo().id]; if(!SY.leaving && dx && dx.v === 1){ SY.kicked = true; SY.lost = false; syCfgSave(null); break; } }
       if(c.ver === 0 || (j.same ? stab(st) !== c.sent : stab(st) !== stab(rem))){
-        const pr = await fetch(SY_API + '/api/sync', { method:'PUT', headers:{ 'Content-Type':'application/json', 'X-Secret':c.secret }, body:JSON.stringify({ gid:c.gid, base:c.ver, blob:await syEnc(c, { s:st }) }) });
+        const pr = await syFetchT(SY_API + '/api/sync', { method:'PUT', headers:{ 'Content-Type':'application/json', 'X-Secret':c.secret }, body:JSON.stringify({ gid:c.gid, base:c.ver, blob:await syEnc(c, { s:st }) }) });
         if(pr.status === 409) continue;
         if(!pr.ok) throw new Error('http');
         c.ver = (await pr.json()).ver;
@@ -4745,6 +4765,7 @@ async function syncNow(){
     }
   }catch(e){ ok = false; }
   syncBusy = false;
+  SY.fail = ok ? 0 : (syCfg() ? (SY.fail || Date.now()) : 0);   // أول وقت فشل متصل (للتنبيه في شاشة المزامنة)
   try{ paintTapStats(); }catch(e){}
   if(syncOverlay.classList.contains('open')){ if(!syCfg() && (SY.lost || SY.kicked)) syShow('idle'); else if(SY.state === 'linked' && syCfg()) syShow('linked'); }
   return ok;
@@ -4774,6 +4795,7 @@ const SY_EHERO = (kind) => {
     '<g opacity=".45"><rect class="dv" x="239" y="18" width="46" height="84" rx="10"/><path class="dv" d="M255 26h14"/><use href="#syl" x="250" y="48" width="24" height="24" opacity=".5"/></g>' +
     '<g class="syex"><circle cx="162" cy="62" r="11" fill="none" stroke="var(--text-dim)" stroke-width="2"/>' + gl + '</g>' + fl + '</svg>';
 };
+const SY_SHERO = '<svg class="sy-hero sy-hero5" viewBox="0 0 324 120" aria-hidden="true"><g class="vf" fill="none" stroke="var(--accent-text)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M118 32v-8a8 8 0 0 1 8-8h8"/><path d="M206 32v-8a8 8 0 0 0-8-8h-8"/><path d="M118 88v8a8 8 0 0 0 8 8h8"/><path d="M206 88v8a8 8 0 0 1-8 8h-8"/></g><g fill="none" stroke="var(--text-dim)" stroke-width="2" opacity=".4"><rect x="134" y="36" width="20" height="20" rx="4"/><rect x="170" y="36" width="20" height="20" rx="4"/><rect x="134" y="64" width="20" height="20" rx="4"/><path d="M172 66h6v6h-6zM184 78h6v6h-6z"/></g><rect class="sysl" x="124" y="58" width="76" height="3" rx="1.5" fill="var(--accent-text)"/></svg>';
 const SY_LHERO = (() => {
   const sym = SY_HERO.match(/<symbol[\s\S]*?<\/symbol>/)[0];
   const fl = [[24,0,''],[34,-2.2,''],[28,-1.1,' rv'],[20,-3.3,' rv']].map(a => '<g class="syp' + a[2] + '" style="--dl:' + a[1] + 's"><g class="sypy" style="--h:' + a[0] + 'px;--dl:' + a[1] + 's"><g class="sypr" style="--dl:' + a[1] + 's"><use href="#syl" x="-8" y="-8" width="16" height="16"/></g></g></g>').join('');
@@ -4818,32 +4840,47 @@ function syDevList(){
 }
 const SY_BTN = (act, txt, cls) => '<button class="' + (cls || 'sheet-close') + '" data-act="' + act + '"><span>' + txt + '</span></button>';
 const SY_STEPS = a => '<ol class="sheet-steps">' + a.map((t, i) => '<li><b>' + (i + 1) + '</b><span>' + t + '</span></li>').join('') + '</ol>';
+const SY_TABS = (t) => '<div class="sy-tabs"><button data-act="tab-show"' + (t === 'show' ? ' class="on"' : '') + '>عرض كود</button><button data-act="tab-scan"' + (t === 'scan' ? ' class="on"' : '') + '>مسح كود</button></div>';
 function syShow(s){
-  SY.state = s; const c = syCfg(); let h = ''; syBodyEl.classList.toggle('qrv', s === 'qr');
+  SY.state = s; const c = syCfg(); let h = ''; syBodyEl.classList.toggle('qrv', s === 'qr'); if(s !== 'scan') syStopCam();
   if(s === 'idle') h = SY_DHERO + '<h2>' + (SY.lost || SY.kicked ? 'تم فصل هذا الجهاز' : 'تم الفصل') + '</h2><p>' + (SY.alone ? 'لم يبق أي جهاز آخر مرتبط، فتم فصل هذا الجهاز أيضًا، وتقدّمك عليه بقي كما هو.' : SY.kicked ? 'تم فصله من جهاز آخر، وتقدّمك على هذا الجهاز بقي كما هو.' : SY.lost ? 'النسخة المحفوظة على الخادم اتحذفت.' : 'تقدّمك على هذا الجهاز بقي كما هو.') + '</p>' + SY_BTN('close', 'تمام');
   else if(s === 'wait') h = SY_ICON + '<h2>جارٍ تجهيز الكود…</h2>';
+  else if(s === 'join') h = SY_ICON + '<h2>جارٍ استلام تقدّمك…</h2>';
   else if(s === 'qr'){
-    h = SY_HERO + '<h2>زامن تقدّمك</h2><p class="sy-sub">لنقل بياناتك وأذكارك إلى هذا الجهاز بسهولة</p><div class="qrbox">' + SY.svg + '</div>' +
-      '<div class="sy-hd">امسح الكود بكاميرا جهازك الآخر</div><p class="sy-gr">سيتم نقل جميع بياناتك وتقدّمك إلى هذا الجهاز فور التأكيد.</p>' +
-      '<p class="sy-note">الكود صالح لمدة 5 دقائق. لا تستطيع المسح؟ انسخ الرابط وافتحه على جهازك الآخر. لازم يكون محدّثًا لآخر إصدار، وبياناتك مشفّرة ولا يقرأها أحد غيرك.</p><div class="sy-row">' + SY_BTN('copy', 'نسخ الرابط', 'done-btn') + SY_BTN('share', 'مشاركة', 'done-btn') + '</div>';
+    h = (c ? '' : SY_TABS('show')) + SY_HERO + '<h2>زامن تقدّمك</h2><p class="sy-sub">يمسح جهازك الجديد هذا الكود فيستلم تقدّمك فورًا</p><div class="qrbox">' + SY.svg + '</div>' +
+      '<div class="sy-hd">امسح الكود من جهازك الجديد</div><p class="sy-gr">يتم نقل بياناتك وتقدّمك فور المسح، بدون خطوة تأكيد.</p>' +
+      '<p class="sy-note">الكود صالح 3 دقائق ولمرة واحدة، وبياناتك مشفّرة ولا يقرأها أحد غيرك. لا تعرضه إلا لجهازك. الجهاز الجديد لازم يكون محدّثًا لآخر إصدار.</p><div class="sy-row">' + SY_BTN('copy', 'نسخ الرابط', 'done-btn') + SY_BTN('share', 'مشاركة', 'done-btn') + '</div>' + (c ? SY_BTN('back', 'رجوع', 'done-btn') : '');
   }
+  else if(s === 'scan'){
+    const cam = !NATIVE && 'BarcodeDetector' in window && !!navigator.mediaDevices;
+    const msg = SY.scanMsg || (!NATIVE && !cam ? 'متصفحك لا يدعم المسح بالكاميرا. الصق رابط الربط في الخانة بالأسفل.' : '');
+    h = SY_TABS('scan') + (cam ? '' : SY_SHERO) + '<h2>امسح كود الربط</h2><p class="sy-sub">وجّه الكاميرا إلى الكود المعروض على جهازك اللي عليه تقدّمك.</p>' +
+      (cam ? '<div class="sy-cam"><video playsinline muted></video></div>' : '') + (NATIVE ? SY_BTN('scan-go', 'فتح الكاميرا') : '') +
+      '<p class="sy-note" id="syCamMsg"' + (msg ? '' : ' hidden') + '>' + esc(msg) + '</p>' +
+      '<div class="sy-paste-row"><input id="syPaste" class="sy-paste" data-clarity-mask="true" dir="ltr" autocomplete="off" spellcheck="false" placeholder="أو الصق رابط الربط هنا" value="' + esc(SY.pre || '') + '"><button class="done-btn sy-pbtn" data-act="paste-go"><span>ربط</span></button></div>';
+  }
+  else if(s === 'joined') h = SY_OKI + '<h2>تم ربط جهازك الجديد</h2><p>' + (SY.joinedName ? esc(SY.joinedName) + ' استلم تقدّمك، ' : 'الجهاز الجديد استلم تقدّمك، ') + 'وأي تقدّم جديد يتحدّث بين أجهزتك تلقائيًا.</p>';
+  else if(s === 'joinerr') h = SY_EHERO('err') + '<h2>تعذّر الربط</h2><p>' + esc(SY.joinMsg || 'حاول مرة أخرى.') + '</p>' + SY_BTN('tab-scan', 'حاول مرة أخرى');
   else if(s === 'done') h = SY_OKI + '<h2>تم نقل تقدّمك</h2><p>أذكارك وأورادك وصلت لهذا الجهاز، وأي تقدّم جديد يتحدّث بين الجهازين تلقائيًا.</p>';
-  else if(s === 'expired' || s === 'err') h = SY_EHERO(s) + '<h2>' + (s === 'expired' ? 'انتهت مدة الكود' : 'تعذّر الاتصال الآن') + '</h2><p>' + (s === 'expired' ? 'الكود صالح لمدة 5 دقائق فقط.' : (SY.rate ? 'محاولات كتيرة في وقت قصير، استنى دقيقة وحاول مرة أخرى.' : 'تأكد من الإنترنت وحاول مرة أخرى.')) + '</p>' + SY_BTN('start', s === 'expired' ? 'إظهار كود جديد' : 'إعادة المحاولة');
+  else if(s === 'expired' || s === 'err') h = SY_EHERO(s) + '<h2>' + (s === 'expired' ? 'انتهت مدة الكود' : 'تعذّر الاتصال الآن') + '</h2><p>' + (s === 'expired' ? 'الكود صالح لمدة 3 دقائق فقط.' : (SY.rate ? 'محاولات كتيرة في وقت قصير، استنى دقيقة وحاول مرة أخرى.' : 'تأكد من الإنترنت وحاول مرة أخرى.')) + '</p>' + SY_BTN('start', s === 'expired' ? 'إظهار كود جديد' : 'إعادة المحاولة');
   else if(s === 'linked' && c){
     const t = c.last ? new Date(c.last).toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' }) : '—';
-    h = SY_LHERO + '<h2>أجهزتك مرتبطة</h2><p>آخر مزامنة: <span class="sy-time">' + t + '</span><br>تقدّمك يتحدّث تلقائيًا بين أجهزتك.</p>' + syDevList() +
-      SY_BTN('wipe', SY.armed === 'wipe' ? 'اضغط مرة أخرى للتأكيد' : 'حذف النسخة المشفّرة من الخادم', 'done-btn wird-del');
+    h = SY_LHERO + '<h2>أجهزتك مرتبطة</h2><p>آخر مزامنة: <span class="sy-time">' + t + '</span><br>تقدّمك يتحدّث تلقائيًا بين أجهزتك.</p>' + (SY.fail && Date.now() - SY.fail > 120000 ? '<p class="sy-note" style="color:var(--reset)">تعذّرت المزامنة آخر مرة، بنعيد المحاولة تلقائيًا. تأكد من الإنترنت.</p>' : '') + syDevList() +
+      SY_BTN('adddev', 'ربط جهاز جديد') + SY_BTN('wipe', SY.armed === 'wipe' ? 'اضغط مرة أخرى للتأكيد' : 'حذف النسخة المشفّرة من الخادم', 'done-btn wird-del');
   } else return syShow('idle');
   syBodyEl.innerHTML = h;
 }
 function openSync(){
   SY.armed = null;
   if(syCfg()){ syShow('linked'); syncNow(); }
+  else if(SY.pre){ SY.tab = 'scan'; syShow('scan'); }
   else if(SY.id && SY.svg && Date.now() < SY.until) syShow('qr');
-  else syncStartPair();
+  else if(syHasData()) syStartShow();
+  else syStartScan();
   syncOverlay.classList.add('open');
 }
 syncBtn.addEventListener('click', () => { haptic('tap'); openSync(); });
+new MutationObserver(() => { if(!syncOverlay.classList.contains('open')){ syStopCam(); if(SY.pend || SY.id) syAbandon(); } }).observe(syncOverlay, { attributes:true, attributeFilter:['class'] });
 syncOverlay.addEventListener('click', (e) => { if(e.target === syncOverlay) syncOverlay.classList.remove('open'); });
 
 // الشبكات بتقطع لحظات (أخطاء مؤقتة من الخادم أو المتصفح): نعيد المحاولة قبل ما نظهر «تعذّر الاتصال»
@@ -4869,61 +4906,200 @@ async function syncRetryNow(){
   }
   return false;
 }
-// الجهاز الجديد: يعرض QR ثم ينتظر استلام المفاتيح المشفّرة
-async function syncStartPair(){
-  SY.alone = false; SY.rate = false;
+// ---------- الربط بنموذج الواي فاي: الجهاز اللي معاه التقدّم يعرض الكود، والجهاز الجديد يمسحه فيستلم تقدّمه فورًا ----------
+const SY_TTL = 180000;   // صلاحية الكود: 3 دقائق ولمرة واحدة
+const syDevs = () => { const st = syState(); return Object.keys(st).filter(k => /^dv:/.test(k) && st[k].v && !(st['dx:' + k.slice(3)] && st['dx:' + k.slice(3)].v === 1)).map(k => Object.assign({ id:k.slice(3) }, st[k].v)); };
+function syHasData(){ try{ return Object.keys(syncSnapshot()).some(k => !/^(dv|dx|n|nb):/.test(k)); }catch(e){ return false; } }
+const syPost = (path, body) => syFetchRetry(SY_API + path, { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify(body) });
+// إلغاء الكود المعروض: لو كانت مجموعة جديدة لسه محدّش انضم لها نمسحها من الخادم (مفيش فيها أي بيانات)
+function syAbandon(){
+  const p = SY.pend; SY.pend = null; SY.id = null; SY.svg = null; SY.show = 0;
+  if(p){ try{ fetch(SY_API + '/api/sync?gid=' + p.gid, { method:'DELETE', headers:{ 'X-Secret':p.secret } }).catch(() => {}); }catch(e){} }
+}
+// الجهاز اللي معاه التقدّم: يجهّز كودًا مشفّرًا لمرة واحدة. المفتاح جوه الكود نفسه (ps) فالخادم ما بيشوفش حاجة
+async function syStartShow(){
+  syAbandon(); syStopCam();
+  SY.tab = 'show'; SY.alone = false; SY.rate = false; SY.pre = null;
+  const tok = SY.show = Date.now() + Math.random();
   syShow('wait');
   try{
-    const kp = await crypto.subtle.generateKey({ name:'ECDH', namedCurve:'P-256' }, true, ['deriveKey']);
-    const pub = u8b64u(new Uint8Array(await crypto.subtle.exportKey('raw', kp.publicKey)));
-    const id = rndB64u(16);
-    const r = await syFetchRetry(SY_API + '/api/pair/new', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ id, pub }) });
-    if(r.status === 429) SY.rate = true;
-    if(!r.ok) throw new Error('http');
-    SY.kp = kp; SY.id = id; SY.until = Date.now() + 300000;
-    SY.link = 'https://toobaapp.com/#pair=' + id + '.' + pub;
+    const c = syCfg();
+    let pend = null;
+    if(!c){
+      pend = { gid:rndB64u(16), secret:rndB64u(32), key:rndB64u(32) };
+      const r0 = await syPost('/api/sync/create', { gid:pend.gid, secret:pend.secret });
+      if(r0.status === 429) SY.rate = true;
+      if(!r0.ok) throw new Error('http');
+      SY.pend = pend;
+    }
+    const g = pend || c;
+    const id = rndB64u(16), psU = crypto.getRandomValues(new Uint8Array(32)), ps = u8b64u(psU);
+    const ek = { name:'ECDH', namedCurve:'P-256' };
+    const k1 = await crypto.subtle.generateKey(ek, true, ['deriveKey']), k2 = await crypto.subtle.generateKey(ek, true, ['deriveKey']);
+    const pub = u8b64u(new Uint8Array(await crypto.subtle.exportKey('raw', k1.publicKey)));
+    const eph = u8b64u(new Uint8Array(await crypto.subtle.exportKey('raw', k2.publicKey)));
+    const aes = await crypto.subtle.importKey('raw', psU, { name:'AES-GCM' }, false, ['encrypt']);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = new Uint8Array(await crypto.subtle.encrypt({ name:'AES-GCM', iv, additionalData:new TextEncoder().encode(id) }, aes, new TextEncoder().encode(JSON.stringify({ gid:g.gid, secret:g.secret, key:g.key }))));
+    const r1 = await syPost('/api/pair/new', { id, pub });
+    if(r1.status === 429) SY.rate = true;
+    if(!r1.ok) throw new Error('http');
+    const r2 = await syPost('/api/pair/send', { id, eph, iv:u8b64u(iv), ct:u8b64u(ct) });
+    if(!r2.ok) throw new Error('http');
+    if(SY.show !== tok) return;   // المستخدم غيّر الشاشة وهو بيتجهّز (والتنظيف اتعمل)
+    if(!syncOverlay.classList.contains('open')){ syAbandon(); return; }
+    SY.id = id; SY.until = Date.now() + SY_TTL;
+    SY.link = 'https://toobaapp.com/#join=' + id + '.' + ps;
     SY.svg = qrSvg(SY.link);
     if(!SY.svg) throw new Error('qr');
     syShow('qr');
-    syncPoll(id);
-  }catch(e){ SY.id = null; syShow('err'); }
+    syPollJoin(tok);
+  }catch(e){ if(SY.show === tok){ syAbandon(); syShow('err'); } }
 }
-async function syncPoll(id){
-  while(SY.id === id && syncOverlay.classList.contains('open') && Date.now() < SY.until){
+// بنراقب انضمام الجهاز الجديد: مجموعة جديدة ← أول رفع منه، ومجموعة قائمة ← ظهور جهاز زيادة في القائمة
+async function syPollJoin(tok){
+  const base = syDevs().length;
+  while(SY.show === tok && syncOverlay.classList.contains('open') && Date.now() < SY.until){
     await new Promise(r => setTimeout(r, 2000));
-    if(SY.id !== id) return;
+    if(SY.show !== tok) return;
     try{
-      const j = await (await fetch(SY_API + '/api/pair/get?id=' + id)).json();
-      if(j.ready){ await syncReceive(j.blob, id); return; }
-      if(j.gone) break;
+      if(SY.pend){
+        const r = await syFetchT(SY_API + '/api/sync?gid=' + SY.pend.gid + '&since=0', { headers:{ 'X-Secret':SY.pend.secret } }, 8000);
+        if(r.ok){ const j = await r.json(); if((j.ver || 0) > 0){ await syFinishShow(tok); return; } }
+      }else{
+        await syncNow();
+        if(SY.show !== tok) return;
+        if(syDevs().length > base){ SY.show = 0; SY.id = null; SY.svg = null; syJoined(); return; }
+      }
     }catch(e){}
   }
-  if(SY.id === id){
+  if(SY.show === tok){
     const open = syncOverlay.classList.contains('open');
-    SY.id = null; SY.svg = null;
+    syAbandon();
     if(open) syShow('expired');
   }
 }
-async function syncReceive(b, id){
+async function syFinishShow(tok){
+  const p = SY.pend; SY.pend = null; SY.id = null; SY.svg = null; SY.show = 0;
+  SY.lost = false; SY.kicked = false; SY.alone = false;
+  syCfgSave({ gid:p.gid, secret:p.secret, key:p.key, ver:0, last:0 });
+  if(!Object.keys(syState()).length) syncTouch(Date.now());   // بيانات هذا الجهاز أحدث من الجهاز الجديد عند التعارض
+  await syncRetryNow();
+  syJoined();
+}
+function syJoined(){
+  const me = devInfo().id, o = syDevs().filter(d => d.id !== me).sort((a, b) => (b.l || 0) - (a.l || 0));
+  SY.joinedName = (o[0] && o[0].n) || '';
+  haptic('done'); syShow('joined');
+  setTimeout(() => { if(syncOverlay.classList.contains('open') && SY.state === 'joined' && syCfg()) syShow('linked'); }, 2600);
+}
+// الجهاز الجديد: بعد فك الكود يتربط ويستلم تقدّم الجهاز الأصلي في خطوة واحدة
+async function syAdopt(g){
+  const had = Object.keys(syState()).length > 0;
+  SY.lost = false; SY.kicked = false; SY.alone = false;
+  syCfgSave({ gid:g.gid, secret:g.secret, key:g.key, ver:0, last:0 });
+  if(!had) syncTouch(0);   // بيانات هذا الجهاز الجديد أضعف من بيانات الجهاز الأصلي عند التعارض
+  syShow('join');
+  const ok = await syncRetryNow();
+  if(ok){
+    for(let n = 0; n < 8 && !syDevs().some(d => d.id !== devInfo().id); n++){ await new Promise(r => setTimeout(r, 1500)); await syncNow(); }
+  }
+  haptic('done');
+  if(!ok && syCfg()){ syncSchedule(); syShow('linked'); return; }   // الربط تم والمزامنة الأولى هتعاد تلقائيًا: ما نظهرش خطأ وهمي
+  syShow(ok ? 'done' : 'err');
+  if(ok) setTimeout(() => { if(syncOverlay.classList.contains('open') && SY.state === 'done') syShow('linked'); }, 2200);
+}
+async function syJoin(text){
+  const t = String(text || '').trim();
+  syStopCam(); SY.pre = null; SY.scanMsg = '';
+  const m = /(?:[#&]join=|^)([A-Za-z0-9_-]{22})\.([A-Za-z0-9_-]{43})$/.exec(t);
+  if(!m){
+    SY.joinMsg = /[#&]pair=/.test(t) ? 'ده كود من إصدار قديم. حدّث الجهاز الآخر لآخر إصدار.' : 'ده مش كود ربط طوبى. امسح الكود المعروض على الجهاز اللي عليه تقدّمك.';
+    return syShow('joinerr');
+  }
+  syShow('join');
+  let g = null;
   try{
-    const priv = SY.kp.privateKey;
-    const pub = await crypto.subtle.importKey('raw', b64uToU8(b.eph), { name:'ECDH', namedCurve:'P-256' }, false, []);
-    const key = await crypto.subtle.deriveKey({ name:'ECDH', public:pub }, priv, { name:'AES-GCM', length:256 }, false, ['decrypt']);
-    const pt = await crypto.subtle.decrypt({ name:'AES-GCM', iv:b64uToU8(b.iv), additionalData:new TextEncoder().encode(id) }, key, b64uToU8(b.ct));
-    const g = JSON.parse(new TextDecoder().decode(pt));
-    if(typeof g.gid !== 'string' || typeof g.secret !== 'string' || typeof g.key !== 'string') throw new Error('bad');
-    SY.id = null; SY.kp = null; SY.svg = null;
-    const had = Object.keys(syState()).length > 0;
-    SY.lost = false; SY.kicked = false; SY.alone = false;
-    syCfgSave({ gid:g.gid, secret:g.secret, key:g.key, ver:0, last:0 });
-    if(!had) syncTouch(0);   // بيانات هذا الجهاز الجديد أضعف من بيانات الجهاز القديم عند التعارض
-    syShow('wait');
-    const ok = await syncRetryNow();
-    haptic('done');
-    if(!ok && syCfg()){ syncSchedule(); syShow('linked'); return; }   // الربط تم والمزامنة الأولى هتعاد تلقائيًا: ما نظهرش خطأ وهمي
-    syShow(ok ? 'done' : 'err');
-    if(ok) setTimeout(() => { if(syncOverlay.classList.contains('open') && SY.state === 'done') syShow('linked'); }, 1800);
-  }catch(e){ SY.id = null; syShow('err'); }
+    let j = null;
+    for(let n = 0; n < 4; n++){
+      const r = await syFetchRetry(SY_API + '/api/pair/get?id=' + m[1], {}, 3);
+      try{ j = await r.json(); }catch(e){ j = null; }
+      if(j && (j.ready || j.gone)) break;
+      await new Promise(res => setTimeout(res, 800));
+    }
+    if(!j || !j.ready){ SY.joinMsg = 'الكود انتهت مدته أو اتستخدم قبل كده. اطلب كودًا جديدًا من الجهاز الآخر.'; return syShow('joinerr'); }
+    try{
+      const aes = await crypto.subtle.importKey('raw', b64uToU8(m[2]), { name:'AES-GCM' }, false, ['decrypt']);
+      const pt = await crypto.subtle.decrypt({ name:'AES-GCM', iv:b64uToU8(j.blob.iv), additionalData:new TextEncoder().encode(m[1]) }, aes, b64uToU8(j.blob.ct));
+      g = JSON.parse(new TextDecoder().decode(pt));
+      if(typeof g.gid !== 'string' || typeof g.secret !== 'string' || typeof g.key !== 'string') throw new Error('bad');
+    }catch(e){ SY.joinMsg = 'الكود غير صالح. اطلب كودًا جديدًا من الجهاز الآخر.'; return syShow('joinerr'); }
+  }catch(e){ SY.joinMsg = 'تعذّر الاتصال. تأكد من الإنترنت وحاول مرة أخرى.'; return syShow('joinerr'); }
+  try{ await syAdopt(g); }catch(e){ syShow('err'); }
+}
+// ---------- المسح: على التطبيق بقارئ جوجل الجاهز (بدون إذن كاميرا)، وعلى الويب بكاميرا المتصفح لو بيدعم القراءة، وبديلهم لصق الرابط ----------
+let syCam = null;
+function syStopCam(){ if(syCam){ clearInterval(syCam.timer); try{ syCam.stream.getTracks().forEach(t => t.stop()); }catch(e){} syCam = null; } }
+function syCamMsg(t){ const el = syBodyEl.querySelector('#syCamMsg'); if(el){ el.textContent = t || ''; el.hidden = !t; } }
+async function syStartCam(){
+  if(NATIVE || SY.state !== 'scan') return;
+  const v = syBodyEl.querySelector('.sy-cam video');
+  if(!v) return;
+  try{
+    const det = new BarcodeDetector({ formats:['qr_code'] });
+    const stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' }, audio:false });
+    if(SY.state !== 'scan' || !syncOverlay.classList.contains('open')){ stream.getTracks().forEach(t => t.stop()); return; }
+    v.srcObject = stream; await v.play();
+    syCam = { stream, timer:setInterval(async () => {
+      try{ const r = await det.detect(v); if(r && r[0] && r[0].rawValue){ const val = r[0].rawValue; syStopCam(); syJoin(val); } }catch(e){}
+    }, 300) };
+  }catch(e){ syCamMsg('تعذّر تشغيل الكاميرا. اسمح للمتصفح باستخدامها أو الصق رابط الربط بالأسفل.'); }
+}
+async function syScanNative(){
+  const P = nativePlugin('BarcodeScanner');
+  SY.scanMsg = '';
+  try{
+    if(!P) throw new Error('no-plugin');
+    const sup = await P.isSupported();
+    if(sup && sup.supported === false) throw new Error('no-camera');
+    const av = await P.isGoogleBarcodeScannerModuleAvailable();
+    if(av && av.available === false){
+      syShow('join'); syBodyEl.querySelector('h2').textContent = 'جارٍ تجهيز الماسح…';
+      await new Promise((res, rej) => {
+        P.addListener('googleBarcodeScannerModuleInstallProgress', (ev) => { if(ev.state === 4) res(); else if(ev.state === 3 || ev.state === 5) rej(new Error('install')); });
+        P.installGoogleBarcodeScannerModule().catch(rej);
+        setTimeout(() => rej(new Error('timeout')), 90000);
+      });
+    }
+    const r = await P.scan({ formats:['QR_CODE'] });
+    const v = r && r.barcodes && r.barcodes[0] && (r.barcodes[0].rawValue || r.barcodes[0].displayValue);
+    if(v) return syJoin(v);
+  }catch(e){
+    const m = String(e && e.message || e);
+    if(/no-plugin|UNIMPLEMENTED|not implemented/i.test(m)) SY.scanMsg = 'الماسح غير متاح في هذا الإصدار. الصق رابط الربط بالأسفل.';
+    else if(/no-camera/.test(m)) SY.scanMsg = 'مفيش كاميرا متاحة على هذا الجهاز. الصق رابط الربط بالأسفل.';
+    else if(/install|timeout/.test(m)) SY.scanMsg = 'تعذّر تجهيز الماسح. تأكد من الإنترنت أو الصق رابط الربط بالأسفل.';
+  }
+  if(SY.state === 'scan' || SY.state === 'join') syShow('scan');   // المستخدم لغى المسح: نرجع لشاشة المسح
+}
+function syStartScan(){
+  syAbandon();
+  SY.tab = 'scan';
+  syShow('scan');
+  if(SY.pre) return;
+  if(NATIVE) setTimeout(() => { if(SY.state === 'scan' && syncOverlay.classList.contains('open') && !SY.scanMsg) syScanNative(); }, 450);
+  else if('BarcodeDetector' in window && navigator.mediaDevices) setTimeout(syStartCam, 60);
+}
+// رابط ربط اتفتح من خارج التطبيق (كاميرا الجوال العادية): ما نربطش تلقائيًا، نفتح شاشة المسح والرابط جاهز والمستخدم يضغط «ربط»
+function handleJoinUrl(u){
+  const m = /[#&]join=([A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43})/.exec(u || '');
+  if(!m) return false;
+  try{ if(location.hash) history.replaceState(null, '', location.pathname + location.search); }catch(e){}
+  if(syCfg()) return true;
+  SY.pre = 'https://toobaapp.com/#join=' + m[1];
+  SY.scanMsg = 'وصلك كود ربط. اضغط «ربط» لنقل تقدّم الجهاز الآخر إلى هذا الجهاز.';
+  SY.tab = 'scan'; syShow('scan'); syncOverlay.classList.add('open');
+  return true;
 }
 // يفصل هذا الجهاز: يعلّم نفسه «مفصولًا» ويرفعها (فيعرف باقي الأجهزة ويختفي من قوائمهم) ثم يمسح الربط محليًا
 async function syLeave(alone){
@@ -4950,7 +5126,13 @@ syBodyEl.addEventListener('click', async (e) => {
   const a = b.dataset.act;
   haptic('tap');
   if(a === 'close'){ syncOverlay.classList.remove('open'); return; }
-  if(a === 'start') return syncStartPair();
+  if(a === 'start') return SY.tab === 'scan' ? syStartScan() : syStartShow();
+  if(a === 'tab-show') return syStartShow();
+  if(a === 'tab-scan') return syStartScan();
+  if(a === 'scan-go') return syScanNative();
+  if(a === 'paste-go'){ const inp = syBodyEl.querySelector('#syPaste'); return syJoin(inp ? inp.value : ''); }
+  if(a === 'adddev') return syStartShow();
+  if(a === 'back'){ syAbandon(); return syShow('linked'); }
   if(a === 'copy') return syCopy(b);
   if(a === 'share'){
     try{ if(navigator.share) await navigator.share({ title:'ربط طوبى', text:'افتح هذا الرابط على جهازك الذي عليه بياناتك:', url:SY.link }); else syCopy(b.previousElementSibling || b); }catch(err){}
@@ -5000,6 +5182,7 @@ function pairShow(s, msg){
   pairBody.innerHTML = h;
 }
 function handlePairUrl(u){
+  if(/[#&]join=/.test(u || '')) return handleJoinUrl(u);
   const p = syncParseLink(u);
   if(!p) return false;
   if(SY.incoming && SY.incoming.id === p.id && pairOverlay.classList.contains('open')) return true;
@@ -5047,8 +5230,19 @@ if(NATIVE){
     if(AppP2.getLaunchUrl) AppP2.getLaunchUrl().then((r) => { if(r && r.url) handlePairUrl(r.url); }).catch(() => {});
   }catch(e){}
 }
-setInterval(() => { if(document.visibilityState === 'visible' && syCfg()) syncNow(); }, 30000);
-document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && syCfg()) setTimeout(syncNow, 500); });
+let lastAct = Date.now();
+['pointerdown', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, () => { lastAct = Date.now(); }, { passive:true, capture:true }));
+// صفحة فاضلة ظاهرة عدّى عليها منتصف الليل: المزامنة بتتوقف لحد التحديث (dayStale)، فنعيد التحميل بعد 15 ثانية بدون لمس (التقدّم محفوظ)
+const rolloverCheck = () => {
+  if(new Date().toDateString() === LOADED_DAY || Date.now() - lastAct < 15000) return false;
+  try{ sessionStorage.setItem('tooba-skip-splash', '1'); }catch(e){}
+  location.reload(); return true;
+};
+setInterval(() => { if(document.visibilityState !== 'visible' || rolloverCheck()) return; if(syCfg()) syncNow(); }, 30000);
+const syWake = () => { if(rolloverCheck()) return; if(syCfg()) setTimeout(syncNow, 500); };
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') syWake(); });
+window.addEventListener('online', syWake); window.addEventListener('focus', syWake);
+if(NATIVE){ try{ nativePlugin('App').addListener('resume', syWake); }catch(e){} }
 window.__syncReady = true;
 paintTapStats();
 setTimeout(() => { if(syCfg()) syncNow(); }, 3000);
