@@ -1738,18 +1738,29 @@
   html body.focus .theme-toggle, html body.focus[data-mode="tasbeeh"] #focusBtn, html body.focus[data-mode="tasbeeh"] #hapticBtn,
   html body.focus[data-mode="tasbeeh"] #doneBtn, html body.focus[data-mode="tasbeeh"] #wedit,
   html body.focus[data-mode="tasbeeh"] .tasbih > :not(.seg-wrap), html body.focus .battery-toast{ display:none !important; }
-  body.focus[data-mode="tasbeeh"] .tasbih{ position:fixed; inset:0; z-index:1; min-height:0 !important; padding:0 !important; gap:0; justify-content:center; }
+  body.focus[data-mode="tasbeeh"] .tasbih{ position:fixed; inset:0; z-index:1; min-height:0 !important; padding:0 !important; gap:0; justify-content:flex-start; }
+  /* (2.4.160) الرقم في التلت العلوي (مركزه عند 30% من الشاشة) وأصغر بحوالي 25% */
+  html body.focus[data-mode="tasbeeh"] .seg-row svg{ height:clamp(72px,19.5vw,112px); }
+  body.focus[data-mode="tasbeeh"] .seg-wrap{ margin-top:calc(30vh - clamp(36px,9.75vw,56px)); }
   body.focus[data-mode="tasbeeh"] .seg.on{ filter:none; fill:color-mix(in srgb, var(--accent-text) 72%, #000); }
   body.focus[data-mode="tasbeeh"] #tReset{ background:transparent !important; border:none !important; box-shadow:none !important; opacity:1; }
   body.focus[data-mode="tasbeeh"] #tReset svg{ display:none; }
-  body.focus[data-mode="tasbeeh"] #tReset::after{ content:''; width:16px; height:16px; border-radius:50%; background:var(--reset); opacity:.75; transition:opacity .2s ease; }
-  body.focus[data-mode="tasbeeh"] #tReset.dis::after{ opacity:.35; }
-  .saver-hint{ position:fixed; z-index:60; left:0; right:0; top:24%; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; pointer-events:none; opacity:0; }
-  .saver-hint b{ font-size:26px; font-weight:700; color:color-mix(in srgb, var(--accent-text) 80%, #000); }
+  body.focus[data-mode="tasbeeh"] #tReset::after{ content:''; position:absolute; inset:0; border-radius:50%; background:color-mix(in srgb, var(--accent-text) 72%, #000); opacity:.8; transition:opacity .2s ease; }
+  body.focus[data-mode="tasbeeh"] #tReset.dis::after{ opacity:.3; }   /* (2.4.159) نفس حجم الزر (34px) ونفس لون الرقم */
+  /* (2.4.159) التلميح: اسم الورد بنفس حجم العنوان القديم ويتلاشى لفوق، وتحته إيد بتنزل لتحت مع «اسحب لتحت للخروج» */
+  .saver-hint{ position:fixed; z-index:60; left:0; right:0; top:0; bottom:0; pointer-events:none; }
+  .saver-hint b{ position:absolute; left:16px; right:16px; bottom:calc(70vh + clamp(56px,14vw,80px)); text-align:center; font-size:32px; font-weight:700; line-height:1.4; color:color-mix(in srgb, var(--accent-text) 80%, #000); opacity:0; }
+  .saver-hint .sh-go{ position:absolute; left:0; right:0; bottom:calc(var(--sa-bottom) + 18%); display:flex; flex-direction:column; align-items:center; gap:10px; opacity:0; }
+  .saver-hint .sh-hand{ width:34px; height:34px; color:var(--text-dim); }
+  .saver-hint .sh-hand path{ fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
   .saver-hint span{ font-size:14px; color:var(--text-dim); }
-  .saver-hint.show{ animation:saverHint 2.2s ease both; }
-  @keyframes saverHint{ 0%{ opacity:0; transform:translateY(6px); } 12%{ opacity:1; transform:none; } 70%{ opacity:1; } 100%{ opacity:0; } }
-  @media (prefers-reduced-motion: reduce){ .saver-hint.show{ animation:none; opacity:1; } }
+  .saver-hint.show b{ animation:shName 1.8s cubic-bezier(.4,0,.2,1) both; }
+  .saver-hint.show .sh-go{ animation:shGo 2.6s ease both; }
+  .saver-hint.show .sh-hand{ animation:shHand 1.1s cubic-bezier(.45,0,.55,1) .15s 2 both; }
+  @keyframes shName{ 0%{ opacity:0; transform:translateY(8px); } 15%{ opacity:1; transform:none; } 55%{ opacity:1; transform:none; } 100%{ opacity:0; transform:translateY(-34px); } }
+  @keyframes shGo{ 0%{ opacity:0; } 10%{ opacity:1; } 82%{ opacity:1; } 100%{ opacity:0; } }
+  @keyframes shHand{ 0%{ transform:translateY(-10px); opacity:.35; } 55%{ transform:translateY(14px); opacity:1; } 100%{ transform:translateY(14px); opacity:0; } }
+  @media (prefers-reduced-motion: reduce){ .saver-hint.show b, .saver-hint.show .sh-go{ animation:shGo 2.6s ease both; } .saver-hint.show .sh-hand{ animation:none; } }
   body.intro-go .bnav{ animation:rvFade 1s ease backwards; animation-delay:.45s; }
   body:not(.focus) .undo-toast, body:not(.focus) .upd-toast{ bottom:calc(var(--sa-bottom) + 88px); }
   /* البار مخفي (الوضع الهادئ): الإشعارات تنزل مكانه */
@@ -1954,7 +1965,7 @@
   <button class="undo-btn" id="undoBtn">تراجع</button>
 </div>
 
-<div class="saver-hint" id="saverHint" aria-hidden="true"><b></b><span></span></div>
+<div class="saver-hint" id="saverHint" aria-hidden="true"><b></b><div class="sh-go"><svg class="sh-hand" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 11V10a2 2 0 0 0-4 0v0M14 10V9a2 2 0 0 0-4 0v1M10 9.5V4a2 2 0 0 0-4 0v10l-1.6-1.6a2 2 0 0 0-2.83 2.82l3.6 3.6C6.66 20.3 8.4 21.4 12 21.4h2a8 8 0 0 0 8-8V11a2 2 0 0 0-4 0z"/></svg><span></span></div></div>
 <div class="battery-toast" id="batteryToast" role="status" aria-live="polite"><span class="bt-icon" aria-hidden="true"><svg class="bt-logo" viewBox="0 0 336.42 336.42"><path fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><svg class="bt-bat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="4.5" width="11" height="17" rx="2.5"/><path d="M10.5 2.5h3"/><path class="bt-leaf" d="M12 17.8c-3.1-1-3.3-4.8 0-6.8 3.3 2 3.1 5.8 0 6.8z" fill="currentColor" stroke="none"/><path class="bt-leaf" d="M12 17.5v-3.5" stroke="var(--surface)" stroke-width="0.9"/></svg></span><span>تم تفعيل الوضع الهادئ وتوفير البطارية</span></div>
 
 <div class="battery-toast remind-toast" id="remindToast" role="status" aria-live="polite"><span class="rt-icon" aria-hidden="true"><svg class="rt-logo" viewBox="0 0 336.42 336.42"><path class="rt-p p1" fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path class="rt-p p2" fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path class="rt-p p3" fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path class="rt-p p4" fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path class="rt-p p5" fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><svg class="rt-bellwrap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g class="rt-bell"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g><path class="rt-slash" d="M3.5 3L20.5 21" pathLength="100"/><g class="rt-check"><circle cx="19" cy="18.6" r="3.7" fill="#15ce57" stroke="var(--surface)" stroke-width="1"/><path d="M17.5 18.7l1.1 1.1 2-2.3" stroke="#fff" stroke-width="1.1"/></g></svg></span><span id="remindToastText">تم حفظ الأوقات وتفعيل الإشعارات</span></div>
@@ -1986,7 +1997,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.158</div>
+    <div class="about-ver">الإصدار 2.4.162</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -2638,7 +2649,11 @@ function drawTasbih(bump){
   const trb = document.getElementById('tReset');
   if(trb) trb.classList.toggle('dis', !(n > 0));
   paintTapStats();
-  if(bump && !reduceMotion && !body.classList.contains('focus')){
+  if(bump && !reduceMotion && body.classList.contains('focus')){
+    // (2.4.160) وضع توفير الطاقة: نطّة أخف من غير زيادة إضاءة
+    if(row._bump) row._bump.cancel();
+    row._bump = row.animate([{ transform:'scale(1)' }, { transform:'scale(1.07)', offset:0.4 }, { transform:'scale(1)' }], { duration:420, easing:'cubic-bezier(.2,.9,.3,1.4)' });
+  } else if(bump && !reduceMotion){
     // نفس إحساس رقم البروجريس الصغير (نفس المدة والنطة الناعمة)، بحجم أهدأ لأن الرقم كبير
     if(row._bump) row._bump.cancel();
     row._bump = row.animate([
@@ -2666,6 +2681,7 @@ document.addEventListener('click', (e) => {
     drawTasbih(true);
     paintChips();
     paintWirdProgress(c);
+    recenterWirdStrip();
     if(window.tasbihBarHide) window.tasbihBarHide();
     return;
   }
@@ -2674,6 +2690,7 @@ document.addEventListener('click', (e) => {
   saveTasbih();
   haptic(tasbihCount % 100 === 0 ? 'long' : tasbihCount % 33 === 0 ? 'mile' : 'tap');
   drawTasbih(true);
+  recenterWirdStrip();
   if(window.tasbihBarHide) window.tasbihBarHide();
 });
 
@@ -2753,7 +2770,7 @@ function showSaverHint(){
   const touch = window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
   saverHint.querySelector('span').textContent = TT(touch ? 'اسحب لتحت للخروج' : 'اضغط Esc للخروج');
   saverHint.classList.remove('show'); void saverHint.offsetWidth; saverHint.classList.add('show');
-  clearTimeout(saverHintT); saverHintT = setTimeout(() => saverHint.classList.remove('show'), 2200);
+  clearTimeout(saverHintT); saverHintT = setTimeout(() => saverHint.classList.remove('show'), 2700);
 }
 function hideSaverHint(){ if(saverHint){ clearTimeout(saverHintT); saverHint.classList.remove('show'); } }
 // في تطبيق أندرويد: نخفي شريط الساعة فوق وشريط التنقل تحت (بيرجعوا بسحبة من حافة الشاشة)
@@ -3201,8 +3218,8 @@ function paintWirdProgress(prev){
   const tkey = w ? w.id + '|' + (w.short || w.name) : '';
   if(title.dataset.w !== tkey){
     title.dataset.w = tkey;
-    if(w) title.innerHTML = 'السبحة<span class="t-sub"' + (w.custom ? ' data-clarity-mask="true"' : '') + '> - ' + esc(w.short || w.name) + '</span>';
-    else title.textContent = MODE_TITLES.tasbeeh;
+    // (2.4.162) العنوان «السبحة» بس؛ الورد الحالي ظاهر من الزر الأخضر في الشريط
+    title.textContent = MODE_TITLES.tasbeeh;
   }
   paintWirdStrip();
   if(!w) return;
@@ -3249,6 +3266,19 @@ function alignStrip(el, chip, smooth){
   // (2.4.137) من الزر التالت: الزر النشط في نص الشريط بالظبط
   const er = el.getBoundingClientRect(), cr = chip.getBoundingClientRect();
   el.scrollTo({ left: el.scrollLeft + (cr.left + cr.width / 2) - (er.left + er.width / 2), behavior:beh });
+}
+// (2.4.162) مع العدّ: لو المستخدم حرّك شريط الأوراد والزر النشط مش في مكانه، الشريط يرجع له بنعومة (ومن غير حركة لو هو في مكانه)
+function recenterWirdStrip(){
+  const el = document.getElementById('wsel'), chip = el && el.querySelector('.wchip.on');
+  if(!el || !chip || !el.offsetParent || body.classList.contains('focus')) return;
+  const i = [...el.children].indexOf(chip);
+  let want;
+  if(i < 2) want = 0;
+  else { const er = el.getBoundingClientRect(), cr = chip.getBoundingClientRect(); want = el.scrollLeft + (cr.left + cr.width / 2) - (er.left + er.width / 2); }
+  want = Math.max(-(el.scrollWidth - el.clientWidth), Math.min(el.scrollWidth - el.clientWidth, want));
+  if(Math.abs(el.scrollLeft - want) < 4 && i >= 2) return;
+  if(i < 2 && Math.abs(el.scrollLeft) < 4) return;
+  alignStrip(el, chip, true);
 }
 function selectWird(id, animate, center){
   const prevIdx = wirdIndex(selWird);
@@ -6375,3 +6405,5 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
 </script>
 </body>
 </html>
+
+</body></html>
