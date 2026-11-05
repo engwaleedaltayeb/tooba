@@ -2059,7 +2059,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.174</div>
+    <div class="about-ver">الإصدار 2.4.175</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -2260,9 +2260,9 @@ data.prayer = [
   {text:"اللّه أكبر", count:33},
   {text:"لا إله إلّا اللّه وحده لا شريك له، له الملك وله الحمد، وهو على كلّ شيءٍ قديرٌ", count:1, note:"تمام المائة"},
   {text:data.morning[0].text, count:1, note:"آية الكرسي"},
-  {text:data.morning[1].text, count:1, note:"سورة الإخلاص", when:"وثلاثًا بعد الفجر والمغرب"},
-  {text:data.morning[2].text, count:1, note:"سورة الفلق", when:"وثلاثًا بعد الفجر والمغرب"},
-  {text:data.morning[3].text, count:1, note:"سورة الناس", when:"وثلاثًا بعد الفجر والمغرب"},
+  mu3({text:data.morning[1].text, note:"سورة الإخلاص"}),
+  mu3({text:data.morning[2].text, note:"سورة الفلق"}),
+  mu3({text:data.morning[3].text, note:"سورة الناس"}),
   {text:"اللّهمّ أعنّي على ذكرك، وشكرك، وحسن عبادتك", count:1},
   {text:"لا إله إلّا اللّه وحده لا شريك له، له الملك وله الحمد، يحيي ويميت، وهو على كلّ شيءٍ قديرٌ", count:10, when:"بعد الفجر والمغرب", at:'fajr-maghrib'},
   {text:"اللّهمّ إنّي أسألك علمًا نافعًا، ورزقًا طيّبًا، وعملًا متقبّلًا", count:1, when:"بعد الفجر", at:'fajr'}
@@ -3664,6 +3664,19 @@ function atOk(at){
   if(at === 'fajr-maghrib') return fajr || maghrib;
   return true;
 }
+// (2.4.175) المعوذات بعد الصلاة: ثلاث مرات في وقت الفجر والمغرب، ومرة في باقي الصلوات
+function mu3(o){
+  o.mu3 = 1;
+  return Object.defineProperties(o, {
+    count: { get(){ return atOk('fajr-maghrib') ? 3 : 1; }, enumerable:true },
+    when:  { get(){ return atOk('fajr-maghrib') ? 'بعد الفجر والمغرب' : 'وثلاثًا بعد الفجر والمغرب'; }, enumerable:true }
+  });
+}
+// لو اتغيّر العدد (دخل أو خرج وقت الفجر/المغرب) الباقي ما يزيدش عن العدد
+function mu3Clamp(){
+  const p = progress && progress.prayer; if(!p) return;
+  (data.prayer || []).forEach((it, i) => { if(!it.mu3) return; const k = pkey(it, i); if(p[k] != null && p[k] > it.count) p[k] = it.count; });
+}
 function itemOff(item){ return !!(item && item.at && !atOk(item.at)); }
 let atSig = '';
 function atSigNow(){ return ['night', 'fajr', 'fajr-maghrib'].map(a => atOk(a) ? 1 : 0).join(''); }
@@ -3700,6 +3713,7 @@ function render(){
   if(mode === 'prayer') prFresh();
   if(mode === 'sleep') sleepFresh();
   if(mode === 'wake') wkFresh();
+  mu3Clamp();
   atSig = atSigNow();
   if(body.dataset.mode !== mode){
     // نلغي انتقالات الألوان لحظة التبديل فيظهر لون القسم الجديد مباشرة وما يعلقش لون القسم السابق
@@ -6658,4 +6672,5 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
 </body>
 </html>
 
+</body></html>
 </body></html>
