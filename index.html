@@ -88,6 +88,7 @@
     --accent-evening:var(--brand);
     --accent-prayer:var(--brand);
     --accent-sleep:var(--brand);
+    --accent-wake:var(--brand);
     --accent-tasbeeh:var(--brand);
     --bell-on:var(--brand-text);
     --reset:#d8453a;
@@ -761,6 +762,12 @@
   .fl-big .fl{ filter:drop-shadow(0 6px 14px color-mix(in srgb, currentColor 30%, transparent)); }
   .fl-title{ font-size:24px; font-weight:700; margin:6px 0 4px; }
   .fl-sub{ font-size:14.5px; color:var(--text-dim); line-height:1.7; }
+  /* (2.4.171) شاشة الرجوع بعد غياب: شعلة مطفية + «لا تفقد عادتك» */
+  .cb-hadith{ margin:10px auto 8px; max-width:320px; }
+  .cb-hadith span{ display:block; font-family:'Noto Naskh Arabic', serif; font-size:19px; line-height:1.9; color:var(--text); }
+  .cb-hadith small{ display:block; font-size:12.5px; color:var(--text-dim); margin-top:2px; }
+  .cb-sheet .sheet-close{ margin-top:22px; }
+  .cb-later{ display:block; width:100%; margin-top:6px; padding:12px; border:none; background:none; color:var(--text-dim); font-family:inherit; font-size:15px; font-weight:500; cursor:pointer; }
   .fl-week{ display:flex; justify-content:center; gap:10px; margin:20px 0 14px; }
   .fl-day{ display:flex; flex-direction:column; align-items:center; gap:6px; font-size:12px; color:var(--text-dim); }
   .fl-dot{ width:30px; height:30px; border-radius:50%; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; color:#fff; }
@@ -1681,7 +1688,7 @@
   .toggle{ display:none !important; }
   .about-wrap{ display:none !important; }
   #syncBtn{ display:none !important; }
-  body[data-mode="morning"] .font-ctrl, body[data-mode="evening"] .font-ctrl, body[data-mode="prayer"] .font-ctrl, body[data-mode="sleep"] .font-ctrl{ display:none; }
+  body[data-mode="morning"] .font-ctrl, body[data-mode="evening"] .font-ctrl, body[data-mode="prayer"] .font-ctrl, body[data-mode="sleep"] .font-ctrl, body[data-mode="wake"] .font-ctrl{ display:none; }
   .promo:not(.in-settings):not(.inline){ display:none !important; }   /* (2.4.153) النسخة الداخلية (حبّاية) رجعت تحت الأذكار؛ الثابت لسه مخفي */
   .wrap{ padding-bottom:calc(104px + var(--sa-bottom)) !important; }
   /* الشرائح */
@@ -1737,7 +1744,7 @@
   html body.focus[data-mode="tasbeeh"] .wstrip, html body.focus[data-mode="tasbeeh"] .progress, html body.focus[data-mode="tasbeeh"] #wselSlot,
   html body.focus .theme-toggle, html body.focus[data-mode="tasbeeh"] #focusBtn, html body.focus[data-mode="tasbeeh"] #hapticBtn,
   html body.focus[data-mode="tasbeeh"] #doneBtn, html body.focus[data-mode="tasbeeh"] #wedit,
-  html body.focus[data-mode="tasbeeh"] .tasbih > :not(.seg-wrap), html body.focus .battery-toast{ display:none !important; }
+  html body.focus[data-mode="tasbeeh"] .tasbih > :not(.seg-wrap), html body.focus .battery-toast:not(#batteryToast){ display:none !important; }
   body.focus[data-mode="tasbeeh"] .tasbih{ position:fixed; inset:0; z-index:1; min-height:0 !important; padding:0 !important; gap:0; justify-content:flex-start; }
   /* (2.4.160) الرقم في التلت العلوي (مركزه عند 30% من الشاشة) وأصغر بحوالي 25% */
   html body.focus[data-mode="tasbeeh"] .seg-row svg{ height:clamp(72px,19.5vw,112px); }
@@ -1754,13 +1761,18 @@
   .saver-hint .sh-hand{ width:34px; height:34px; color:var(--text-dim); }
   .saver-hint .sh-hand path{ fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
   .saver-hint span{ font-size:14px; color:var(--text-dim); }
-  .saver-hint.show b{ animation:shName 1.8s cubic-bezier(.4,0,.2,1) both; }
-  .saver-hint.show .sh-go{ animation:shGo 2.6s ease both; }
-  .saver-hint.show .sh-hand{ animation:shHand 1.1s cubic-bezier(.45,0,.55,1) .15s 2 both; }
-  @keyframes shName{ 0%{ opacity:0; transform:translateY(8px); } 15%{ opacity:1; transform:none; } 55%{ opacity:1; transform:none; } 100%{ opacity:0; transform:translateY(-34px); } }
+  /* (2.4.165) العنوان والتلميح يفضلوا ظاهرين لحد أول عدّة، والإيد بتتحرك لفوق وتحت على طول */
+  .saver-hint.show b{ animation:shIn .45s ease both; }
+  .saver-hint.show .sh-go{ animation:shIn .45s ease .1s both; }
+  .saver-hint.show .sh-hand{ animation:shHand 1.8s ease-in-out .3s infinite; }
+  .saver-hint.show.out b{ animation:shName .7s cubic-bezier(.4,0,.2,1) both; }
+  .saver-hint.show.out .sh-go{ animation:shOut .4s ease both; }
+  @keyframes shIn{ 0%{ opacity:0; transform:translateY(8px); } 100%{ opacity:1; transform:none; } }
+  @keyframes shOut{ 0%{ opacity:1; } 100%{ opacity:0; } }
+  @keyframes shName{ 0%{ opacity:1; transform:none; } 100%{ opacity:0; transform:translateY(-34px); } }
   @keyframes shGo{ 0%{ opacity:0; } 10%{ opacity:1; } 82%{ opacity:1; } 100%{ opacity:0; } }
-  @keyframes shHand{ 0%{ transform:translateY(-10px); opacity:.35; } 55%{ transform:translateY(14px); opacity:1; } 100%{ transform:translateY(14px); opacity:0; } }
-  @media (prefers-reduced-motion: reduce){ .saver-hint.show b, .saver-hint.show .sh-go{ animation:shGo 2.6s ease both; } .saver-hint.show .sh-hand{ animation:none; } }
+  @keyframes shHand{ 0%,100%{ transform:translateY(0); } 25%{ transform:translateY(-14px); } 75%{ transform:translateY(14px); } }
+  @media (prefers-reduced-motion: reduce){ .saver-hint.show b, .saver-hint.show .sh-go{ animation:none; opacity:1; } .saver-hint.show.out b, .saver-hint.show.out .sh-go{ animation:shOut .3s ease both; } .saver-hint.show .sh-hand{ animation:none; } }
   body.intro-go .bnav{ animation:rvFade 1s ease backwards; animation-delay:.45s; }
   body:not(.focus) .undo-toast, body:not(.focus) .upd-toast{ bottom:calc(var(--sa-bottom) + 88px); }
   /* البار مخفي (الوضع الهادئ): الإشعارات تنزل مكانه */
@@ -1800,6 +1812,47 @@
   .theme-toggle{ display:none; position:fixed; top:calc(var(--sa-top) + 14px); right:calc(var(--sa-right) + 20px); z-index:50; width:34px; height:34px; border-radius:50%; border:1px solid var(--border); background:var(--surface); color:var(--text); align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 3px var(--shadow); transition:background .5s ease, transform .15s ease; }
   .theme-toggle:active{ transform:scale(0.9); }
   body.focus .theme-toggle{ display:flex; }
+  /* (2.4.167) تلميح الضغطة المطولة: نفس إيد تلميح أول كارت (56px)، بتضغط وتثبت والدايرة الخضرا بتتملي، وتحتها الجملة */
+  .lp-hint{ position:fixed; z-index:54; left:50%; top:74vh; width:56px; height:56px; margin:-5px 0 0 -19px; pointer-events:none; opacity:0; transition:opacity .3s ease; }
+  html[dir="ltr"] .lp-hint{ margin-left:-19px; }
+  .lp-hint.show{ opacity:1; }
+  .lp-hint .lp-hand{ position:absolute; inset:0; width:56px; height:56px; transform-origin:19px 5px; filter:drop-shadow(0 4px 10px rgba(0,0,0,.25)); }
+  .lp-hint .lp-hand path{ fill:rgba(255,255,255,.88); stroke:rgba(40,40,40,.75); stroke-width:1.3; stroke-linecap:round; stroke-linejoin:round; }
+  .lp-hint .lp-ring{ position:absolute; left:-3px; top:-17px; width:44px; height:44px; transform:rotate(-90deg); overflow:visible; }
+  .lp-hint .lp-ring circle{ fill:none; stroke:var(--accent); stroke-width:3; stroke-linecap:round; stroke-dasharray:119.4; stroke-dashoffset:119.4; opacity:0; }
+  .lp-hint span{ position:absolute; top:66px; left:19px; transform:translateX(-50%); white-space:nowrap; font-size:14px; font-weight:500; color:var(--text-dim); }
+  .lp-hint.show .lp-hand{ animation:lpHand 2.3s cubic-bezier(.4,0,.2,1) infinite; }
+  .lp-hint.show .lp-ring circle{ animation:lpRing 2.3s linear infinite; }
+  @keyframes lpHand{ 0%{ opacity:0; transform:translate(14px,20px); } 14%{ opacity:1; transform:none; } 22%,68%{ transform:scale(.84); } 78%{ transform:scale(1); } 90%{ opacity:1; transform:none; } 100%{ opacity:0; transform:translate(14px,20px); } }
+  @keyframes lpRing{ 0%,22%{ opacity:0; stroke-dashoffset:119.4; } 25%{ opacity:.9; } 66%{ opacity:.9; stroke-dashoffset:0; } 76%,100%{ opacity:0; stroke-dashoffset:0; } }
+  body.focus .lp-hint, body:not([data-mode="tasbeeh"]) .lp-hint, body.settings-open .lp-hint{ display:none; }
+  @media (prefers-reduced-motion: reduce){ .lp-hint.show .lp-hand, .lp-hint.show .lp-ring circle{ animation:none; } }
+  /* (2.4.164) «تم تفعيل وضع توفير الطاقة» في مكان زر البطارية فوق: الدايرة تنور أخضر وفيها الحركة، والجملة تطلع على شمالها وتختفي */
+  html body.focus #batteryToast{
+    top:calc(var(--sa-top) + 14px); bottom:auto; right:calc(var(--sa-right) + 62px); left:auto;
+    height:34px; padding:0; margin:0 !important; gap:10px; max-width:none;
+    background:none; border:0; box-shadow:none; -webkit-backdrop-filter:none; backdrop-filter:none;
+    transform:none; transition:none; opacity:0; z-index:55;
+  }
+  html[dir="ltr"] body.focus #batteryToast{ flex-direction:row-reverse; }
+  html body.focus #batteryToast .bt-icon{
+    width:34px; height:34px; border-radius:50%; box-sizing:border-box;
+    border:1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+    background:color-mix(in srgb, var(--accent) 16%, #000); color:var(--accent-text);
+  }
+  html body.focus #batteryToast .bt-icon svg{ inset:6px; width:20px; height:20px; }
+  html body.focus #batteryToast > span:last-child{ font-size:14px; font-weight:500; color:var(--text); opacity:0; }
+  html body.focus #batteryToast.show{ animation:svWrap 2.8s ease both; }
+  html body.focus #batteryToast.show .bt-icon{ animation:svGlow 2.8s ease both; }
+  html body.focus #batteryToast.show > span:last-child{ animation:svText 2.8s cubic-bezier(.2,.8,.3,1) both; }
+  @keyframes svWrap{ 0%{ opacity:0; } 6%{ opacity:1; } 86%{ opacity:1; } 100%{ opacity:0; } }
+  @keyframes svGlow{
+    0%{ transform:scale(.7); box-shadow:0 0 0 0 transparent; }
+    16%{ transform:scale(1.1); box-shadow:0 0 0 5px color-mix(in srgb, var(--accent) 28%, transparent), 0 0 18px color-mix(in srgb, var(--accent) 60%, transparent); }
+    40%,100%{ transform:scale(1); box-shadow:0 0 0 0 transparent, 0 0 12px color-mix(in srgb, var(--accent) 40%, transparent); }
+  }
+  @keyframes svText{ 0%,14%{ opacity:0; transform:translateX(14px); } 30%{ opacity:1; transform:none; } 82%{ opacity:1; transform:none; } 100%{ opacity:0; transform:translateX(-6px); } }
+  @media (prefers-reduced-motion: reduce){ html body.focus #batteryToast.show .bt-icon, html body.focus #batteryToast.show > span:last-child{ animation:svWrap 2.8s ease both; } }
   /* الوضع الهادئ: التصفير والوضع الهادئ والاهتزاز في نفس أماكنهم فوق يمين زي السبحة العادية، والثيم في النص */
   body.focus .theme-toggle{ right:auto; left:50%; margin-left:-17px; }
   body.focus[data-mode="tasbeeh"] #tReset{ right:calc(var(--sa-right) + 20px) !important; }
@@ -1867,7 +1920,7 @@
     </button>
   </div>
 
-  <div class="asel" id="adhkarSel" role="group" aria-label="الأذكار"><button type="button" class="achip on" data-m="morning"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg><span>الصباح</span></button><button type="button" class="achip" data-m="evening"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg><span>المساء</span></button><button type="button" class="achip" data-m="prayer"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4.5" width="12" height="15" rx="1.5"/><path d="M9 17v-4.5l3-3.5 3 3.5V17M8 2.5v2M12 2.5v2M16 2.5v2M8 19.5v2M12 19.5v2M16 19.5v2"/></svg><span>بعد الصلاة</span></button><button type="button" class="achip" data-m="sleep"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.4 10.1a4.2 4.2 0 0 0 6.3 6.3 6.3 6.3 0 1 1-6.3-6.3ZM13 3.5h5l-5 6h5"/></svg><span>النوم</span></button><button type="button" class="achip soon" data-soon="1"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18M6.5 18a5.5 5.5 0 0 1 11 0M12 6.5V9M4.6 10.6l1.7 1.5M19.4 10.6l-1.7 1.5"/></svg><span>الاستيقاظ</span></button><button type="button" class="achip soon" data-soon="1"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5c3.4 4.1 5.5 7 5.5 10a5.5 5.5 0 0 1-11 0c0-3 2.1-5.9 5.5-10Z"/></svg><span>الوضوء</span></button><button type="button" class="achip soon" data-soon="1"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 21h20M7 21v-7a5 5 0 0 1 10 0v7M12 9V6.5M10.5 21v-2.5a1.5 1.5 0 0 1 3 0V21M2.5 21V11.5L3.5 9l1 2.5V21M19.5 21V11.5L20.5 9l1 2.5V21"/></svg><span>المسجد</span></button><button type="button" class="achip soon" data-soon="1"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5.5"/><path d="M3 4v4a1.5 1.5 0 0 0 3 0V4M4.5 4v16M20.5 20V4c-1.5 1-2.5 3-2.5 6v3h2.5"/></svg><span>الطعام</span></button><button type="button" class="achip soon" data-soon="1"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z"/></svg><span>السفر</span></button></div>
+  <div class="asel" id="adhkarSel" role="group" aria-label="الأذكار"><button type="button" class="achip on" data-m="morning"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg><span>الصباح</span></button><button type="button" class="achip" data-m="evening"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg><span>المساء</span></button><button type="button" class="achip" data-m="prayer"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4.5" width="12" height="15" rx="1.5"/><path d="M9 17v-4.5l3-3.5 3 3.5V17M8 2.5v2M12 2.5v2M16 2.5v2M8 19.5v2M12 19.5v2M16 19.5v2"/></svg><span>بعد الصلاة</span></button><button type="button" class="achip" data-m="sleep"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.4 10.1a4.2 4.2 0 0 0 6.3 6.3 6.3 6.3 0 1 1-6.3-6.3ZM13 3.5h5l-5 6h5"/></svg><span>النوم</span></button><button type="button" class="achip" data-m="wake"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18M6.5 18a5.5 5.5 0 0 1 11 0M12 6.5V9M4.6 10.6l1.7 1.5M19.4 10.6l-1.7 1.5"/></svg><span>الاستيقاظ</span></button><button type="button" class="achip soon" data-soon="1"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5c3.4 4.1 5.5 7 5.5 10a5.5 5.5 0 0 1-11 0c0-3 2.1-5.9 5.5-10Z"/></svg><span>الوضوء</span></button><button type="button" class="achip soon" data-soon="1"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 21h20M7 21v-7a5 5 0 0 1 10 0v7M12 9V6.5M10.5 21v-2.5a1.5 1.5 0 0 1 3 0V21M2.5 21V11.5L3.5 9l1 2.5V21M19.5 21V11.5L20.5 9l1 2.5V21"/></svg><span>المسجد</span></button><button type="button" class="achip soon" data-soon="1"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5.5"/><path d="M3 4v4a1.5 1.5 0 0 0 3 0V4M4.5 4v16M20.5 20V4c-1.5 1-2.5 3-2.5 6v3h2.5"/></svg><span>الطعام</span></button><button type="button" class="achip soon" data-soon="1"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z"/></svg><span>السفر</span></button></div>
 
   <div class="font-ctrl" aria-label="حجم الخط">
     <button id="tReset" class="dis" aria-label="تصفير العدّاد"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
@@ -1965,8 +2018,9 @@
   <button class="undo-btn" id="undoBtn">تراجع</button>
 </div>
 
+<div class="lp-hint" id="lpHint" role="status" aria-live="polite"><svg class="lp-ring" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="19"/></svg><svg class="lp-hand" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 11V10a2 2 0 0 0-4 0v0M14 10V9a2 2 0 0 0-4 0v1M10 9.5V4a2 2 0 0 0-4 0v10l-1.6-1.6a2 2 0 0 0-2.83 2.82l3.6 3.6C6.66 20.3 8.4 21.4 12 21.4h2a8 8 0 0 0 8-8V11a2 2 0 0 0-4 0z"/></svg><span>اضغط مطولًا لتفعيل وضع توفير الطاقة</span></div>
 <div class="saver-hint" id="saverHint" aria-hidden="true"><b></b><div class="sh-go"><svg class="sh-hand" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 11V10a2 2 0 0 0-4 0v0M14 10V9a2 2 0 0 0-4 0v1M10 9.5V4a2 2 0 0 0-4 0v10l-1.6-1.6a2 2 0 0 0-2.83 2.82l3.6 3.6C6.66 20.3 8.4 21.4 12 21.4h2a8 8 0 0 0 8-8V11a2 2 0 0 0-4 0z"/></svg><span></span></div></div>
-<div class="battery-toast" id="batteryToast" role="status" aria-live="polite"><span class="bt-icon" aria-hidden="true"><svg class="bt-logo" viewBox="0 0 336.42 336.42"><path fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><svg class="bt-bat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="4.5" width="11" height="17" rx="2.5"/><path d="M10.5 2.5h3"/><path class="bt-leaf" d="M12 17.8c-3.1-1-3.3-4.8 0-6.8 3.3 2 3.1 5.8 0 6.8z" fill="currentColor" stroke="none"/><path class="bt-leaf" d="M12 17.5v-3.5" stroke="var(--surface)" stroke-width="0.9"/></svg></span><span>تم تفعيل الوضع الهادئ وتوفير البطارية</span></div>
+<div class="battery-toast" id="batteryToast" role="status" aria-live="polite"><span class="bt-icon" aria-hidden="true"><svg class="bt-logo" viewBox="0 0 336.42 336.42"><path fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><svg class="bt-bat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="4.5" width="11" height="17" rx="2.5"/><path d="M10.5 2.5h3"/><path class="bt-leaf" d="M12 17.8c-3.1-1-3.3-4.8 0-6.8 3.3 2 3.1 5.8 0 6.8z" fill="currentColor" stroke="none"/><path class="bt-leaf" d="M12 17.5v-3.5" stroke="var(--surface)" stroke-width="0.9"/></svg></span><span>تم تفعيل وضع توفير الطاقة</span></div>
 
 <div class="battery-toast remind-toast" id="remindToast" role="status" aria-live="polite"><span class="rt-icon" aria-hidden="true"><svg class="rt-logo" viewBox="0 0 336.42 336.42"><path class="rt-p p1" fill="#15ce57" d="M20.38,192.52l-13.16-12.41,4.64-4.36c43.06-40.45,110.43-39.47,152.49.97l-11.89,11.98c-6.14,6.18-13.13,11.02-20.7,15.15-35.8,19.52-80.06,15.16-111.38-11.33Z"/><path class="rt-p p2" fill="#15ce57" d="M102.23,20.61l7.74-16.35,5.58,3.07c51.78,28.45,71.66,92.82,46.2,145.32l-15.06-7.6c-7.78-3.93-14.54-9.08-20.81-15.01-29.63-28.02-39.16-71.46-23.64-109.43Z"/><path class="rt-p p3" fill="#15ce57" d="M291.02,45.33l17.94,2.3-1.19,6.25c-11.06,58.04-66.14,96.84-123.93,88.84l2.58-16.68c1.33-8.61,4.14-16.64,7.84-24.43,17.49-36.84,55.86-59.33,96.77-56.3Z"/><path class="rt-p p4" fill="#15ce57" d="M325.85,232.52l3.35,17.77-6.32.8c-58.62,7.42-112.54-32.97-122.79-90.41l16.66-2.7c8.6-1.39,17.1-1.2,25.65-.09,40.44,5.25,73.68,34.79,83.45,74.63Z"/><path class="rt-p p5" fill="#15ce57" d="M158.59,323.49l-15.87,8.68-2.71-5.76c-25.17-53.45-3.42-117.22,48.04-144.72l7.72,15.01c3.98,7.75,6.43,15.9,8.01,24.37,7.5,40.08-10.32,80.83-45.19,102.43Z"/></svg><svg class="rt-bellwrap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g class="rt-bell"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g><path class="rt-slash" d="M3.5 3L20.5 21" pathLength="100"/><g class="rt-check"><circle cx="19" cy="18.6" r="3.7" fill="#15ce57" stroke="var(--surface)" stroke-width="1"/><path d="M17.5 18.7l1.1 1.1 2-2.3" stroke="#fff" stroke-width="1.1"/></g></svg></span><span id="remindToastText">تم حفظ الأوقات وتفعيل الإشعارات</span></div>
 
@@ -1978,8 +2032,16 @@
   <div class="fl-sub" id="flSub"></div>
   <div class="fl-week" id="flWeek"></div>
   <div class="fl-best"><span>أطول سلسلة</span><b id="flBest">0</b></div>
-  <p class="fl-note">يُحسب اليوم بإتمام أذكار الصباح أو المساء أو بعد الصلاة أو النوم كاملة، أو إتمام ورد، أو 33 تسبيحة في العدّ الحر.</p>
+  <p class="fl-note">يُحسب اليوم بإتمام أذكار الصباح أو المساء أو بعد الصلاة أو النوم أو الاستيقاظ كاملة، أو إتمام ورد، أو 33 تسبيحة في العدّ الحر.</p>
   <button class="sheet-close" id="flameClose">تمام</button>
+</div></div>
+<div class="sheet-overlay" id="cbOverlay"><div class="sheet fl-sheet cb-sheet"><div class="sheet-handle"></div>
+  <div class="fl-big"><svg class="fl" width="64" height="64" viewBox="0 0 24 24" aria-hidden="true"><path class="fo" d="M12 2.2c1.3 3.7 5.6 6.1 5.6 11.4a5.6 5.6 0 0 1-11.2 0c0-2.7 1.3-4.5 2.7-5.8.2 1.9 1.1 3.1 2.3 3.5C10.8 8.1 11.3 4.9 12 2.2z"/><path class="fi" d="M12 13.1c1 1.4 2.5 2.3 2.5 4.3a2.5 2.5 0 0 1-5 0c0-1.4.9-2.5 2.5-4.3z"/></svg></div>
+  <div class="fl-title" id="cbTitle">لا تفقد عادتك</div>
+  <p class="cb-hadith"><span>«أحبّ الأعمال إلى الله أدومها وإن قلّ»</span><small>متفق عليه</small></p>
+  <div class="fl-sub" id="cbSub"></div>
+  <button class="sheet-close" id="cbGo">ابدأ الآن</button>
+  <button class="cb-later" id="cbLater">لاحقًا</button>
 </div></div>
 <div class="sheet-overlay" id="aboutOverlay">
   <div class="sheet">
@@ -1997,7 +2059,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.162</div>
+    <div class="about-ver">الإصدار 2.4.174</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -2202,8 +2264,8 @@ data.prayer = [
   {text:data.morning[2].text, count:1, note:"سورة الفلق", when:"وثلاثًا بعد الفجر والمغرب"},
   {text:data.morning[3].text, count:1, note:"سورة الناس", when:"وثلاثًا بعد الفجر والمغرب"},
   {text:"اللّهمّ أعنّي على ذكرك، وشكرك، وحسن عبادتك", count:1},
-  {text:"لا إله إلّا اللّه وحده لا شريك له، له الملك وله الحمد، يحيي ويميت، وهو على كلّ شيءٍ قديرٌ", count:10, when:"بعد الفجر والمغرب"},
-  {text:"اللّهمّ إنّي أسألك علمًا نافعًا، ورزقًا طيّبًا، وعملًا متقبّلًا", count:1, when:"بعد الفجر"}
+  {text:"لا إله إلّا اللّه وحده لا شريك له، له الملك وله الحمد، يحيي ويميت، وهو على كلّ شيءٍ قديرٌ", count:10, when:"بعد الفجر والمغرب", at:'fajr-maghrib'},
+  {text:"اللّهمّ إنّي أسألك علمًا نافعًا، ورزقًا طيّبًا، وعملًا متقبّلًا", count:1, when:"بعد الفجر", at:'fajr'}
 ];
 // (2.4.152) أذكار النوم: تتصفّر الساعة 12 الظهر (مش نص الليل) عشان اللي بينام بعد نص الليل ما يضيعش تقدّمه
 data.sleep = [
@@ -2222,10 +2284,17 @@ data.sleep = [
   {text:"اللّهمّ عالم الغيب والشّهادة، فاطر السّماوات والأرض، ربّ كلّ شيءٍ ومليكه، أشهد أن لا إله إلّا أنت، أعوذ بك من شرّ نفسي، ومن شرّ الشّيطان وشركه، وأن أقترف على نفسي سوءًا، أو أجرّه إلى مسلمٍ", count:1},
   {text:"اللّهمّ أسلمت نفسي إليك، ووجّهت وجهي إليك، وفوّضت أمري إليك، وألجأت ظهري إليك، رغبةً ورهبةً إليك، لا ملجأ ولا منجا منك إلّا إليك، آمنت بكتابك الّذي أنزلت، وبنبيّك الّذي أرسلت", count:1, how:"اجعلها آخر ما تقول قبل أن تنام"}
 ];
+// (2.4.172) أذكار الاستيقاظ: ما يخص الاستيقاظ بالليل يظهر بالليل بس (at). (2.4.173) التشهد اتشال
+data.wake = [
+  {text:"الحمد للّه الّذي أحيانا بعد ما أماتنا وإليه النّشور", count:1},
+  {text:"الحمد للّه الّذي عافاني في جسدي، وردّ عليّ روحي، وأذن لي بذكره", count:1},
+  {text:"لا إله إلّا اللّه وحده لا شريك له، له الملك وله الحمد، وهو على كلّ شيءٍ قديرٌ، الحمد للّه، وسبحان اللّه، ولا إله إلّا اللّه، واللّه أكبر، ولا حول ولا قوّة إلّا باللّه، اللّهمّ اغفر لي", count:1, when:"إذا استيقظ من الليل", at:'night'},
+  {text:"إِنَّ فِي خَلْقِ السَّمَاوَاتِ وَالْأَرْضِ وَاخْتِلَافِ اللَّيْلِ وَالنَّهَارِ لَآيَاتٍ لِأُولِي الْأَلْبَابِ ۝ الَّذِينَ يَذْكُرُونَ اللَّهَ قِيَامًا وَقُعُودًا وَعَلَىٰ جُنُوبِهِمْ وَيَتَفَكَّرُونَ فِي خَلْقِ السَّمَاوَاتِ وَالْأَرْضِ رَبَّنَا مَا خَلَقْتَ هَٰذَا بَاطِلًا سُبْحَانَكَ فَقِنَا عَذَابَ النَّارِ ۝ رَبَّنَا إِنَّكَ مَنْ تُدْخِلِ النَّارَ فَقَدْ أَخْزَيْتَهُ ۖ وَمَا لِلظَّالِمِينَ مِنْ أَنْصَارٍ ۝ رَبَّنَا إِنَّنَا سَمِعْنَا مُنَادِيًا يُنَادِي لِلْإِيمَانِ أَنْ آمِنُوا بِرَبِّكُمْ فَآمَنَّا ۚ رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ ۝ رَبَّنَا وَآتِنَا مَا وَعَدْتَنَا عَلَىٰ رُسُلِكَ وَلَا تُخْزِنَا يَوْمَ الْقِيَامَةِ ۗ إِنَّكَ لَا تُخْلِفُ الْمِيعَادَ ۝ فَاسْتَجَابَ لَهُمْ رَبُّهُمْ أَنِّي لَا أُضِيعُ عَمَلَ عَامِلٍ مِنْكُمْ مِنْ ذَكَرٍ أَوْ أُنْثَىٰ ۖ بَعْضُكُمْ مِنْ بَعْضٍ ۖ فَالَّذِينَ هَاجَرُوا وَأُخْرِجُوا مِنْ دِيَارِهِمْ وَأُوذُوا فِي سَبِيلِي وَقَاتَلُوا وَقُتِلُوا لَأُكَفِّرَنَّ عَنْهُمْ سَيِّئَاتِهِمْ وَلَأُدْخِلَنَّهُمْ جَنَّاتٍ تَجْرِي مِنْ تَحْتِهَا الْأَنْهَارُ ثَوَابًا مِنْ عِنْدِ اللَّهِ ۗ وَاللَّهُ عِنْدَهُ حُسْنُ الثَّوَابِ ۝ لَا يَغُرَّنَّكَ تَقَلُّبُ الَّذِينَ كَفَرُوا فِي الْبِلَادِ ۝ مَتَاعٌ قَلِيلٌ ثُمَّ مَأْوَاهُمْ جَهَنَّمُ ۚ وَبِئْسَ الْمِهَادُ ۝ لَٰكِنِ الَّذِينَ اتَّقَوْا رَبَّهُمْ لَهُمْ جَنَّاتٌ تَجْرِي مِنْ تَحْتِهَا الْأَنْهَارُ خَالِدِينَ فِيهَا نُزُلًا مِنْ عِنْدِ اللَّهِ ۗ وَمَا عِنْدَ اللَّهِ خَيْرٌ لِلْأَبْرَارِ ۝ وَإِنَّ مِنْ أَهْلِ الْكِتَابِ لَمَنْ يُؤْمِنُ بِاللَّهِ وَمَا أُنْزِلَ إِلَيْكُمْ وَمَا أُنْزِلَ إِلَيْهِمْ خَاشِعِينَ لِلَّهِ لَا يَشْتَرُونَ بِآيَاتِ اللَّهِ ثَمَنًا قَلِيلًا ۗ أُولَٰئِكَ لَهُمْ أَجْرُهُمْ عِنْدَ رَبِّهِمْ ۗ إِنَّ اللَّهَ سَرِيعُ الْحِسَابِ ۝ يَا أَيُّهَا الَّذِينَ آمَنُوا اصْبِرُوا وَصَابِرُوا وَرَابِطُوا وَاتَّقُوا اللَّهَ لَعَلَّكُمْ تُفْلِحُونَ", count:1, note:"خواتيم سورة آل عمران", how:"يمسح النّوم عن وجهه بيده، ثمّ يقرأ"}
+];
 
 let mode = "morning";
 let bannerLockUntil = 0;
-let progress = { morning:{}, evening:{}, prayer:{}, sleep:{} };
+let progress = { morning:{}, evening:{}, prayer:{}, sleep:{}, wake:{} };
 
 // يوم تحميل الصفحة: كل ما يتحفظ يُوسَم بيه (مش بتاريخ لحظة الحفظ)، عشان لو الصفحة فضلت مفتوحة بعد منتصف الليل ما يتحسبش تقدّم أمس كأنه تقدّم اليوم
 const BOOT_DAY = new Date().toDateString();
@@ -2242,7 +2311,9 @@ const STORAGE_KEY = 'tooba-progress-v1';
   }catch(e){ /* تجاهل أي خطأ في القراءة، الصفحة تشتغل عادي بدون حفظ */ }
 })();
 
-['morning','evening','prayer','sleep'].forEach(k => { if(!progress[k]) progress[k] = {}; });
+['morning','evening','prayer','sleep','wake'].forEach(k => { if(!progress[k]) progress[k] = {}; });
+// (2.4.173) أرقام أذكار الاستيقاظ اتغيّرت بعد شيل أول ذكر: نصفّر تقدّمها مرة واحدة
+try{ if(localStorage.getItem('tooba-wake-v') !== '2'){ progress.wake = {}; const o = JSON.parse(localStorage.getItem('tooba-order') || 'null'); if(o && o.wake){ delete o.wake; localStorage.setItem('tooba-order', JSON.stringify(o)); } localStorage.setItem('tooba-wake-v', '2'); } }catch(e){}
 // أذكار النوم محفوظة لوحدها بمفتاح «الليلة» (من 12 الظهر لـ12 الظهر)
 const SL_KEY = 'tooba-sleep-v1';
 function nightKey(){ const d = new Date(Date.now() - 12 * 3600 * 1000), z = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); }
@@ -2257,6 +2328,7 @@ function sleepFresh(){
 function saveProgress(){ syncTouch();
   try{ sleepFresh(); localStorage.setItem(SL_KEY, JSON.stringify({ night:sleepNight, p:progress.sleep || {} })); }catch(e){}
   if(mode === 'prayer'){ try{ const r = prMeta(); r.t = Date.now(); prSave(r); }catch(e){} }
+  if(mode === 'wake'){ try{ localStorage.setItem(WK_KEY, String(Date.now())); }catch(e){} }
   try{
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       date: BOOT_DAY,
@@ -2269,10 +2341,10 @@ const listEl = document.getElementById('list');
 const body = document.body;
 const btnMorning = document.getElementById('btnMorning');
 const btnEvening = document.getElementById('btnEvening');
-const MODE_TITLES = { morning:'أذكار الصباح', evening:'أذكار المساء', prayer:'أذكار بعد الصلاة', sleep:'أذكار النوم', tasbeeh:'السبحة' };
-const MODE_DONE = { morning:'أتممت أذكار الصباح', evening:'أتممت أذكار المساء', prayer:'أتممت أذكار بعد الصلاة', sleep:'أتممت أذكار النوم' };
-const MODE_REMIND_BTN = { morning:'ذكّر أحبابك بأذكار الصباح', evening:'ذكّر أحبابك بأذكار المساء', prayer:'ذكّر أحبابك بأذكار بعد الصلاة', sleep:'ذكّر أحبابك بأذكار النوم' };
-const MODE_REMIND = { morning:'لا تنسَ أذكار الصباح 🤍 ذكّرتك بها هنا:', evening:'لا تنسَ أذكار المساء 🤍 ذكّرتك بها هنا:', prayer:'لا تنسَ أذكار بعد الصلاة 🤍 ذكّرتك بها هنا:', sleep:'لا تنسَ أذكار النوم 🤍 ذكّرتك بها هنا:' };
+const MODE_TITLES = { morning:'أذكار الصباح', evening:'أذكار المساء', prayer:'أذكار بعد الصلاة', sleep:'أذكار النوم', wake:'أذكار الاستيقاظ', tasbeeh:'السبحة' };
+const MODE_DONE = { morning:'أتممت أذكار الصباح', evening:'أتممت أذكار المساء', prayer:'أتممت أذكار بعد الصلاة', sleep:'أتممت أذكار النوم', wake:'أتممت أذكار الاستيقاظ' };
+const MODE_REMIND_BTN = { morning:'ذكّر أحبابك بأذكار الصباح', evening:'ذكّر أحبابك بأذكار المساء', prayer:'ذكّر أحبابك بأذكار بعد الصلاة', sleep:'ذكّر أحبابك بأذكار النوم', wake:'ذكّر أحبابك بأذكار الاستيقاظ' };
+const MODE_REMIND = { morning:'لا تنسَ أذكار الصباح 🤍 ذكّرتك بها هنا:', evening:'لا تنسَ أذكار المساء 🤍 ذكّرتك بها هنا:', prayer:'لا تنسَ أذكار بعد الصلاة 🤍 ذكّرتك بها هنا:', sleep:'لا تنسَ أذكار النوم 🤍 ذكّرتك بها هنا:', wake:'لا تنسَ أذكار الاستيقاظ 🤍 ذكّرتك بها هنا:' };
 const title = document.getElementById('pageTitle');
 const dateLine = document.getElementById('dateLine');
 const progressText = document.getElementById('progressText');
@@ -2350,8 +2422,15 @@ const SL_META = [
 [null,"رواه أبو داود والترمذي"],
 ["من قالها ثمّ مات من ليلته مات على الفطرة","متفق عليه"]
 ];
+const WK_META = [
+["من استيقظ فذكر اللّه انحلّت عنه عقدةٌ من عقد الشّيطان","رواه البخاري ومسلم"],
+[null,"رواه الترمذي وقال: حديث حسن"],
+["من قالها ثمّ دعا استُجيب له، فإن توضّأ وصلّى قُبلت صلاته","رواه البخاري"],
+[null,"رواه البخاري ومسلم"]
+];
 function metaFor(i){
   if(mode === 'prayer') return PR_META[i];
+  if(mode === 'wake') return WK_META[i];
   if(mode === 'sleep') return SL_META[i];
   if(mode !== 'evening') return META[i];
   if(i === 1) return BAQARA_META;
@@ -2392,7 +2471,7 @@ async function shareOrCopy(btn, text, title){
   }catch(err){ /* المستخدم لغى المشاركة */ }
 }
 
-const ringPrev = { morning:{}, evening:{}, prayer:{}, sleep:{} };
+const ringPrev = { morning:{}, evening:{}, prayer:{}, sleep:{}, wake:{} };
 function drawRing(chip, f, prev){
   if(!chip || f <= 0) return;
   const r = chip.getBoundingClientRect();
@@ -2666,9 +2745,12 @@ function drawTasbih(bump){
 document.addEventListener('click', (e) => {
   if(mode !== 'tasbeeh' || body.classList.contains('settings-open')) return;
   if(window.__saverSwipeAt && Date.now() - window.__saverSwipeAt < 500) return;
+  if(window.__lpAt && Date.now() - window.__lpAt < 900) return;   // (2.4.166) الضغطة المطولة دخّلت وضع التوفير، ما تتعدّش
   // composedPath يحفظ مسار الضغطة حتى لو العنصر اتشال من الصفحة أثناء المعالجة (زي أيقونة زر التركيز)
   const path = e.composedPath ? e.composedPath() : [e.target];
   if(path.some(el => el.matches && el.matches('button, a, .sheet-overlay, .undo-toast, .wsel, .promo'))) return;
+  if(body.classList.contains('focus')) dismissSaverHint();
+  if(window.lpHintHide) window.lpHintHide();
   const w = selWirdObj();
   if(w){
     const c = wirdCounts[w.id] || 0;
@@ -2768,11 +2850,17 @@ function showSaverHint(){
   const w = selWirdObj();
   saverHint.querySelector('b').textContent = TT(w ? (w.short || w.name) : 'عدّ حر');
   const touch = window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
-  saverHint.querySelector('span').textContent = TT(touch ? 'اسحب لتحت للخروج' : 'اضغط Esc للخروج');
-  saverHint.classList.remove('show'); void saverHint.offsetWidth; saverHint.classList.add('show');
-  clearTimeout(saverHintT); saverHintT = setTimeout(() => saverHint.classList.remove('show'), 2700);
+  saverHint.querySelector('span').textContent = TT(touch ? 'اسحب للأعلى أو للأسفل للخروج' : 'اضغط Esc للخروج');
+  clearTimeout(saverHintT);
+  saverHint.classList.remove('show', 'out'); void saverHint.offsetWidth; saverHint.classList.add('show');
 }
-function hideSaverHint(){ if(saverHint){ clearTimeout(saverHintT); saverHint.classList.remove('show'); } }
+// (2.4.165) أول عدّة جوه الوضع: اسم الورد يتلاشى لفوق والتلميح يختفي
+function dismissSaverHint(){
+  if(!saverHint || !saverHint.classList.contains('show') || saverHint.classList.contains('out')) return;
+  saverHint.classList.add('out');
+  clearTimeout(saverHintT); saverHintT = setTimeout(() => saverHint.classList.remove('show', 'out'), 750);
+}
+function hideSaverHint(){ if(saverHint){ clearTimeout(saverHintT); saverHint.classList.remove('show', 'out'); } }
 // في تطبيق أندرويد: نخفي شريط الساعة فوق وشريط التنقل تحت (بيرجعوا بسحبة من حافة الشاشة)
 function saverBars(on){
   if(!NATIVE) return;
@@ -2792,7 +2880,8 @@ document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && body.clas
     if(y0 < 0) return;
     const t = e.changedTouches[0]; if(!t) return;
     const dy = t.clientY - y0, dx = t.clientX - x0; y0 = -1;
-    if(dy > 70 && dy > Math.abs(dx) * 1.5 && Date.now() - t0 < 900){ window.__saverSwipeAt = Date.now(); exitSaver(); }
+    // (2.4.165) السحب لتحت أو لفوق يخرّج
+    if(Math.abs(dy) > 70 && Math.abs(dy) > Math.abs(dx) * 1.5 && Date.now() - t0 < 900){ window.__saverSwipeAt = Date.now(); exitSaver(); }
   }, { passive:true });
 })();
 function setFocus(on){
@@ -2814,7 +2903,8 @@ function setFocus(on){
   focusBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
   focusBtn.setAttribute('aria-label', on ? 'إنهاء وضع توفير الطاقة' : 'وضع توفير الطاقة');
   applyThemeIcon();
-  if(on){ showSaverHint(); } else { hideBatteryToast(); hideSaverHint(); }
+  // (2.4.163) رجعت حركة «تم تفعيل وضع توفير الطاقة» مع الدخول
+  if(on){ showBatteryToast(); showSaverHint(); } else { hideBatteryToast(); hideSaverHint(); }
   // زر الرجوع في الموبايل يقفل الوضع الهادئ بس بدل ما يقفل التطبيق
   try{
     if(on && !focusPushed){ history.pushState({ toobaFocus:true }, ''); focusPushed = true; }
@@ -2823,7 +2913,7 @@ function setFocus(on){
 }
 let focusPushed = false;
 // زر الرجوع يقفل النافذة المنبثقة المفتوحة فقط بدل ما يقفل التطبيق
-const OV_IDS = ['fbOverlay','flameOverlay','aboutOverlay','wirdOverlay','zOverlay','rOverlay','sheetOverlay','syncOverlay','pairOverlay','ordOverlay'];
+const OV_IDS = ['fbOverlay','flameOverlay','cbOverlay','aboutOverlay','wirdOverlay','zOverlay','rOverlay','sheetOverlay','syncOverlay','pairOverlay','ordOverlay'];
 const ovStack = [];
 let ovIgnore = 0;
 let ovNativeBack = false;
@@ -2970,8 +3060,51 @@ if(NATIVE){
     if(reg && reg.then) reg.then(() => { ovNativeBack = true; }).catch(() => {});
   }catch(e){}
 }
+// (2.4.166) ضغطة مطولة في السبحة العادية تدخّل وضع توفير الطاقة (السحب لفوق وتحت فاضل للبار)
+(function(){
+  const LP_MS = 550;
+  let lpT = 0, lx = 0, ly = 0, pid = null;
+  const cancel = () => { clearTimeout(lpT); lpT = 0; pid = null; };
+  document.addEventListener('pointerdown', (e) => {
+    cancel();
+    if(mode !== 'tasbeeh' || body.classList.contains('focus') || body.classList.contains('settings-open') || ovStack.length) return;
+    if(e.pointerType === 'mouse' && e.button !== 0) return;
+    const path = e.composedPath ? e.composedPath() : [e.target];
+    if(path.some(el => el.matches && el.matches('button, a, input, textarea, select, .sheet-overlay, .undo-toast, .wsel, .promo, .bnav, .bar-handle'))) return;
+    lx = e.clientX; ly = e.clientY; pid = e.pointerId;
+    lpT = setTimeout(() => {
+      lpT = 0;
+      if(mode !== 'tasbeeh' || body.classList.contains('focus')) return;
+      window.__lpAt = Date.now();
+      haptic('long');
+      lpHintLearned();
+      setFocus(true);
+    }, LP_MS);
+  }, true);
+  document.addEventListener('pointermove', (e) => { if(lpT && e.pointerId === pid && Math.hypot(e.clientX - lx, e.clientY - ly) > 10) cancel(); }, true);
+  ['pointerup', 'pointercancel'].forEach(ev => document.addEventListener(ev, (e) => { if(e.pointerId === pid) cancel(); }, true));
+  window.addEventListener('blur', cancel);
+  document.addEventListener('contextmenu', (e) => { if(mode === 'tasbeeh' && (lpT || (window.__lpAt && Date.now() - window.__lpAt < 900))) e.preventDefault(); });
+  // التلميح: أول 3 مرات تفتح السبحة، يختفي بعد 5 ثواني أو مع أول عدّة، ومش بيظهر تاني بعد أول ضغطة مطولة
+  const hint = document.getElementById('lpHint');
+  let hT = 0;
+  function lpHintLearned(){ window.lpHintHide(); }
+  window.lpHintHide = () => { clearTimeout(hT); if(hint) hint.classList.remove('show'); };
+  window.lpHintMaybe = () => {
+    if(!hint || body.classList.contains('focus')) return;
+    // (2.4.168) بيظهر كل مرة تفتح السبحة (وبيختفي لوحده)
+    clearTimeout(hT);
+    hT = setTimeout(() => {
+      if(mode !== 'tasbeeh' || body.classList.contains('focus') || selWirdObj()) return;   // (2.4.170) في العدّ الحر بس
+      hint.querySelector('span').textContent = TT('اضغط مطولًا لتفعيل وضع توفير الطاقة');
+      hint.classList.remove('show'); void hint.offsetWidth; hint.classList.add('show');
+      hT = setTimeout(window.lpHintHide, 4600);   // دورتين ضغط مطوّل
+    }, 700);
+  };
+})();
 focusBtn.addEventListener('click', () => {
   const on = !body.classList.contains('focus');
+  window.lpHintHide && window.lpHintHide();
   setFocus(on);
   // الوضع الهادئ يملأ الصفحة نفسها فقط، بدون ملء شاشة المتصفح
   if(!on) exitFS();
@@ -3042,14 +3175,25 @@ function loadStreak(){
   try{ const r = JSON.parse(localStorage.getItem(STREAK_KEY)); if(r && typeof r.n === 'number' && r.last) return r; }catch(e){}
   return { n:0, last:null, best:0 };
 }
+function dayDiff(a, b){ return Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 864e5); }
+// (2.4.171) فرصة الرجوع: غياب يوم إلى 3 أيام، مرة واحدة كل أسبوع؛ الرقم يكمّل من غير ما يحسب أيام الغياب
+function streakGrace(r){
+  if(!r || !r.last || (r.n || 0) < 1) return false;
+  const t = ymd(new Date()), gap = dayDiff(r.last, t) - 1;
+  if(gap < 1 || gap > 3) return false;
+  return !r.g || dayDiff(r.g, t) >= 7;
+}
 function streakNow(){
   const r = loadStreak();
-  return (r.last === ymd(new Date()) || r.last === ymdYesterday()) ? r.n : 0;
+  if(r.last === ymd(new Date()) || r.last === ymdYesterday()) return r.n;
+  return streakGrace(r) ? r.n : 0;
 }
 function bumpStreak(){
   const r = loadStreak(), t = ymd(new Date());
   if(r.last === t) return;
-  r.n = r.last === ymdYesterday() ? r.n + 1 : 1;
+  if(r.last === ymdYesterday()) r.n = r.n + 1;
+  else if(streakGrace(r)){ r.d = Array.from(streakDays()).sort(); r.gd = 1; r.g = t; r.n = r.n + 1; }   // أيام الغياب تفضل مطفية في الأسبوع
+  else r.n = 1;
   r.last = t; r.best = Math.max(r.best || 0, r.n);
   r.d = (Array.isArray(r.d) ? r.d.filter(x => x !== t) : []).concat(t).sort().slice(-60);
   setTimeout(() => syncTouch(), 0);
@@ -3059,7 +3203,7 @@ function bumpStreak(){
 // أيام الإنجاز المعروفة: السجل + الأيام اللي السلسلة الحالية بتغطيها (للمستخدمين القدام قبل السجل)
 function streakDays(){
   const r = loadStreak(), set = new Set(Array.isArray(r.d) ? r.d : []);
-  if(r.last){ const d = new Date(r.last + 'T12:00:00'); for(let i = 0; i < (r.n || 0); i++){ set.add(ymd(d)); d.setDate(d.getDate() - 1); } }
+  if(r.last && !r.gd){ const d = new Date(r.last + 'T12:00:00'); for(let i = 0; i < (r.n || 0); i++){ set.add(ymd(d)); d.setDate(d.getDate() - 1); } }
   return set;
 }
 function streakOff(){ try{ return localStorage.getItem('tooba-streak-off') === '1'; }catch(e){ return false; } }
@@ -3104,7 +3248,7 @@ function paintFlameSheet(){
   const r = loadStreak(), n = streakNow(), t = ymd(new Date()), today = r.last === t, days = streakDays();
   flameOverlay.querySelector('.fl-sheet').classList.toggle('on', today);
   document.getElementById('flTitle').textContent = dayWord(n);
-  document.getElementById('flSub').textContent = today ? 'أنجزت اليوم، تقبّل الله منك' : (n ? 'أتمّ الأذكار أو وردًا اليوم لتستمر السلسلة' : 'أتمّ الأذكار أو وردًا لتبدأ السلسلة');
+  document.getElementById('flSub').textContent = today ? 'أنجزت اليوم، تقبّل الله منك' : (n && r.last !== ymdYesterday() && streakGrace(r)) ? 'أتمّ الأذكار أو وردًا اليوم لترجع شعلتك' : (n ? 'أتمّ الأذكار أو وردًا اليوم لتستمر السلسلة' : 'أتمّ الأذكار أو وردًا لتبدأ السلسلة');
   document.getElementById('flBest').textContent = Math.max(r.best || 0, n);
   const wk = document.getElementById('flWeek'); wk.innerHTML = '';
   // (2.4.130) الأسبوع يبدأ من السبت (يمين) لحد الجمعة (شمال)
@@ -3120,6 +3264,47 @@ function paintFlameSheet(){
 flameBtn.addEventListener('click', () => { haptic('tap'); paintFlameSheet(); flameOverlay.classList.add('open'); });
 document.getElementById('flameClose').addEventListener('click', () => flameOverlay.classList.remove('open'));
 flameOverlay.addEventListener('click', (e) => { if(e.target === flameOverlay) flameOverlay.classList.remove('open'); });
+// ---------- (2.4.171) شاشة الرجوع بعد غياب: مرة واحدة لكل غياب، بعد شاشة البداية ----------
+(function(){
+  const ov = document.getElementById('cbOverlay');
+  if(!ov) return;
+  const close = () => ov.classList.remove('open');
+  function check(){
+    if(streakOff() || ovStack.length || body.classList.contains('focus')) return;
+    const r = loadStreak(), t = ymd(new Date());
+    if(!r.last || (r.n || 0) < 2) return;
+    const gap = dayDiff(r.last, t) - 1;
+    if(gap < 1) return;
+    const grace = streakGrace(r), key = (grace ? 'g:' : 'r:') + r.last;
+    let seen = ''; try{ seen = localStorage.getItem('tooba-comeback') || ''; }catch(e){}
+    if(seen === key) return;
+    try{ localStorage.setItem('tooba-comeback', key); }catch(e){}
+    const days = (k) => k + (k <= 10 ? ' أيام' : ' يومًا');
+    document.getElementById('cbTitle').textContent = TT(grace ? 'لا تفقد عادتك' : 'ابدأ من جديد، والعود أحمد');
+    document.getElementById('cbSub').textContent = TT(grace
+      ? 'سلسلتك ' + days(r.n) + '. أتمّ الأذكار أو وردًا اليوم ترجع شعلتك وتكمل.'
+      : 'أطول سلسلة لك ' + Math.max(r.best || 0, r.n) + '. أتمّ الأذكار أو وردًا اليوم لتبدأ سلسلة جديدة.');
+    ov.classList.add('open');
+  }
+  document.getElementById('cbLater').addEventListener('click', () => { haptic('tap'); close(); });
+  document.getElementById('cbGo').addEventListener('click', () => {
+    haptic('tap'); close();
+    const h = new Date().getHours(), m = (h >= 4 && h < 14) ? 'morning' : 'evening';
+    setTimeout(() => {
+      if(body.classList.contains('settings-open') || mode === 'tasbeeh'){ const a = document.querySelector('#bnav [data-tab="adhkar"]'); if(a) a.click(); }
+      if(mode !== m) switchMode(m);
+      window.scrollTo({ top:0, behavior:'smooth' });
+    }, 250);
+  });
+  ov.addEventListener('click', (e) => { if(e.target === ov) close(); });
+  let tries = 0;
+  const wait = setInterval(() => {
+    if(++tries > 60){ clearInterval(wait); return; }
+    if(document.getElementById('splash') || body.classList.contains('intro-go')) return;
+    clearInterval(wait);
+    setTimeout(check, 250);
+  }, 300);
+})();
 paintFlame();
 // توهّج هادي كل 10 ثواني والشعلة والعة (الحركة القوية لأول إنجاز في اليوم بس)
 setInterval(() => {
@@ -3268,8 +3453,9 @@ function alignStrip(el, chip, smooth){
   el.scrollTo({ left: el.scrollLeft + (cr.left + cr.width / 2) - (er.left + er.width / 2), behavior:beh });
 }
 // (2.4.162) مع العدّ: لو المستخدم حرّك شريط الأوراد والزر النشط مش في مكانه، الشريط يرجع له بنعومة (ومن غير حركة لو هو في مكانه)
-function recenterWirdStrip(){
-  const el = document.getElementById('wsel'), chip = el && el.querySelector('.wchip.on');
+// (2.4.174) نفس الفكرة لشريط أنواع الأذكار: أول ما يعدّ على كارت، الشريط يرجع للنوع الحالي
+function recenterWirdStrip(id, on){
+  const el = document.getElementById(id || 'wsel'), chip = el && el.querySelector(on || '.wchip.on');
   if(!el || !chip || !el.offsetParent || body.classList.contains('focus')) return;
   const i = [...el.children].indexOf(chip);
   let want;
@@ -3281,6 +3467,7 @@ function recenterWirdStrip(){
   alignStrip(el, chip, true);
 }
 function selectWird(id, animate, center){
+  if(id && window.lpHintHide) window.lpHintHide();   // (2.4.170) تلميح الضغطة المطولة للعدّ الحر بس
   const prevIdx = wirdIndex(selWird);
   selWird = id || null;
   paintChips();
@@ -3450,14 +3637,54 @@ function dedupeCustomZ(){
 }
 function saveCustomZ(){ syncTouch(); try{ localStorage.setItem(CZ_KEY, JSON.stringify(customAdhkar)); }catch(e){} }
 // الأذكار الخاصة تُضاف في آخر القائمة وتُحفظ بمعرّف ثابت، فلا تزحزح عدّادات الأذكار الأصلية
+// ---------- (2.4.172) الأذكار المرتبطة بوقت (at): تظهر في وقتها بس ----------
+// المواقيت تقريبية: حساب الشمس من موقع تقريبي لمنطقة الجهاز الزمنية (من غير إذن موقع)
+const TZ_LL = {'Asia/Kuwait':[29.37,47.98],'Asia/Riyadh':[24.71,46.68],'Asia/Dubai':[25.2,55.27],'Asia/Qatar':[25.29,51.53],'Asia/Bahrain':[26.23,50.59],'Asia/Muscat':[23.59,58.41],'Asia/Aden':[15.37,44.19],'Asia/Baghdad':[33.31,44.36],'Asia/Amman':[31.95,35.93],'Asia/Damascus':[33.51,36.29],'Asia/Beirut':[33.89,35.5],'Asia/Jerusalem':[31.77,35.21],'Asia/Gaza':[31.5,34.47],'Asia/Hebron':[31.53,35.1],'Africa/Cairo':[30.04,31.24],'Africa/Khartoum':[15.5,32.56],'Africa/Tripoli':[32.89,13.19],'Africa/Tunis':[36.81,10.18],'Africa/Algiers':[36.75,3.06],'Africa/Casablanca':[33.57,-7.59],'Africa/El_Aaiun':[27.15,-13.2],'Africa/Nouakchott':[18.08,-15.98],'Africa/Mogadishu':[2.05,45.32],'Africa/Djibouti':[11.59,43.15],'Indian/Comoro':[-11.7,43.26],'Europe/Istanbul':[41.01,28.98],'Asia/Tehran':[35.69,51.39],'Asia/Karachi':[24.86,67.0],'Asia/Kolkata':[28.61,77.21],'Asia/Calcutta':[28.61,77.21],'Asia/Dhaka':[23.81,90.41],'Asia/Jakarta':[-6.2,106.85],'Asia/Kuala_Lumpur':[3.14,101.69],'Asia/Singapore':[1.35,103.82],'Africa/Lagos':[6.52,3.38],'Europe/London':[51.51,-0.13],'Europe/Paris':[48.86,2.35],'Europe/Berlin':[52.52,13.4],'Europe/Amsterdam':[52.37,4.9],'Europe/Brussels':[50.85,4.35],'Europe/Madrid':[40.42,-3.7],'Europe/Rome':[41.9,12.5],'Europe/Stockholm':[59.33,18.07],'America/New_York':[40.71,-74.0],'America/Chicago':[41.88,-87.63],'America/Denver':[39.74,-104.99],'America/Los_Angeles':[34.05,-118.24],'America/Toronto':[43.65,-79.38],'Australia/Sydney':[-33.87,151.21]};
+function sunToday(){
+  const now = new Date(), key = now.toDateString();
+  if(sunToday._k === key) return sunToday._v;
+  let tz = ''; try{ tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; }catch(e){}
+  const off = -now.getTimezoneOffset() / 60, ll = TZ_LL[tz] || [25, off * 15], lat = ll[0], lon = ll[1], rad = Math.PI / 180;
+  const N = Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(now.getFullYear(), 0, 0)) / 864e5);
+  const g = 2 * Math.PI / 365 * (N - 1);
+  const eqt = 229.18 * (0.000075 + 0.001868 * Math.cos(g) - 0.032077 * Math.sin(g) - 0.014615 * Math.cos(2 * g) - 0.040849 * Math.sin(2 * g));
+  const dec = 0.006918 - 0.399912 * Math.cos(g) + 0.070257 * Math.sin(g) - 0.006758 * Math.cos(2 * g) + 0.000907 * Math.sin(2 * g) - 0.002697 * Math.cos(3 * g) + 0.00148 * Math.sin(3 * g);
+  const noon = 720 - 4 * lon - eqt + off * 60;
+  const ha = (alt) => { const c = (Math.sin(alt * rad) - Math.sin(lat * rad) * Math.sin(dec)) / (Math.cos(lat * rad) * Math.cos(dec)); return c < -1 || c > 1 ? null : Math.acos(c) / rad * 4; };
+  const h0 = ha(-0.833) || 360, hf = ha(-18), hi = ha(-17);
+  const v = { fajr: hf ? noon - hf : noon - h0 - 90, sunrise: noon - h0, sunset: noon + h0, isha: hi ? noon + hi : noon + h0 + 90 };
+  sunToday._k = key; sunToday._v = v; return v;
+}
+function atOk(at){
+  if(!at) return true;
+  const d = new Date(), t = d.getHours() * 60 + d.getMinutes(), s = sunToday();
+  const fajr = t >= s.fajr - 15 && t <= s.sunrise + 60, maghrib = t >= s.sunset - 10 && t < s.isha - 5;
+  if(at === 'night') return t >= s.isha || t < s.fajr;
+  if(at === 'fajr') return fajr;
+  if(at === 'fajr-maghrib') return fajr || maghrib;
+  return true;
+}
+function itemOff(item){ return !!(item && item.at && !atOk(item.at)); }
+let atSig = '';
+function atSigNow(){ return ['night', 'fajr', 'fajr-maghrib'].map(a => atOk(a) ? 1 : 0).join(''); }
+// أذكار الاستيقاظ تبدأ من جديد بعد 4 ساعات من آخر عدّة (استيقاظ الليل غير استيقاظ الصبح)
+const WK_KEY = 'tooba-wake-t', WK_GAP = 4 * 3600 * 1000;
+function wkFresh(){
+  let t = 0; try{ t = +localStorage.getItem(WK_KEY) || 0; }catch(e){}
+  if(t && Date.now() - t > WK_GAP && Object.keys(progress.wake || {}).length){
+    progress.wake = {}; try{ lastDone.wake = null; localStorage.setItem(WK_KEY, '0'); localStorage.setItem(STORAGE_KEY, JSON.stringify({ date:BOOT_DAY, progress })); }catch(e){}
+    return true;
+  }
+  return false;
+}
 function itemsOf(m){
   return data[m].concat(customAdhkar.filter(z => z.modes.includes(m)).map(z => ({ text:z.text, count:z.count, cid:z.id })));
 }
 function pkey(item, i){ return item.cid ? item.cid : i; }
 // ترتيب الأذكار المخصّص: مصفوفة مفاتيح (pkey كنص) لكل قسم، منفصلة عن الأذكار والتقدّم (ما بتغيّرش أي مفتاح تخزين قديم)
 const ORD_KEY = 'tooba-order';
-let ORDER = { morning:[], evening:[], prayer:[], sleep:[] };
-try{ const r = JSON.parse(localStorage.getItem(ORD_KEY)); if(r) ['morning', 'evening', 'prayer', 'sleep'].forEach(m => { if(Array.isArray(r[m])) ORDER[m] = r[m].map(String).slice(0, 80); }); }catch(e){}
+let ORDER = { morning:[], evening:[], prayer:[], sleep:[], wake:[] };
+try{ const r = JSON.parse(localStorage.getItem(ORD_KEY)); if(r) ['morning', 'evening', 'prayer', 'sleep', 'wake'].forEach(m => { if(Array.isArray(r[m])) ORDER[m] = r[m].map(String).slice(0, 80); }); }catch(e){}
 function saveOrder(){ syncTouch(); try{ localStorage.setItem(ORD_KEY, JSON.stringify(ORDER)); }catch(e){} }
 // الأذكار بالترتيب المعروض: المرتّب أولًا، وأي ذكر جديد (مثلًا ذكر خاص أضفته) يتضاف في الآخر
 function orderedOf(m){
@@ -3472,6 +3699,8 @@ function render(){
   if(mode !== 'tasbeeh' && body.classList.contains('focus')){ setFocus(false); exitFS(); }
   if(mode === 'prayer') prFresh();
   if(mode === 'sleep') sleepFresh();
+  if(mode === 'wake') wkFresh();
+  atSig = atSigNow();
   if(body.dataset.mode !== mode){
     // نلغي انتقالات الألوان لحظة التبديل فيظهر لون القسم الجديد مباشرة وما يعلقش لون القسم السابق
     body.classList.add('no-tr');
@@ -3508,7 +3737,7 @@ function render(){
   orderedOf(mode).forEach(({ item, i }) => {
     const k = pkey(item, i);
     const remaining = progress[mode][k] ?? item.count;
-    if(remaining <= 0) return; // الأذكار المكتملة تختفي من القائمة
+    if(remaining <= 0 || itemOff(item)) return; // الأذكار المكتملة (وما ليس وقته) تختفي من القائمة
     const m = item.cid ? null : metaFor(i);
     const card = document.createElement('div');
     card.className = 'card';
@@ -3540,6 +3769,7 @@ function render(){
       completeAllBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         const current = progress[mode][k] ?? item.count;
+        recenterWirdStrip('adhkarSel', '.achip.on');
         haptic('done');
         completeItem(card, k, current);
       });
@@ -3595,6 +3825,7 @@ function render(){
     card.addEventListener('click', () => {
       const current = progress[mode][k] ?? item.count;
       if(current <= 0 || card.classList.contains('leaving')) return;
+      recenterWirdStrip('adhkarSel', '.achip.on');
       if(current - 1 <= 0){
         haptic('done');
         completeItem(card, k, current);
@@ -3642,7 +3873,7 @@ function render(){
     empty.querySelector('#remindBtn').addEventListener('click', (e) => shareOrCopy(e.currentTarget, remindText, 'أذكار الصباح والمساء'));
   }
   const ADD_BTN = '<button class="wird-add" id="addZikrBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span>إضافة ذكر أو دعاء خاص</span></button>';
-  listEl.insertAdjacentHTML('beforeend', '<div class="zrow' + (mode === 'prayer' || mode === 'sleep' ? ' solo' : '') + '">' + (mode === 'prayer' || mode === 'sleep' ? '' : ADD_BTN) + '<button class="ord-link" id="ordBtn" aria-label="ترتيب الأذكار"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4v16"/><path d="M4.5 7.5L8 4l3.5 3.5"/><path d="M16 20V4"/><path d="M12.5 16.5L16 20l3.5-3.5"/></svg><span>ترتيب</span></button></div>');
+  listEl.insertAdjacentHTML('beforeend', '<div class="zrow' + (mode === 'prayer' || mode === 'sleep' || mode === 'wake' ? ' solo' : '') + '">' + (mode === 'prayer' || mode === 'sleep' || mode === 'wake' ? '' : ADD_BTN) + '<button class="ord-link" id="ordBtn" aria-label="ترتيب الأذكار"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4v16"/><path d="M4.5 7.5L8 4l3.5 3.5"/><path d="M16 20V4"/><path d="M12.5 16.5L16 20l3.5-3.5"/></svg><span>ترتيب</span></button></div>');
   updateProgress();
 }
 
@@ -3659,6 +3890,7 @@ function render(){
   function build(){
     list.innerHTML = '';
     orderedOf(om).forEach(({ item, i, k }) => {
+      if(itemOff(item)) return;
       const done = (progress[om][pkey(item, i)] ?? item.count) <= 0;
       const row = document.createElement('div');
       row.className = 'ord-row' + (done ? ' done' : '');
@@ -3738,7 +3970,7 @@ function render(){
   document.addEventListener('click', (e) => {
     if(!(e.target.closest && e.target.closest('#ordBtn')) || mode === 'tasbeeh') return;
     om = mode; dirty = false; disarm();
-    document.getElementById('ordTitle').textContent = om === 'prayer' ? 'ترتيب أذكار بعد الصلاة' : om === 'sleep' ? 'ترتيب أذكار النوم' : 'ترتيب أذكار ' + (om === 'evening' ? 'المساء' : 'الصباح');
+    document.getElementById('ordTitle').textContent = om === 'prayer' ? 'ترتيب أذكار بعد الصلاة' : om === 'sleep' ? 'ترتيب أذكار النوم' : om === 'wake' ? 'ترتيب أذكار الاستيقاظ' : 'ترتيب أذكار ' + (om === 'evening' ? 'المساء' : 'الصباح');
     build(); list.scrollTop = 0;
     ov.classList.add('open');
   });
@@ -3839,7 +4071,7 @@ function completeItem(card, index, prevRemaining){
   showUndo(mode, index, prevRemaining);
   try{ undoState.sk = localStorage.getItem(STREAK_KEY); }catch(e){}
   // (2.4.130) اليوم يتحسب بإتمام أذكار الصباح أو المساء كاملة، مش ذكر واحد
-  if(itemsOf(mode).every((item,i) => (progress[mode][pkey(item,i)] ?? item.count) <= 0)){ bumpStreak(); paintFlame(); }
+  if(itemsOf(mode).every((item,i) => itemOff(item) || (progress[mode][pkey(item,i)] ?? item.count) <= 0)){ bumpStreak(); paintFlame(); }
   // الرقم يبقى صفر والإطار يكمل قبل ما الكارد تختفي
   const chip = card.querySelector('.count-chip');
   if(chip){
@@ -3940,7 +4172,7 @@ undoBtn.addEventListener('click', () => {
 const barWrap = document.getElementById('barWrap');
 const barEl = barWrap.querySelector('.bar');
 const cheerEl = document.getElementById('cheer');
-const lastDone = { morning:null, evening:null, prayer:null, sleep:null };
+const lastDone = { morning:null, evening:null, prayer:null, sleep:null, wake:null };
 // (2.4.149) أذكار بعد الصلاة: تتصفّر تلقائيًا بعد 40 دقيقة من آخر عدّة (جاهزة للصلاة التالية)، وعدّاد الصلوات المكتملة اليوم
 const PR_KEY = 'tooba-prayer-meta', PR_GAP = 40 * 60 * 1000;
 function prMeta(){
@@ -3960,8 +4192,9 @@ function prFresh(){
   return false;
 }
 function prCountText(n){ return 'أتممت أذكار ' + (n === 1 ? 'صلاة واحدة' : n === 2 ? 'صلاتين' : n <= 10 ? n + ' صلوات' : n + ' صلاة') + ' اليوم'; }
-setInterval(() => { if(!document.hidden && ((mode === 'prayer' && prFresh()) || (mode === 'sleep' && sleepFresh()))) render(); }, 60000);
-document.addEventListener('visibilitychange', () => { if(!document.hidden && ((mode === 'prayer' && prFresh()) || (mode === 'sleep' && sleepFresh()))) render(); });
+const atMoved = () => (mode === 'prayer' || mode === 'wake') && atSigNow() !== atSig;   // (2.4.172) دخل/خرج وقت ذكر مرتبط بوقت
+setInterval(() => { if(!document.hidden && ((mode === 'prayer' && prFresh()) || (mode === 'sleep' && sleepFresh()) || (mode === 'wake' && wkFresh()) || atMoved())) render(); }, 60000);
+document.addEventListener('visibilitychange', () => { if(!document.hidden && ((mode === 'prayer' && prFresh()) || (mode === 'sleep' && sleepFresh()) || (mode === 'wake' && wkFresh()) || atMoved())) render(); });
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const MILESTONES = [[100,'ما شاء الله! أتممت الأذكار'],[75,'اقتربت من النهاية'],[50,'نصف الطريق!'],[25,'بداية ممتازة']];
 let cheerTimer = null;
@@ -4077,8 +4310,9 @@ function celebrate(prev, done, total, pct){
 
 function updateProgress(){
   const items = itemsOf(mode);
-  const total = items.length;
-  const done = items.filter((item,i) => (progress[mode][pkey(item,i)] ?? item.count) <= 0).length;
+  const live = items.filter(it => !itemOff(it));
+  const total = live.length;
+  const done = items.filter((item,i) => !itemOff(item) && (progress[mode][pkey(item,i)] ?? item.count) <= 0).length;
   const pct = done / total * 100;
   progressText.innerHTML = '<b class="pnum">' + done + '</b> من ' + total;
   barFill.style.width = pct + '%';
@@ -4141,7 +4375,7 @@ function closeZikrSheet(){ zOverlay.classList.remove('open'); zTextEl.blur(); zC
   function fillPick(){
     const keep = pickEl.value, o = (v, t) => { const e = document.createElement('option'); e.value = v; e.textContent = t; return e; };
     pickEl.innerHTML = ''; pickEl.appendChild(o('', 'غير محدد'));
-    [['morning', 'أذكار الصباح'], ['evening', 'أذكار المساء'], ['prayer', 'أذكار بعد الصلاة'], ['sleep', 'أذكار النوم']].forEach(([m, title]) => {
+    [['morning', 'أذكار الصباح'], ['evening', 'أذكار المساء'], ['prayer', 'أذكار بعد الصلاة'], ['sleep', 'أذكار النوم'], ['wake', 'أذكار الاستيقاظ']].forEach(([m, title]) => {
       const g = document.createElement('optgroup'); g.label = title;
       itemsOf(m).forEach((item, i) => { if(!item.cid) g.appendChild(o(title + ' · ' + (i + 1) + ' · ' + zName(item), (i + 1) + '. ' + zName(item))); });
       pickEl.appendChild(g);
@@ -4321,11 +4555,12 @@ zDelBtn.addEventListener('click', () => {
 });
 
 // التنقل بين الأقسام: الشاشة الجديدة تدخل من اتجاه زرها (صباح ← مساء ← سبحة من اليسار، والرجوع من اليمين)
-const MODE_ORDER = ['morning','evening','prayer','sleep','tasbeeh'];
+const MODE_ORDER = ['morning','evening','prayer','sleep','wake','tasbeeh'];
 function switchMode(m){
   const dir = (MODE_ORDER.indexOf(m) > MODE_ORDER.indexOf(mode) ? -1 : 1) * SGN;
   const same = m === mode;
   hideUndo(); unlockScrollHeight(); mode = m; render();
+  if(m === 'tasbeeh' && !same && window.lpHintMaybe) window.lpHintMaybe();
   if(!same && !reduceMotion && listEl.animate){
     listEl.animate([
       { transform:'translateX(' + (dir * 56) + 'px)', opacity:0 },
@@ -4379,17 +4614,15 @@ document.addEventListener('click', (e) => {
 });
 document.addEventListener('contextmenu', (e) => { if(e.target.closest && e.target.closest('#tReset')) e.preventDefault(); });
 
-{ const qm = new URLSearchParams(location.search).get('m'); if(qm === 'morning' || qm === 'evening' || qm === 'prayer' || qm === 'sleep') mode = qm; }
+{ const qm = new URLSearchParams(location.search).get('m'); if(qm === 'morning' || qm === 'evening' || qm === 'prayer' || qm === 'sleep' || qm === 'wake') mode = qm; }
 render();
 
 // ---------- (2.4.135) تلميح أول مرة: إيد شفافة تنقر مرتين على عدّاد أول ذكر، للمستخدم الجديد بس ----------
 (function(){
-  let seen = true;
-  try{
-    seen = localStorage.getItem('tooba-tap-hint') === '1' || !!localStorage.getItem(STREAK_KEY)
-      || Object.keys(progress.morning || {}).length > 0 || Object.keys(progress.evening || {}).length > 0;
-  }catch(e){}
-  if(seen || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // (2.4.169) بيظهر كل مرة: مع فتح التطبيق، وكل ما تدخل قسم أذكار (من الشريط أو من البار)
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let showT = 0;
+  window.tapHintShow = () => { clearTimeout(showT); showT = setTimeout(show, 500); };
   let tries = 0;
   const wait = setInterval(() => {
     if(++tries > 60){ clearInterval(wait); return; }
@@ -4403,7 +4636,7 @@ render();
     if(!card) return;
     const r = card.getBoundingClientRect(), vb = Math.min(r.bottom, window.innerHeight - 120);
     if(vb - r.top < 120) return;   // الكارت مش ظاهر كفاية: نجرّب المرة الجاية
-    try{ localStorage.setItem('tooba-tap-hint', '1'); }catch(e){}
+    document.querySelectorAll('.tap-hint').forEach(h => h.remove());
     // طرف الصباع على نص الجزء الظاهر من أول كارت (الضغط في أي مكان على الكارت بيعدّ)
     const x = r.left + r.width * 0.5, y = r.top + Math.min(150, (vb - r.top) * 0.5);
     const el = document.createElement('div');
@@ -4447,7 +4680,7 @@ document.addEventListener('click', (e) => {
       haptic('tap'); selectWird(ids[j], true, false);
       return;
     }
-    const AD = ['morning', 'evening', 'prayer', 'sleep'];   // السحب بين شرائح الأذكار فقط؛ السبحة والإعدادات من البار السفلي
+    const AD = ['morning', 'evening', 'prayer', 'sleep', 'wake'];   // السحب بين شرائح الأذكار فقط؛ السبحة والإعدادات من البار السفلي
     const j = AD.indexOf(mode) + (dir > 0 ? 1 : -1);
     if(j < 0 || j >= AD.length) return;
     haptic('tap'); switchMode(AD[j]);
@@ -5458,7 +5691,7 @@ function syncApply(st){
   syncApplying = true;
   try{
     const d = ymd(new Date()), cw = [], cz = [], ord = { morning:[], evening:[] }, byId = (p, q) => p.id < q.id ? -1 : 1;
-    progress = { morning:{}, evening:{}, prayer:progress.prayer || {}, sleep:progress.sleep || {} }; wirdCounts = {}; tasbihCount = 0; wirdTargets = {};
+    progress = { morning:{}, evening:{}, prayer:progress.prayer || {}, sleep:progress.sleep || {}, wake:progress.wake || {} }; wirdCounts = {}; tasbihCount = 0; wirdTargets = {};
     Object.keys(st).forEach(k => {
       const v = st[k].v; if(v === null || v === undefined) return;
       const a = k.split(':');
@@ -6051,7 +6284,7 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
   const nav = $('bnav'), sp = $('settingsPage'), sel = $('adhkarSel');
   if(!nav || !sp || !sel) return;
   const tabs = nav.querySelectorAll('[data-tab]'), chips = sel.querySelectorAll('[data-m]');
-  let lastAd = (mode === 'evening' || mode === 'prayer' || mode === 'sleep') ? mode : 'morning', rt = 0;
+  let lastAd = (mode === 'evening' || mode === 'prayer' || mode === 'sleep' || mode === 'wake') ? mode : 'morning', rt = 0;
   const isSet = () => body.classList.contains('settings-open');
   const pill = $('bpill');
   new MutationObserver(() => body.classList.toggle('nav-hidden', nav.classList.contains('hide'))).observe(nav, { attributes:true, attributeFilter:['class'] });
@@ -6065,7 +6298,7 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
   window.addEventListener('load', () => movePill(true));
   setTimeout(() => movePill(true), 300);
   // لمحة إن الشريط يتسحب: كل مرة يظهر شريط الأذكار أو شريط الأوراد (فتح التطبيق أو التنقل بين التابات)
-  let prevCur = null, nudgeT = 0, firstNudge = true, prevAdMode = null;
+  let prevCur = null, nudgeT = 0, firstNudge = true, prevAdMode = null, prevHintKey;
   let tbT = 0, tbY = -1;   // (2.4.147) إخفاء البار وقت العدّ في السبحة
   function nudgeStrip(el){
     if(!el || reduceMotion || !el.offsetParent || ovStack.length) return;
@@ -6090,6 +6323,10 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
     movePill();
     chips.forEach(c => { const on = c.dataset.m === mode; c.classList.toggle('on', on); c.setAttribute('aria-pressed', on ? 'true' : 'false'); });
     if(cur === 'adhkar' && mode !== prevAdMode){ prevAdMode = mode; alignStrip(sel, sel.querySelector('.achip.on'), true); }
+    // (2.4.169) إيد التلميح على أول ذكر: كل ما تدخل قسم أذكار (أول فتح للتطبيق ليه توقيته الخاص بعد شاشة البداية)
+    { const hk = cur === 'adhkar' ? mode : null;
+      if(hk && hk !== prevHintKey && prevHintKey !== undefined && window.tapHintShow) window.tapHintShow();
+      prevHintKey = hk; }
     requestAnimationFrame(() => { selFade(); edgeFade($('wsel')); });        // الشريط رجع يظهر: نحسب الظل من جديد
   }
   function refresh(){
@@ -6257,7 +6494,7 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
   }
 
   if(!EN) return;
-  const D = {"الأيام المتتالية": "Streak", "أطول سلسلة": "Longest streak", "يوم واحد": "1 day", "يومان متتاليان": "2 days in a row", "ابدأ سلسلتك اليوم": "Start your streak today", "أنجزت اليوم، تقبّل الله منك": "Done for today, may Allah accept it from you", "أتمّ الأذكار أو وردًا اليوم لتستمر السلسلة": "Complete the adhkar or a wird today to keep your streak", "أتمّ الأذكار أو وردًا لتبدأ السلسلة": "Complete the adhkar or a wird to start your streak", "يُحسب اليوم بإتمام أذكار الصباح أو المساء أو بعد الصلاة أو النوم كاملة، أو إتمام ورد، أو 33 تسبيحة في العدّ الحر.": "A day counts when you complete all the morning, evening, after-prayer or sleep adhkar, complete a wird, or reach 33 in free count.", "إظهار شعلة الأيام المتتالية": "Show the streak flame", "إخفاء شعلة الأيام المتتالية": "Hide the streak flame", "شعلة الأيام المتتالية": "Streak flame", "وضع توفير الطاقة": "Power saving mode", "إنهاء وضع توفير الطاقة": "Exit power saving mode", "اسحب لتحت للخروج": "Swipe down to exit", "اضغط Esc للخروج": "Press Esc to exit", "أذكار النوم": "Sleep Adhkar", "أتممت أذكار النوم": "You completed the sleep adhkar", "ذكّر أحبابك بأذكار النوم": "Remind your loved ones of the sleep adhkar", "لا تنسَ أذكار النوم 🤍 ذكّرتك بها هنا:": "Don’t forget the sleep adhkar 🤍 I reminded you of them here:", "ترتيب أذكار النوم": "Reorder sleep adhkar", "تم تصفير أذكار النوم": "Sleep adhkar reset", "الإخلاص والمعوذتان": "Al-Ikhlas, al-Falaq and an-Nas", "يجمع كفّيه وينفث فيهما ويقرأ السّور الثّلاث، ثمّ يمسح بهما ما استطاع من جسده، يبدأ برأسه ووجهه": "Cup your palms, blow lightly into them and recite the three surahs, then wipe over as much of your body as you can, starting with your head and face.", "يضع يده اليمنى تحت خدّه": "Place your right hand under your cheek.", "اجعلها آخر ما تقول قبل أن تنام": "Make it the last thing you say before sleeping.", "رواه أبو داود وصححه الألباني": "Narrated by Abu Dawud; graded sahih by al-Albani", "من قرأها إذا أوى إلى فراشه لم يزل عليه من اللّه حافظٌ، ولا يقربه شيطانٌ حتّى يصبح": "Whoever recites it when going to bed, a guardian from Allah remains with him and no devil comes near him until morning.", "من سبّح وحمد ثلاثًا وثلاثين، وكبّر أربعًا وثلاثين إذا أوى إلى فراشه، فهو خيرٌ له من خادمٍ": "Whoever glorifies and praises Allah 33 times each and magnifies Him 34 times when going to bed, it is better for him than a servant.", "من قالها ثمّ مات من ليلته مات على الفطرة": "Whoever says it and then dies that night dies upon the fitrah (natural pure faith).", "إظهار شريط التنقل": "Show navigation bar", "أذكار بعد الصلاة": "After-Prayer Adhkar", "أتممت أذكار بعد الصلاة": "You completed the after-prayer adhkar", "ذكّر أحبابك بأذكار بعد الصلاة": "Remind your loved ones of the after-prayer adhkar", "لا تنسَ أذكار بعد الصلاة 🤍 ذكّرتك بها هنا:": "Don’t forget the after-prayer adhkar 🤍 I reminded you of them here:", "ترتيب أذكار بعد الصلاة": "Reorder after-prayer adhkar", "تم تصفير أذكار بعد الصلاة": "After-prayer adhkar reset", "تمام المائة": "Completing the hundred", "بعد الفجر والمغرب": "After Fajr and Maghrib", "بعد الفجر": "After Fajr", "وثلاثًا بعد الفجر والمغرب": "3 times after Fajr and Maghrib", "رواه النسائي في الكبرى وصححه الألباني": "Narrated by al-Nasa’i in al-Kubra; graded sahih by al-Albani", "رواه أبو داود والترمذي والنسائي": "Narrated by Abu Dawud, al-Tirmidhi and al-Nasa’i", "رواه الترمذي وحسنه الألباني": "Narrated by al-Tirmidhi; graded hasan by al-Albani", "رواه ابن ماجه وصححه الألباني": "Narrated by Ibn Majah; graded sahih by al-Albani", "تبدأ من جديد تلقائيًا مع الصلاة التالية": "Starts again automatically with your next prayer", "من سبّح وحمد وكبّر ثلاثًا وثلاثين دبر كلّ صلاة، وختم المائة بها، غُفرت خطاياه وإن كانت مثل زبد البحر": "Whoever glorifies, praises and magnifies Allah 33 times each after every prayer and completes the hundred with it, his sins are forgiven even if they are like the foam of the sea.", "من قرأها دبر كلّ صلاة مكتوبة لم يمنعه من دخول الجنّة إلّا أن يموت": "Whoever recites it after every obligatory prayer, nothing prevents him from entering Paradise except death.", "من قالها كُتب له بها عشر حسنات، ومُحي عنه عشر سيّئات، ورُفع له عشر درجات، وكان في حرزٍ من كلّ مكروهٍ، وحُرس من الشّيطان": "Whoever says it, ten good deeds are written for him, ten bad deeds are erased, he is raised ten degrees, and he is protected from every harm and guarded from Satan.", "بعد الصلاة": "After Prayer", "النوم": "Sleep", "الاستيقاظ": "Waking Up", "الوضوء": "Wudu", "المسجد": "Mosque", "الطعام": "Eating", "السفر": "Travel", "قريبًا إن شاء الله": "Coming soon, in sha Allah", "المساعدة والملاحظات": "Help & feedback", "مشكلة، ملاحظة على نص، أو اقتراح": "A problem, a note on a text, or a suggestion", "أي ذكر؟": "Which dhikr?", "غير محدد": "Not specified", "اكتب لنا مشكلة واجهتك، أو ملاحظة على نص أو سند، أو اقتراحًا، وتصلنا مباشرة.": "Tell us about a problem, a note on a text or its source, or a suggestion. It reaches us directly.", "نوع الرسالة": "Message type", "مشكلة في التطبيق": "App problem", "ملاحظة على نص أو سند": "Note on a text or source", "اقتراح": "Suggestion", "أخرى": "Other", "رسالتك": "Your message", "اكتب رسالتك هنا": "Write your message here", "بريدك الإلكتروني (اختياري، لو حابب نرد عليك)": "Your email (optional, if you'd like a reply)", "يُرسل مع رسالتك تلقائيًا: رقم النسخة، ونوع الجهاز، واللغة.": "Sent automatically with your message: app version, device type, and language.", "إرسال": "Send", "جارٍ الإرسال…": "Sending…", "أو راسلنا مباشرة على": "Or email us directly at", "وصلتنا رسالتك، جزاك الله خيرًا": "Message received. Thank you!", "أرسل ملاحظة أو اقتراحًا": "Send feedback or a suggestion", "اكتب رسالتك أولًا": "Please write your message first", "البريد الإلكتروني غير صحيح، صحّحه أو اتركه فارغًا": "That email looks wrong. Fix it or leave it empty.", "تأكد من اتصالك بالإنترنت وحاول مرة أخرى": "Check your internet connection and try again", "أرسلت رسائل كثيرة، حاول بعد دقيقة": "Too many messages. Try again in a minute.", "تعذّر الإرسال الآن. حاول مرة أخرى، أو راسلنا على البريد بالأسفل": "Couldn't send right now. Try again, or email us at the address below.", "ح": "S", "ن": "M", "ث": "T", "ر": "W", "خ": "T", "ج": "F", "س": "S", "اللون": "Color", "المظهر": "Appearance", "تلقائي": "Auto", "فاتح": "Light", "داكن": "Dark", "أذكار الصباح والمساء — طوبى": "Morning & Evening Adhkar — Tooba", "طوبى — أذكار الصباح والمساء": "Tooba — Morning & Evening Adhkar", "أذكار الصباح والمساء بتصميم بسيط، مع عدّاد وفضل وسند كل ذكر.": "Morning and evening adhkar in a simple design, with a counter and the virtue and source of each dhikr.", "طوبى": "Tooba", "حمّل التطبيق من جوجل بلاي": "Get the app on Google Play", "ثبت التطبيق": "Install app", "أذكار الصباح": "Morning Adhkar", "أذكار المساء": "Evening Adhkar", "أذكار الصباح والمساء": "Morning & Evening Adhkar", "الصباح": "Morning", "المساء": "Evening", "السبحة": "Tasbih", "أذكار": "Adhkar", "أ": "A", "إحصاءات السبحة": "Tasbih stats", "نقراتك اليوم": "Your taps today", "في السبحة والأوراد": "In tasbih and wirds", "هذا الأسبوع": "This week", "اضغط على الذكر لعدّ التكرار": "Tap a dhikr to count its repetitions", "عن طوبى": "About Tooba", "شارك تطبيق": "Share the app", "تم تنزيل التحديث": "Update downloaded", "إعادة التشغيل": "Restart", "تم إكمال الذكر": "Dhikr completed", "تراجع": "Undo", "تم تفعيل الوضع الهادئ وتوفير البطارية": "Calm mode is on, saving battery", "تم حفظ الأوقات وتفعيل الإشعارات": "Times saved and notifications turned on", "طوبى تطبيق بسيط لأذكار الصباح والمساء، مع عدّاد لكل ذكر، وفضله وسنده، وسبحة وأوراد يومية.": "Tooba is a simple app for the morning and evening adhkar, with a counter for each dhikr, its virtue and source, plus a tasbih and daily wirds.", "تقدّمك وسبحتك محفوظان على جهازك فقط، بلا حسابات.": "Your progress and tasbih are saved on your device only, with no accounts.", "عند تفعيل التذكير نحفظ على خادمنا بيانات تقنية فقط (رمز الجهاز وأوقات التذكير والمنطقة الزمنية)، بلا اسم ولا بريد.": "When you turn on reminders, we store only technical data on our server (device token, reminder times and time zone), with no name or email.", "التطبيق مجاني، نسأل الله أن يتقبّله ويجعله خالصًا لوجهه الكريم.": "The app is free. We ask Allah to accept it and make it purely for His sake.", "للملاحظات أو التبليغ عن خطأ في نص أو سند:": "For feedback, or to report a mistake in a text or source:", "سياسة الخصوصية": "Privacy Policy", "تخصيص الودجيت": "Customize widget", "شارك الأجر واجعلها صدقة جارية عنك": "Share the reward and make it a continuous charity for you", "تمام": "OK", "إضافة ورد خاص": "Add a custom wird", "اسم الورد": "Wird name", "العدد المطلوب يوميًا": "Daily target", "أو أدخل عددًا آخر": "Or enter another number", "حفظ": "Save", "حذف الورد": "Delete wird", "إضافة ذكر أو دعاء خاص": "Add a custom dhikr or dua", "يظهر في آخر القائمة بعلامة «ذكر أو دعاء خاص»، بلا فضل ولا سند.": "Appears at the end of the list labeled “Custom dhikr or dua”, without a virtue or source.", "نص الذكر": "Dhikr text", "عدد التكرار": "Repetitions", "يظهر في": "Show in", "كلاهما": "Both", "حذف الذكر أو الدعاء": "Delete dhikr or dua", "ترتيب الأذكار": "Reorder adhkar", "ترتيب": "Reorder", "اسحب المقبض لتغيير مكان الذكر، ويُحفظ الترتيب تلقائيًا.": "Drag the handle to move a dhikr. The order is saved automatically.", "تم": "Done", "استرجاع الترتيب الأصلي": "Restore original order", "تذكير بأوقات الأذكار": "Adhkar reminders", "يصلك إشعار من طوبى في الوقت الذي تختاره، حتى لو كان التطبيق مغلقًا.": "You get a notification from Tooba at the time you choose, even when the app is closed.", "وتنبيه إضافي إن نسيت: يصلك فقط إذا لم تُكمل الأذكار حتى هذا الوقت.": "An extra nudge if you forget: sent only if you haven’t finished the adhkar by this time.", "إن لم تكتمل أذكار الصباح": "If the morning adhkar aren’t finished", "إن لم تكتمل أذكار المساء": "If the evening adhkar aren’t finished", "تفعيل التذكير بالإشعارات": "Turn on reminder notifications", "إيقاف التذكير": "Turn off reminders", "إضافة للشاشة الرئيسية": "Add to Home Screen", "الإصدار": "Version", "تبديل الوضع الليلي": "Toggle dark mode", "إعادة التعيين": "Reset", "نقل تقدّمك إلى جهاز جديد": "Move your progress to a new device", "حجم الخط": "Font size", "تصفير العدّاد": "Reset counter", "تصغير الخط": "Smaller text", "تكبير الخط": "Larger text", "الوضع الهادئ": "Calm mode", "الاهتزاز": "Vibration", "تعديل العدد": "Edit target", "إتمام الورد": "Complete wird", "إظهار الإحصاءات": "Show stats", "إخفاء الإحصاءات": "Hide stats", "منحنى نقرات الأسبوع": "Weekly taps chart", "شارك طوبى": "Share Tooba", "مثال: لا إله إلا أنت سبحانك إني كنت من الظالمين": "Example: La ilaha illa anta subhanaka inni kuntu min az-zalimin", "اكتب الذكر أو الدعاء هنا": "Write the dhikr or dua here", "اسحب لتغيير الترتيب": "Drag to reorder", "تعديل الذكر أو الدعاء": "Edit dhikr or dua", "تعديل الورد": "Edit wird", "تعديل العدد المطلوب": "Edit daily target", "إنهاء الوضع الهادئ": "Exit calm mode", "إيقاف الاهتزاز": "Turn off vibration", "تفعيل الاهتزاز": "Turn on vibration", "مشاركة": "Share", "إعادة تعيين الذكر": "Reset dhikr", "ذكر أو دعاء خاص": "Custom dhikr or dua", "الفضل:": "Virtue:", "آية الكرسي": "Ayat al-Kursi", "سورة الإخلاص": "Surat al-Ikhlas", "سورة الفلق": "Surat al-Falaq", "سورة الناس": "Surat an-Nas", "دعاء الصباح الجامع": "Comprehensive morning dua", "دعاء المساء الجامع": "Comprehensive evening dua", "سيد الاستغفار": "Sayyid al-Istighfar", "خواتيم سورة البقرة": "Last verses of Surat al-Baqarah", "إكمال كل التكرارات": "Complete all repetitions", "تم إعادة تعيين الذكر": "Dhikr reset", "تم تصفير العدّاد": "Counter reset", "تم إتمام الورد": "Wird completed", "ترتيب أذكار الصباح": "Reorder morning adhkar", "ترتيب أذكار المساء": "Reorder evening adhkar", "اضغط مرة أخرى للتأكيد": "Tap again to confirm", "تم النسخ ✓": "Copied ✓", "تم نسخ الرابط ✓": "Link copied ✓", "تمت إضافة الورد بنجاح": "Wird added successfully", "تم حفظ التعديل بنجاح": "Changes saved successfully", "تمت إضافة الذكر أو الدعاء الخاص": "Custom dhikr or dua added", "أتممت أذكار الصباح": "You completed the morning adhkar", "أتممت أذكار المساء": "You completed the evening adhkar", "ذكّر أحبابك بأذكار الصباح": "Remind your loved ones of the morning adhkar", "ذكّر أحبابك بأذكار المساء": "Remind your loved ones of the evening adhkar", "لا تنسَ أذكار الصباح 🤍 ذكّرتك بها هنا:": "Don’t forget the morning adhkar 🤍 I reminded you here:", "لا تنسَ أذكار المساء 🤍 ذكّرتك بها هنا:": "Don’t forget the evening adhkar 🤍 I reminded you here:", "ما شاء الله! أتممت الأذكار": "Mashallah! You completed the adhkar", "اقتربت من النهاية": "Almost there", "نصف الطريق!": "Halfway there!", "بداية ممتازة": "An excellent start", "ما شاء الله! أتممت الورد": "Mashallah! You completed the wird", "ما شاء الله، زادك الله من فضله": "Mashallah, may Allah increase you from His bounty", "اكتمل الورد، تقبّل الله منك": "Wird complete, may Allah accept it from you", "استعن بالله وابدأ": "Seek Allah’s help and begin", "بداية مباركة، واصل": "A blessed start, keep going", "ما شاء الله، أنت في الطريق": "Mashallah, you’re on your way", "تجاوزت النصف، أحسنت": "Past halfway, well done", "اقتربت، لا تتوقف الآن": "Almost there, don’t stop now", "باقي القليل، أكمل الورد!": "Just a little left, finish the wird!", "اضغط في أي مكان على الشاشة للبدء": "Tap anywhere on the screen to start", "عدّ حر": "Free count", "ابدأ اليوم وبارك الله فيك": "Start today, and may Allah bless you", "يومان متتاليان من الأوراد": "2-day wird streak", "إظهار عدّاد الأيام المتتالية": "Show day streak", "إخفاء عدّاد الأيام المتتالية": "Hide day streak", "من": "of", "الأحد": "Sunday", "الإثنين": "Monday", "الثلاثاء": "Tuesday", "الأربعاء": "Wednesday", "الخميس": "Thursday", "الجمعة": "Friday", "السبت": "Saturday", "س": "Sa", "ح": "Su", "ن": "Mo", "ث": "Tu", "ر": "We", "خ": "Th", "ج": "Fr", "ورد الاستغفار": "Istighfar (seeking forgiveness)", "الاستغفار": "Istighfar", "ورد الصلاة على النبي": "Salawat on the Prophet ﷺ", "الصلاة على النبي": "Salawat on the Prophet ﷺ", "ورد التسبيح والتحميد": "Tasbih and Tahmid", "التسبيح والتحميد": "Tasbih and Tahmid", "ورد الحوقلة": "Hawqala", "الحوقلة": "Hawqala", "ورد الباقيات الصالحات": "Al-Baqiyat as-Salihat", "الباقيات الصالحات": "Al-Baqiyat as-Salihat", "ورد التهليل والتوحيد": "Tahlil and Tawhid", "التهليل والتوحيد": "Tahlil and Tawhid", "ورد التكبير والتحميد": "Takbir and Tahmid", "التكبير والتحميد": "Takbir and Tahmid", "كان النبي صلى الله عليه وسلم يُعد له في المجلس الواحد مئة مرة": "The Prophet ﷺ was counted saying it a hundred times in a single sitting.", "كلما صليت عليه صلاة واحدة صلى الله عليك بها عشراً، وكُفيت همك وغُفر ذنبك": "Each time you send one blessing upon him, Allah sends ten upon you; your worries are taken care of and your sins forgiven.", "كلمتان ثقيلتان في الميزان، حبيبتان إلى الرحمن": "Two words that are heavy on the scale and beloved to the Most Merciful.", "هي دواء لتسعة وتسعين داء أدناها الهم": "It is a remedy for ninety-nine ailments, the least of which is worry.", "هي أفضل الكلام وأحبّه إلى الله تعالى": "They are the best of speech and the most beloved to Allah.", "الإكثار من قول لا إله إلا الله وحدها فهي أفضل الذكر المطلق": "Say “La ilaha illa Allah” often; it is the best of unrestricted remembrance.", "ولئن شكرتم لأزيدنكم": "“If you are grateful, I will surely increase you.” (Quran 14:7)", "تذكير الأذكار": "Adhkar reminders", "تذكير بأوقات أذكار الصباح والمساء": "Reminders for the morning and evening adhkar", "أذكار الصباح لم تكتمل": "Morning adhkar not finished", "لم تُكمل أذكار الصباح بعد، اضغط لإكمالها.": "You haven’t finished the morning adhkar yet. Tap to complete them.", "أذكار المساء لم تكتمل": "Evening adhkar not finished", "لم تُكمل أذكار المساء بعد، اضغط لإكمالها.": "You haven’t finished the evening adhkar yet. Tap to complete them.", "حان وقت أذكار الصباح، اضغط للبدء.": "It’s time for the morning adhkar. Tap to begin.", "حان وقت أذكار المساء، اضغط للبدء.": "It’s time for the evening adhkar. Tap to begin.", "التذكير مفعّل، اضغط للتعديل": "Reminder is on, tap to edit", "التذكير في تطبيق أندرويد يعمل على جهازك مباشرة، ولا نرسل عنه أي بيانات إلى خادمنا.": "On Android, reminders run directly on your device and no data about them is sent to our server.", "ثبّت طوبى أولًا": "Install Tooba first", "على آيفون تعمل الإشعارات بعد إضافة طوبى إلى الشاشة الرئيسية من زر المشاركة، ثم افتحها من هناك.": "On iPhone, notifications work after you add Tooba to the Home Screen from the Share button, then open it from there.", "الإشعارات غير متاحة": "Notifications unavailable", "هذا المتصفح لا يدعم إشعارات التذكير. جرّب فتح طوبى من متصفح آخر.": "This browser doesn’t support reminder notifications. Try opening Tooba in another browser.", "حفظ الأوقات": "Save times", "التذكير مفعّل على هذا الجهاز.": "Reminders are on for this device.", "الإشعارات محظورة للتطبيق. فعّلها من إعدادات الجوال ← التطبيقات ← طوبى ← الإشعارات ثم أعد المحاولة.": "Notifications are blocked for the app. Turn them on in phone Settings → Apps → Tooba → Notifications, then try again.", "الإشعارات محظورة لهذا الموقع. فعّلها من إعدادات المتصفح ثم أعد المحاولة.": "Notifications are blocked for this site. Turn them on in your browser settings, then try again.", "اختر وقتًا واحدًا على الأقل.": "Choose at least one time.", "لم يتم السماح بالإشعارات. فعّلها من إعدادات الجوال ← التطبيقات ← طوبى ← الإشعارات ثم أعد المحاولة.": "Notifications weren’t allowed. Turn them on in phone Settings → Apps → Tooba → Notifications, then try again.", "لم يتم السماح بالإشعارات. فعّلها من إعدادات المتصفح ثم أعد المحاولة.": "Notifications weren’t allowed. Turn them on in your browser settings, then try again.", "تعذّر تفعيل التذكير الآن، حاول لاحقًا.": "Couldn’t turn on reminders right now. Please try later.", "تم إلغاء وإيقاف الإشعارات": "Notifications turned off", "تم تفعيل إشعارات الأذكار": "Adhkar notifications turned on", "بنية الصدقة الجارية عنك وعن أحبائك": "Charity for you and your loved ones", "صَدَقَةٌ جَارِيَةٌ لَكَ وَلِوَالِدَيْكَ": "A lasting charity for you and your parents", "مَنْ دَلَّ عَلَى خَيْرٍ فَلَهُ مِثْلُ أَجْرِ فَاعِلِهِ": "Whoever guides to good earns its reward", "افتح الصفحة من متصفح Safari": "Open the page in Safari", "اضغط على أيقونة المشاركة 􀈂 في الأسفل": "Tap the Share icon 􀈂 at the bottom", "مرّر لتحت واختر «إضافة إلى الشاشة الرئيسية»": "Scroll down and choose “Add to Home Screen”", "اضغط «إضافة» أعلى الشاشة": "Tap “Add” at the top of the screen", "اضغط على أيقونة القائمة ⋮ أعلى المتصفح": "Tap the menu icon ⋮ at the top of the browser", "اختر «إضافة إلى الشاشة الرئيسية» أو «تثبيت التطبيق»": "Choose “Add to Home Screen” or “Install app”", "أكّد الإضافة": "Confirm", "افتح الصفحة من متصفح جهازك المحمول": "Open the page in your phone’s browser", "من قائمة المتصفح اختر «إضافة إلى الشاشة الرئيسية»": "From the browser menu choose “Add to Home Screen”", "آيفون": "iPhone", "آيباد": "iPad", "أندرويد": "Android", "ويندوز": "Windows", "ماك": "Mac", "لينكس": "Linux", "جهاز": "Device", "إيدج": "Edge", "أوبرا": "Opera", "فايرفوكس": "Firefox", "كروم": "Chrome", "سفاري": "Safari", "التطبيق": "App", "نشط مؤخرًا": "Recently active", "نشط الآن": "Active now", "هذا الجهاز": "This device", "تأكيد الفصل": "Confirm", "فصل": "Unlink", "الأجهزة المرتبطة (": "Linked devices (", "إرسال البيانات": "Send data", "استقبال البيانات": "Receive data", "تم فصل هذا الجهاز": "This device was unlinked", "تم الفصل": "Unlinked", "لم يبق أي جهاز آخر مرتبط، فتم فصل هذا الجهاز أيضًا، وتقدّمك عليه بقي كما هو.": "No other linked device is left, so this device was unlinked too. Your progress on it stays as it is.", "تم فصله من جهاز آخر، وتقدّمك على هذا الجهاز بقي كما هو.": "It was unlinked from another device. Your progress on this device stays as it is.", "النسخة المحفوظة على الخادم اتحذفت.": "The saved copy on the server was deleted.", "تقدّمك على هذا الجهاز بقي كما هو.": "Your progress on this device stays as it is.", "جارٍ تجهيز الكود…": "Preparing the code…", "جارٍ استلام تقدّمك…": "Receiving your progress…", "زامن تقدّمك": "Sync your progress", "يمسح جهازك الجديد هذا الكود فيستلم تقدّمك فورًا": "Your new device scans this code and receives your progress right away", "امسح الكود من جهازك الجديد": "Scan the code from your new device", "يتم نقل بياناتك وتقدّمك فور المسح، بدون خطوة تأكيد.": "Your data and progress are transferred as soon as it’s scanned, with no confirmation step.", "الكود صالح 3 دقائق ولمرة واحدة، وبياناتك مشفّرة ولا يقرأها أحد غيرك. لا تعرضه إلا لجهازك. الجهاز الجديد لازم يكون محدّثًا لآخر إصدار.": "The code is valid for 3 minutes and works once. Your data is encrypted and no one else can read it. Show it only to your own device. The new device must be on the latest version.", "نسخ الرابط": "Copy link", "رجوع": "Back", "متصفحك لا يدعم المسح بالكاميرا. الصق رابط الربط في الخانة بالأسفل.": "Your browser doesn’t support camera scanning. Paste the link code in the box below.", "امسح كود الربط": "Scan the link code", "وجّه الكاميرا إلى الكود المعروض على جهازك اللي عليه تقدّمك.": "Point the camera at the code shown on the device that has your progress.", "فتح الكاميرا": "Open camera", "أو الصق رابط الربط هنا": "Or paste the link here", "ربط": "Link", "تم ربط جهازك الجديد": "Your new device is linked", "الجهاز الجديد استلم تقدّمك، ": "The new device received your progress, ", " استلم تقدّمك، ": " received your progress, ", "وأي تقدّم جديد يتحدّث بين أجهزتك تلقائيًا.": "and any new progress updates across your devices automatically.", "تعذّر الربط": "Couldn’t link", "حاول مرة أخرى.": "Try again.", "حاول مرة أخرى": "Try again", "تم نقل تقدّمك": "Your progress was transferred", "أذكارك وأورادك وصلت لهذا الجهاز، وأي تقدّم جديد يتحدّث بين الجهازين تلقائيًا.": "Your adhkar and wirds reached this device, and any new progress updates between both devices automatically.", "انتهت مدة الكود": "The code expired", "تعذّر الاتصال الآن": "Can’t connect right now", "الكود صالح لمدة 3 دقائق فقط.": "The code is valid for 3 minutes only.", "محاولات كتيرة في وقت قصير، استنى دقيقة وحاول مرة أخرى.": "Too many attempts in a short time. Wait a minute and try again.", "تأكد من الإنترنت وحاول مرة أخرى.": "Check your internet and try again.", "إظهار كود جديد": "Show a new code", "إعادة المحاولة": "Retry", "أجهزتك مرتبطة": "Your devices are linked", "آخر مزامنة:": "Last sync:", "تقدّمك يتحدّث تلقائيًا بين أجهزتك.": "Your progress updates automatically across your devices.", "تعذّرت المزامنة آخر مرة، بنعيد المحاولة تلقائيًا. تأكد من الإنترنت.": "The last sync failed. We’ll retry automatically. Check your internet.", "ربط جهاز جديد": "Link a new device", "حذف النسخة المشفّرة من الخادم": "Delete the encrypted copy from the server", "ده كود من إصدار قديم. حدّث الجهاز الآخر لآخر إصدار.": "This code is from an older version. Update the other device to the latest version.", "ده مش كود ربط طوبى. امسح الكود المعروض على الجهاز اللي عليه تقدّمك.": "This isn’t a Tooba link code. Scan the code shown on the device that has your progress.", "الكود انتهت مدته أو اتستخدم قبل كده. اطلب كودًا جديدًا من الجهاز الآخر.": "The code expired or was already used. Ask the other device for a new code.", "الكود غير صالح. اطلب كودًا جديدًا من الجهاز الآخر.": "The code isn’t valid. Ask the other device for a new code.", "تعذّر الاتصال. تأكد من الإنترنت وحاول مرة أخرى.": "Couldn’t connect. Check your internet and try again.", "تعذّر تشغيل الكاميرا. اسمح للمتصفح باستخدامها أو الصق رابط الربط بالأسفل.": "Couldn’t start the camera. Allow the browser to use it, or paste the link code below.", "جارٍ تجهيز الماسح…": "Preparing the scanner…", "الماسح غير متاح في هذا الإصدار. الصق رابط الربط بالأسفل.": "The scanner isn’t available in this version. Paste the link code below.", "مفيش كاميرا متاحة على هذا الجهاز. الصق رابط الربط بالأسفل.": "No camera is available on this device. Paste the link code below.", "تعذّر تجهيز الماسح. تأكد من الإنترنت أو الصق رابط الربط بالأسفل.": "Couldn’t prepare the scanner. Check your internet or paste the link code below.", "وصلك كود ربط. اضغط «ربط» لنقل تقدّم الجهاز الآخر إلى هذا الجهاز.": "You received a link code. Tap “Link” to move the other device’s progress to this device.", "ربط طوبى": "Link Tooba", "افتح هذا الرابط على جهازك الذي عليه بياناتك:": "Open this link on the device that has your data:", "انقل تقدّمك إلى الجهاز الجديد؟": "Move your progress to the new device?", "سيستلم الجهاز الجديد أذكارك وأورادك وتقدّمك اليوم. لا تؤكد إلا إذا كنت أنت من عرض الكود على جهازك الجديد.": "The new device will receive your adhkar, wirds and today’s progress. Only confirm if you were the one who showed the code on your new device.", "تأكيد وإرسال": "Confirm and send", "إلغاء": "Cancel", "جارٍ الإرسال…": "Sending…", "الجهاز الجديد استلم بياناتك، وسيتحدّث التقدّم بين الجهازين تلقائيًا.": "The new device received your data, and progress will update between both devices automatically.", "تعذّر النقل": "Couldn’t transfer", "انتهت صلاحية الكود، اعرض كودًا جديدًا": "The code expired, show a new one", "تعذّر النقل، تأكد من الإنترنت": "Couldn’t transfer, check your internet", "رواه الحاكم وصححه الألباني": "Narrated by al-Hakim; graded authentic by al-Albani", "رواه أبو داود والترمذي": "Narrated by Abu Dawud and al-Tirmidhi", "رواه البخاري": "Narrated by al-Bukhari", "رواه أحمد وأبو داود والترمذي": "Narrated by Ahmad, Abu Dawud and al-Tirmidhi", "رواه أبو داود": "Narrated by Abu Dawud", "رواه أبو داود والنسائي": "Narrated by Abu Dawud and al-Nasa’i", "رواه ابن السني وأبو داود موقوفًا": "Narrated by Ibn al-Sunni and Abu Dawud (mawquf, a statement of a Companion)", "رواه مسلم": "Narrated by Muslim", "رواه أحمد والترمذي": "Narrated by Ahmad and al-Tirmidhi", "رواه أحمد والبخاري في الأدب المفرد": "Narrated by Ahmad and al-Bukhari in al-Adab al-Mufrad", "متفق عليه": "Agreed upon (al-Bukhari and Muslim)", "رواه الترمذي وأبو داود": "Narrated by al-Tirmidhi and Abu Dawud", "رواه أحمد وابن السني": "Narrated by Ahmad and Ibn al-Sunni", "رواه أبو داود وابن ماجه": "Narrated by Abu Dawud and Ibn Majah", "الأذكار": "Adhkar", "الإعدادات": "Settings", "التنقل": "Navigation", "مفعّل": "On", "غير مفعّل": "Off", "مرتبط": "Linked", "غير مرتبط": "Not linked", "مزامنة الأجهزة": "Device sync", "اللغة": "Language", "التذكير": "Reminders"};
+  const D = {"الأيام المتتالية": "Streak", "أطول سلسلة": "Longest streak", "يوم واحد": "1 day", "يومان متتاليان": "2 days in a row", "ابدأ سلسلتك اليوم": "Start your streak today", "أنجزت اليوم، تقبّل الله منك": "Done for today, may Allah accept it from you", "أتمّ الأذكار أو وردًا اليوم لتستمر السلسلة": "Complete the adhkar or a wird today to keep your streak", "أتمّ الأذكار أو وردًا لتبدأ السلسلة": "Complete the adhkar or a wird to start your streak", "يُحسب اليوم بإتمام أذكار الصباح أو المساء أو بعد الصلاة أو النوم أو الاستيقاظ كاملة، أو إتمام ورد، أو 33 تسبيحة في العدّ الحر.": "A day counts when you complete all the morning, evening, after-prayer, sleep or waking up adhkar, complete a wird, or reach 33 in free count.", "إظهار شعلة الأيام المتتالية": "Show the streak flame", "إخفاء شعلة الأيام المتتالية": "Hide the streak flame", "شعلة الأيام المتتالية": "Streak flame", "وضع توفير الطاقة": "Power saving mode", "إنهاء وضع توفير الطاقة": "Exit power saving mode", "اسحب للأعلى أو للأسفل للخروج": "Swipe up or down to exit", "اضغط مطولًا لتفعيل وضع توفير الطاقة": "Press and hold for power saving mode", "اضغط Esc للخروج": "Press Esc to exit", "أذكار النوم": "Sleep Adhkar", "أتممت أذكار النوم": "You completed the sleep adhkar", "ذكّر أحبابك بأذكار النوم": "Remind your loved ones of the sleep adhkar", "لا تنسَ أذكار النوم 🤍 ذكّرتك بها هنا:": "Don’t forget the sleep adhkar 🤍 I reminded you of them here:", "ترتيب أذكار النوم": "Reorder sleep adhkar", "تم تصفير أذكار النوم": "Sleep adhkar reset", "الإخلاص والمعوذتان": "Al-Ikhlas, al-Falaq and an-Nas", "يجمع كفّيه وينفث فيهما ويقرأ السّور الثّلاث، ثمّ يمسح بهما ما استطاع من جسده، يبدأ برأسه ووجهه": "Cup your palms, blow lightly into them and recite the three surahs, then wipe over as much of your body as you can, starting with your head and face.", "يضع يده اليمنى تحت خدّه": "Place your right hand under your cheek.", "اجعلها آخر ما تقول قبل أن تنام": "Make it the last thing you say before sleeping.", "رواه أبو داود وصححه الألباني": "Narrated by Abu Dawud; graded sahih by al-Albani", "من قرأها إذا أوى إلى فراشه لم يزل عليه من اللّه حافظٌ، ولا يقربه شيطانٌ حتّى يصبح": "Whoever recites it when going to bed, a guardian from Allah remains with him and no devil comes near him until morning.", "من سبّح وحمد ثلاثًا وثلاثين، وكبّر أربعًا وثلاثين إذا أوى إلى فراشه، فهو خيرٌ له من خادمٍ": "Whoever glorifies and praises Allah 33 times each and magnifies Him 34 times when going to bed, it is better for him than a servant.", "من قالها ثمّ مات من ليلته مات على الفطرة": "Whoever says it and then dies that night dies upon the fitrah (natural pure faith).", "إظهار شريط التنقل": "Show navigation bar", "أذكار بعد الصلاة": "After-Prayer Adhkar", "أتممت أذكار بعد الصلاة": "You completed the after-prayer adhkar", "ذكّر أحبابك بأذكار بعد الصلاة": "Remind your loved ones of the after-prayer adhkar", "لا تنسَ أذكار بعد الصلاة 🤍 ذكّرتك بها هنا:": "Don’t forget the after-prayer adhkar 🤍 I reminded you of them here:", "ترتيب أذكار بعد الصلاة": "Reorder after-prayer adhkar", "تم تصفير أذكار بعد الصلاة": "After-prayer adhkar reset", "تمام المائة": "Completing the hundred", "بعد الفجر والمغرب": "After Fajr and Maghrib", "بعد الفجر": "After Fajr", "وثلاثًا بعد الفجر والمغرب": "3 times after Fajr and Maghrib", "رواه النسائي في الكبرى وصححه الألباني": "Narrated by al-Nasa’i in al-Kubra; graded sahih by al-Albani", "رواه أبو داود والترمذي والنسائي": "Narrated by Abu Dawud, al-Tirmidhi and al-Nasa’i", "رواه الترمذي وحسنه الألباني": "Narrated by al-Tirmidhi; graded hasan by al-Albani", "رواه ابن ماجه وصححه الألباني": "Narrated by Ibn Majah; graded sahih by al-Albani", "تبدأ من جديد تلقائيًا مع الصلاة التالية": "Starts again automatically with your next prayer", "من سبّح وحمد وكبّر ثلاثًا وثلاثين دبر كلّ صلاة، وختم المائة بها، غُفرت خطاياه وإن كانت مثل زبد البحر": "Whoever glorifies, praises and magnifies Allah 33 times each after every prayer and completes the hundred with it, his sins are forgiven even if they are like the foam of the sea.", "من قرأها دبر كلّ صلاة مكتوبة لم يمنعه من دخول الجنّة إلّا أن يموت": "Whoever recites it after every obligatory prayer, nothing prevents him from entering Paradise except death.", "من قالها كُتب له بها عشر حسنات، ومُحي عنه عشر سيّئات، ورُفع له عشر درجات، وكان في حرزٍ من كلّ مكروهٍ، وحُرس من الشّيطان": "Whoever says it, ten good deeds are written for him, ten bad deeds are erased, he is raised ten degrees, and he is protected from every harm and guarded from Satan.", "بعد الصلاة": "After Prayer", "النوم": "Sleep", "الاستيقاظ": "Waking Up", "الوضوء": "Wudu", "المسجد": "Mosque", "الطعام": "Eating", "السفر": "Travel", "قريبًا إن شاء الله": "Coming soon, in sha Allah", "المساعدة والملاحظات": "Help & feedback", "مشكلة، ملاحظة على نص، أو اقتراح": "A problem, a note on a text, or a suggestion", "أي ذكر؟": "Which dhikr?", "غير محدد": "Not specified", "اكتب لنا مشكلة واجهتك، أو ملاحظة على نص أو سند، أو اقتراحًا، وتصلنا مباشرة.": "Tell us about a problem, a note on a text or its source, or a suggestion. It reaches us directly.", "نوع الرسالة": "Message type", "مشكلة في التطبيق": "App problem", "ملاحظة على نص أو سند": "Note on a text or source", "اقتراح": "Suggestion", "أخرى": "Other", "رسالتك": "Your message", "اكتب رسالتك هنا": "Write your message here", "بريدك الإلكتروني (اختياري، لو حابب نرد عليك)": "Your email (optional, if you'd like a reply)", "يُرسل مع رسالتك تلقائيًا: رقم النسخة، ونوع الجهاز، واللغة.": "Sent automatically with your message: app version, device type, and language.", "إرسال": "Send", "جارٍ الإرسال…": "Sending…", "أو راسلنا مباشرة على": "Or email us directly at", "وصلتنا رسالتك، جزاك الله خيرًا": "Message received. Thank you!", "أرسل ملاحظة أو اقتراحًا": "Send feedback or a suggestion", "اكتب رسالتك أولًا": "Please write your message first", "البريد الإلكتروني غير صحيح، صحّحه أو اتركه فارغًا": "That email looks wrong. Fix it or leave it empty.", "تأكد من اتصالك بالإنترنت وحاول مرة أخرى": "Check your internet connection and try again", "أرسلت رسائل كثيرة، حاول بعد دقيقة": "Too many messages. Try again in a minute.", "تعذّر الإرسال الآن. حاول مرة أخرى، أو راسلنا على البريد بالأسفل": "Couldn't send right now. Try again, or email us at the address below.", "ح": "S", "ن": "M", "ث": "T", "ر": "W", "خ": "T", "ج": "F", "س": "S", "اللون": "Color", "المظهر": "Appearance", "تلقائي": "Auto", "فاتح": "Light", "داكن": "Dark", "أذكار الصباح والمساء — طوبى": "Morning & Evening Adhkar — Tooba", "طوبى — أذكار الصباح والمساء": "Tooba — Morning & Evening Adhkar", "أذكار الصباح والمساء بتصميم بسيط، مع عدّاد وفضل وسند كل ذكر.": "Morning and evening adhkar in a simple design, with a counter and the virtue and source of each dhikr.", "طوبى": "Tooba", "حمّل التطبيق من جوجل بلاي": "Get the app on Google Play", "ثبت التطبيق": "Install app", "أذكار الصباح": "Morning Adhkar", "أذكار المساء": "Evening Adhkar", "أذكار الصباح والمساء": "Morning & Evening Adhkar", "الصباح": "Morning", "المساء": "Evening", "السبحة": "Tasbih", "أذكار": "Adhkar", "أ": "A", "إحصاءات السبحة": "Tasbih stats", "نقراتك اليوم": "Your taps today", "في السبحة والأوراد": "In tasbih and wirds", "هذا الأسبوع": "This week", "اضغط على الذكر لعدّ التكرار": "Tap a dhikr to count its repetitions", "عن طوبى": "About Tooba", "شارك تطبيق": "Share the app", "تم تنزيل التحديث": "Update downloaded", "إعادة التشغيل": "Restart", "تم إكمال الذكر": "Dhikr completed", "تراجع": "Undo", "تم تفعيل وضع توفير الطاقة": "Power saving mode is on", "تم حفظ الأوقات وتفعيل الإشعارات": "Times saved and notifications turned on", "طوبى تطبيق بسيط لأذكار الصباح والمساء، مع عدّاد لكل ذكر، وفضله وسنده، وسبحة وأوراد يومية.": "Tooba is a simple app for the morning and evening adhkar, with a counter for each dhikr, its virtue and source, plus a tasbih and daily wirds.", "تقدّمك وسبحتك محفوظان على جهازك فقط، بلا حسابات.": "Your progress and tasbih are saved on your device only, with no accounts.", "عند تفعيل التذكير نحفظ على خادمنا بيانات تقنية فقط (رمز الجهاز وأوقات التذكير والمنطقة الزمنية)، بلا اسم ولا بريد.": "When you turn on reminders, we store only technical data on our server (device token, reminder times and time zone), with no name or email.", "التطبيق مجاني، نسأل الله أن يتقبّله ويجعله خالصًا لوجهه الكريم.": "The app is free. We ask Allah to accept it and make it purely for His sake.", "للملاحظات أو التبليغ عن خطأ في نص أو سند:": "For feedback, or to report a mistake in a text or source:", "سياسة الخصوصية": "Privacy Policy", "تخصيص الودجيت": "Customize widget", "شارك الأجر واجعلها صدقة جارية عنك": "Share the reward and make it a continuous charity for you", "تمام": "OK", "إضافة ورد خاص": "Add a custom wird", "اسم الورد": "Wird name", "العدد المطلوب يوميًا": "Daily target", "أو أدخل عددًا آخر": "Or enter another number", "حفظ": "Save", "حذف الورد": "Delete wird", "إضافة ذكر أو دعاء خاص": "Add a custom dhikr or dua", "يظهر في آخر القائمة بعلامة «ذكر أو دعاء خاص»، بلا فضل ولا سند.": "Appears at the end of the list labeled “Custom dhikr or dua”, without a virtue or source.", "نص الذكر": "Dhikr text", "عدد التكرار": "Repetitions", "يظهر في": "Show in", "كلاهما": "Both", "حذف الذكر أو الدعاء": "Delete dhikr or dua", "ترتيب الأذكار": "Reorder adhkar", "ترتيب": "Reorder", "اسحب المقبض لتغيير مكان الذكر، ويُحفظ الترتيب تلقائيًا.": "Drag the handle to move a dhikr. The order is saved automatically.", "تم": "Done", "استرجاع الترتيب الأصلي": "Restore original order", "تذكير بأوقات الأذكار": "Adhkar reminders", "يصلك إشعار من طوبى في الوقت الذي تختاره، حتى لو كان التطبيق مغلقًا.": "You get a notification from Tooba at the time you choose, even when the app is closed.", "وتنبيه إضافي إن نسيت: يصلك فقط إذا لم تُكمل الأذكار حتى هذا الوقت.": "An extra nudge if you forget: sent only if you haven’t finished the adhkar by this time.", "إن لم تكتمل أذكار الصباح": "If the morning adhkar aren’t finished", "إن لم تكتمل أذكار المساء": "If the evening adhkar aren’t finished", "تفعيل التذكير بالإشعارات": "Turn on reminder notifications", "إيقاف التذكير": "Turn off reminders", "إضافة للشاشة الرئيسية": "Add to Home Screen", "الإصدار": "Version", "تبديل الوضع الليلي": "Toggle dark mode", "إعادة التعيين": "Reset", "نقل تقدّمك إلى جهاز جديد": "Move your progress to a new device", "حجم الخط": "Font size", "تصفير العدّاد": "Reset counter", "تصغير الخط": "Smaller text", "تكبير الخط": "Larger text", "الوضع الهادئ": "Calm mode", "الاهتزاز": "Vibration", "تعديل العدد": "Edit target", "إتمام الورد": "Complete wird", "إظهار الإحصاءات": "Show stats", "إخفاء الإحصاءات": "Hide stats", "منحنى نقرات الأسبوع": "Weekly taps chart", "شارك طوبى": "Share Tooba", "مثال: لا إله إلا أنت سبحانك إني كنت من الظالمين": "Example: La ilaha illa anta subhanaka inni kuntu min az-zalimin", "اكتب الذكر أو الدعاء هنا": "Write the dhikr or dua here", "اسحب لتغيير الترتيب": "Drag to reorder", "تعديل الذكر أو الدعاء": "Edit dhikr or dua", "تعديل الورد": "Edit wird", "تعديل العدد المطلوب": "Edit daily target", "إنهاء الوضع الهادئ": "Exit calm mode", "إيقاف الاهتزاز": "Turn off vibration", "تفعيل الاهتزاز": "Turn on vibration", "مشاركة": "Share", "إعادة تعيين الذكر": "Reset dhikr", "ذكر أو دعاء خاص": "Custom dhikr or dua", "الفضل:": "Virtue:", "آية الكرسي": "Ayat al-Kursi", "سورة الإخلاص": "Surat al-Ikhlas", "سورة الفلق": "Surat al-Falaq", "سورة الناس": "Surat an-Nas", "دعاء الصباح الجامع": "Comprehensive morning dua", "دعاء المساء الجامع": "Comprehensive evening dua", "سيد الاستغفار": "Sayyid al-Istighfar", "خواتيم سورة البقرة": "Last verses of Surat al-Baqarah", "إكمال كل التكرارات": "Complete all repetitions", "تم إعادة تعيين الذكر": "Dhikr reset", "تم تصفير العدّاد": "Counter reset", "تم إتمام الورد": "Wird completed", "ترتيب أذكار الصباح": "Reorder morning adhkar", "ترتيب أذكار المساء": "Reorder evening adhkar", "اضغط مرة أخرى للتأكيد": "Tap again to confirm", "تم النسخ ✓": "Copied ✓", "تم نسخ الرابط ✓": "Link copied ✓", "تمت إضافة الورد بنجاح": "Wird added successfully", "تم حفظ التعديل بنجاح": "Changes saved successfully", "تمت إضافة الذكر أو الدعاء الخاص": "Custom dhikr or dua added", "أتممت أذكار الصباح": "You completed the morning adhkar", "أتممت أذكار المساء": "You completed the evening adhkar", "ذكّر أحبابك بأذكار الصباح": "Remind your loved ones of the morning adhkar", "ذكّر أحبابك بأذكار المساء": "Remind your loved ones of the evening adhkar", "لا تنسَ أذكار الصباح 🤍 ذكّرتك بها هنا:": "Don’t forget the morning adhkar 🤍 I reminded you here:", "لا تنسَ أذكار المساء 🤍 ذكّرتك بها هنا:": "Don’t forget the evening adhkar 🤍 I reminded you here:", "ما شاء الله! أتممت الأذكار": "Mashallah! You completed the adhkar", "اقتربت من النهاية": "Almost there", "نصف الطريق!": "Halfway there!", "بداية ممتازة": "An excellent start", "ما شاء الله! أتممت الورد": "Mashallah! You completed the wird", "ما شاء الله، زادك الله من فضله": "Mashallah, may Allah increase you from His bounty", "اكتمل الورد، تقبّل الله منك": "Wird complete, may Allah accept it from you", "استعن بالله وابدأ": "Seek Allah’s help and begin", "بداية مباركة، واصل": "A blessed start, keep going", "ما شاء الله، أنت في الطريق": "Mashallah, you’re on your way", "تجاوزت النصف، أحسنت": "Past halfway, well done", "اقتربت، لا تتوقف الآن": "Almost there, don’t stop now", "باقي القليل، أكمل الورد!": "Just a little left, finish the wird!", "اضغط في أي مكان على الشاشة للبدء": "Tap anywhere on the screen to start", "عدّ حر": "Free count", "ابدأ اليوم وبارك الله فيك": "Start today, and may Allah bless you", "يومان متتاليان من الأوراد": "2-day wird streak", "إظهار عدّاد الأيام المتتالية": "Show day streak", "إخفاء عدّاد الأيام المتتالية": "Hide day streak", "من": "of", "الأحد": "Sunday", "الإثنين": "Monday", "الثلاثاء": "Tuesday", "الأربعاء": "Wednesday", "الخميس": "Thursday", "الجمعة": "Friday", "السبت": "Saturday", "س": "Sa", "ح": "Su", "ن": "Mo", "ث": "Tu", "ر": "We", "خ": "Th", "ج": "Fr", "ورد الاستغفار": "Istighfar (seeking forgiveness)", "الاستغفار": "Istighfar", "ورد الصلاة على النبي": "Salawat on the Prophet ﷺ", "الصلاة على النبي": "Salawat on the Prophet ﷺ", "ورد التسبيح والتحميد": "Tasbih and Tahmid", "التسبيح والتحميد": "Tasbih and Tahmid", "ورد الحوقلة": "Hawqala", "الحوقلة": "Hawqala", "ورد الباقيات الصالحات": "Al-Baqiyat as-Salihat", "الباقيات الصالحات": "Al-Baqiyat as-Salihat", "ورد التهليل والتوحيد": "Tahlil and Tawhid", "التهليل والتوحيد": "Tahlil and Tawhid", "ورد التكبير والتحميد": "Takbir and Tahmid", "التكبير والتحميد": "Takbir and Tahmid", "كان النبي صلى الله عليه وسلم يُعد له في المجلس الواحد مئة مرة": "The Prophet ﷺ was counted saying it a hundred times in a single sitting.", "كلما صليت عليه صلاة واحدة صلى الله عليك بها عشراً، وكُفيت همك وغُفر ذنبك": "Each time you send one blessing upon him, Allah sends ten upon you; your worries are taken care of and your sins forgiven.", "كلمتان ثقيلتان في الميزان، حبيبتان إلى الرحمن": "Two words that are heavy on the scale and beloved to the Most Merciful.", "هي دواء لتسعة وتسعين داء أدناها الهم": "It is a remedy for ninety-nine ailments, the least of which is worry.", "هي أفضل الكلام وأحبّه إلى الله تعالى": "They are the best of speech and the most beloved to Allah.", "الإكثار من قول لا إله إلا الله وحدها فهي أفضل الذكر المطلق": "Say “La ilaha illa Allah” often; it is the best of unrestricted remembrance.", "ولئن شكرتم لأزيدنكم": "“If you are grateful, I will surely increase you.” (Quran 14:7)", "تذكير الأذكار": "Adhkar reminders", "تذكير بأوقات أذكار الصباح والمساء": "Reminders for the morning and evening adhkar", "أذكار الصباح لم تكتمل": "Morning adhkar not finished", "لم تُكمل أذكار الصباح بعد، اضغط لإكمالها.": "You haven’t finished the morning adhkar yet. Tap to complete them.", "أذكار المساء لم تكتمل": "Evening adhkar not finished", "لم تُكمل أذكار المساء بعد، اضغط لإكمالها.": "You haven’t finished the evening adhkar yet. Tap to complete them.", "حان وقت أذكار الصباح، اضغط للبدء.": "It’s time for the morning adhkar. Tap to begin.", "حان وقت أذكار المساء، اضغط للبدء.": "It’s time for the evening adhkar. Tap to begin.", "التذكير مفعّل، اضغط للتعديل": "Reminder is on, tap to edit", "التذكير في تطبيق أندرويد يعمل على جهازك مباشرة، ولا نرسل عنه أي بيانات إلى خادمنا.": "On Android, reminders run directly on your device and no data about them is sent to our server.", "ثبّت طوبى أولًا": "Install Tooba first", "على آيفون تعمل الإشعارات بعد إضافة طوبى إلى الشاشة الرئيسية من زر المشاركة، ثم افتحها من هناك.": "On iPhone, notifications work after you add Tooba to the Home Screen from the Share button, then open it from there.", "الإشعارات غير متاحة": "Notifications unavailable", "هذا المتصفح لا يدعم إشعارات التذكير. جرّب فتح طوبى من متصفح آخر.": "This browser doesn’t support reminder notifications. Try opening Tooba in another browser.", "حفظ الأوقات": "Save times", "التذكير مفعّل على هذا الجهاز.": "Reminders are on for this device.", "الإشعارات محظورة للتطبيق. فعّلها من إعدادات الجوال ← التطبيقات ← طوبى ← الإشعارات ثم أعد المحاولة.": "Notifications are blocked for the app. Turn them on in phone Settings → Apps → Tooba → Notifications, then try again.", "الإشعارات محظورة لهذا الموقع. فعّلها من إعدادات المتصفح ثم أعد المحاولة.": "Notifications are blocked for this site. Turn them on in your browser settings, then try again.", "اختر وقتًا واحدًا على الأقل.": "Choose at least one time.", "لم يتم السماح بالإشعارات. فعّلها من إعدادات الجوال ← التطبيقات ← طوبى ← الإشعارات ثم أعد المحاولة.": "Notifications weren’t allowed. Turn them on in phone Settings → Apps → Tooba → Notifications, then try again.", "لم يتم السماح بالإشعارات. فعّلها من إعدادات المتصفح ثم أعد المحاولة.": "Notifications weren’t allowed. Turn them on in your browser settings, then try again.", "تعذّر تفعيل التذكير الآن، حاول لاحقًا.": "Couldn’t turn on reminders right now. Please try later.", "تم إلغاء وإيقاف الإشعارات": "Notifications turned off", "تم تفعيل إشعارات الأذكار": "Adhkar notifications turned on", "بنية الصدقة الجارية عنك وعن أحبائك": "Charity for you and your loved ones", "صَدَقَةٌ جَارِيَةٌ لَكَ وَلِوَالِدَيْكَ": "A lasting charity for you and your parents", "مَنْ دَلَّ عَلَى خَيْرٍ فَلَهُ مِثْلُ أَجْرِ فَاعِلِهِ": "Whoever guides to good earns its reward", "افتح الصفحة من متصفح Safari": "Open the page in Safari", "اضغط على أيقونة المشاركة 􀈂 في الأسفل": "Tap the Share icon 􀈂 at the bottom", "مرّر لتحت واختر «إضافة إلى الشاشة الرئيسية»": "Scroll down and choose “Add to Home Screen”", "اضغط «إضافة» أعلى الشاشة": "Tap “Add” at the top of the screen", "اضغط على أيقونة القائمة ⋮ أعلى المتصفح": "Tap the menu icon ⋮ at the top of the browser", "اختر «إضافة إلى الشاشة الرئيسية» أو «تثبيت التطبيق»": "Choose “Add to Home Screen” or “Install app”", "أكّد الإضافة": "Confirm", "افتح الصفحة من متصفح جهازك المحمول": "Open the page in your phone’s browser", "من قائمة المتصفح اختر «إضافة إلى الشاشة الرئيسية»": "From the browser menu choose “Add to Home Screen”", "آيفون": "iPhone", "آيباد": "iPad", "أندرويد": "Android", "ويندوز": "Windows", "ماك": "Mac", "لينكس": "Linux", "جهاز": "Device", "إيدج": "Edge", "أوبرا": "Opera", "فايرفوكس": "Firefox", "كروم": "Chrome", "سفاري": "Safari", "التطبيق": "App", "نشط مؤخرًا": "Recently active", "نشط الآن": "Active now", "هذا الجهاز": "This device", "تأكيد الفصل": "Confirm", "فصل": "Unlink", "الأجهزة المرتبطة (": "Linked devices (", "إرسال البيانات": "Send data", "استقبال البيانات": "Receive data", "تم فصل هذا الجهاز": "This device was unlinked", "تم الفصل": "Unlinked", "لم يبق أي جهاز آخر مرتبط، فتم فصل هذا الجهاز أيضًا، وتقدّمك عليه بقي كما هو.": "No other linked device is left, so this device was unlinked too. Your progress on it stays as it is.", "تم فصله من جهاز آخر، وتقدّمك على هذا الجهاز بقي كما هو.": "It was unlinked from another device. Your progress on this device stays as it is.", "النسخة المحفوظة على الخادم اتحذفت.": "The saved copy on the server was deleted.", "تقدّمك على هذا الجهاز بقي كما هو.": "Your progress on this device stays as it is.", "جارٍ تجهيز الكود…": "Preparing the code…", "جارٍ استلام تقدّمك…": "Receiving your progress…", "زامن تقدّمك": "Sync your progress", "يمسح جهازك الجديد هذا الكود فيستلم تقدّمك فورًا": "Your new device scans this code and receives your progress right away", "امسح الكود من جهازك الجديد": "Scan the code from your new device", "يتم نقل بياناتك وتقدّمك فور المسح، بدون خطوة تأكيد.": "Your data and progress are transferred as soon as it’s scanned, with no confirmation step.", "الكود صالح 3 دقائق ولمرة واحدة، وبياناتك مشفّرة ولا يقرأها أحد غيرك. لا تعرضه إلا لجهازك. الجهاز الجديد لازم يكون محدّثًا لآخر إصدار.": "The code is valid for 3 minutes and works once. Your data is encrypted and no one else can read it. Show it only to your own device. The new device must be on the latest version.", "نسخ الرابط": "Copy link", "رجوع": "Back", "متصفحك لا يدعم المسح بالكاميرا. الصق رابط الربط في الخانة بالأسفل.": "Your browser doesn’t support camera scanning. Paste the link code in the box below.", "امسح كود الربط": "Scan the link code", "وجّه الكاميرا إلى الكود المعروض على جهازك اللي عليه تقدّمك.": "Point the camera at the code shown on the device that has your progress.", "فتح الكاميرا": "Open camera", "أو الصق رابط الربط هنا": "Or paste the link here", "ربط": "Link", "تم ربط جهازك الجديد": "Your new device is linked", "الجهاز الجديد استلم تقدّمك، ": "The new device received your progress, ", " استلم تقدّمك، ": " received your progress, ", "وأي تقدّم جديد يتحدّث بين أجهزتك تلقائيًا.": "and any new progress updates across your devices automatically.", "تعذّر الربط": "Couldn’t link", "حاول مرة أخرى.": "Try again.", "حاول مرة أخرى": "Try again", "تم نقل تقدّمك": "Your progress was transferred", "أذكارك وأورادك وصلت لهذا الجهاز، وأي تقدّم جديد يتحدّث بين الجهازين تلقائيًا.": "Your adhkar and wirds reached this device, and any new progress updates between both devices automatically.", "انتهت مدة الكود": "The code expired", "تعذّر الاتصال الآن": "Can’t connect right now", "الكود صالح لمدة 3 دقائق فقط.": "The code is valid for 3 minutes only.", "محاولات كتيرة في وقت قصير، استنى دقيقة وحاول مرة أخرى.": "Too many attempts in a short time. Wait a minute and try again.", "تأكد من الإنترنت وحاول مرة أخرى.": "Check your internet and try again.", "إظهار كود جديد": "Show a new code", "إعادة المحاولة": "Retry", "أجهزتك مرتبطة": "Your devices are linked", "آخر مزامنة:": "Last sync:", "تقدّمك يتحدّث تلقائيًا بين أجهزتك.": "Your progress updates automatically across your devices.", "تعذّرت المزامنة آخر مرة، بنعيد المحاولة تلقائيًا. تأكد من الإنترنت.": "The last sync failed. We’ll retry automatically. Check your internet.", "ربط جهاز جديد": "Link a new device", "حذف النسخة المشفّرة من الخادم": "Delete the encrypted copy from the server", "ده كود من إصدار قديم. حدّث الجهاز الآخر لآخر إصدار.": "This code is from an older version. Update the other device to the latest version.", "ده مش كود ربط طوبى. امسح الكود المعروض على الجهاز اللي عليه تقدّمك.": "This isn’t a Tooba link code. Scan the code shown on the device that has your progress.", "الكود انتهت مدته أو اتستخدم قبل كده. اطلب كودًا جديدًا من الجهاز الآخر.": "The code expired or was already used. Ask the other device for a new code.", "الكود غير صالح. اطلب كودًا جديدًا من الجهاز الآخر.": "The code isn’t valid. Ask the other device for a new code.", "تعذّر الاتصال. تأكد من الإنترنت وحاول مرة أخرى.": "Couldn’t connect. Check your internet and try again.", "تعذّر تشغيل الكاميرا. اسمح للمتصفح باستخدامها أو الصق رابط الربط بالأسفل.": "Couldn’t start the camera. Allow the browser to use it, or paste the link code below.", "جارٍ تجهيز الماسح…": "Preparing the scanner…", "الماسح غير متاح في هذا الإصدار. الصق رابط الربط بالأسفل.": "The scanner isn’t available in this version. Paste the link code below.", "مفيش كاميرا متاحة على هذا الجهاز. الصق رابط الربط بالأسفل.": "No camera is available on this device. Paste the link code below.", "تعذّر تجهيز الماسح. تأكد من الإنترنت أو الصق رابط الربط بالأسفل.": "Couldn’t prepare the scanner. Check your internet or paste the link code below.", "وصلك كود ربط. اضغط «ربط» لنقل تقدّم الجهاز الآخر إلى هذا الجهاز.": "You received a link code. Tap “Link” to move the other device’s progress to this device.", "ربط طوبى": "Link Tooba", "افتح هذا الرابط على جهازك الذي عليه بياناتك:": "Open this link on the device that has your data:", "انقل تقدّمك إلى الجهاز الجديد؟": "Move your progress to the new device?", "سيستلم الجهاز الجديد أذكارك وأورادك وتقدّمك اليوم. لا تؤكد إلا إذا كنت أنت من عرض الكود على جهازك الجديد.": "The new device will receive your adhkar, wirds and today’s progress. Only confirm if you were the one who showed the code on your new device.", "تأكيد وإرسال": "Confirm and send", "إلغاء": "Cancel", "جارٍ الإرسال…": "Sending…", "الجهاز الجديد استلم بياناتك، وسيتحدّث التقدّم بين الجهازين تلقائيًا.": "The new device received your data, and progress will update between both devices automatically.", "تعذّر النقل": "Couldn’t transfer", "انتهت صلاحية الكود، اعرض كودًا جديدًا": "The code expired, show a new one", "تعذّر النقل، تأكد من الإنترنت": "Couldn’t transfer, check your internet", "رواه الحاكم وصححه الألباني": "Narrated by al-Hakim; graded authentic by al-Albani", "رواه أبو داود والترمذي": "Narrated by Abu Dawud and al-Tirmidhi", "رواه البخاري": "Narrated by al-Bukhari", "رواه أحمد وأبو داود والترمذي": "Narrated by Ahmad, Abu Dawud and al-Tirmidhi", "رواه أبو داود": "Narrated by Abu Dawud", "رواه أبو داود والنسائي": "Narrated by Abu Dawud and al-Nasa’i", "رواه ابن السني وأبو داود موقوفًا": "Narrated by Ibn al-Sunni and Abu Dawud (mawquf, a statement of a Companion)", "رواه مسلم": "Narrated by Muslim", "رواه أحمد والترمذي": "Narrated by Ahmad and al-Tirmidhi", "رواه أحمد والبخاري في الأدب المفرد": "Narrated by Ahmad and al-Bukhari in al-Adab al-Mufrad", "متفق عليه": "Agreed upon (al-Bukhari and Muslim)", "رواه الترمذي وأبو داود": "Narrated by al-Tirmidhi and Abu Dawud", "رواه أحمد وابن السني": "Narrated by Ahmad and Ibn al-Sunni", "رواه أبو داود وابن ماجه": "Narrated by Abu Dawud and Ibn Majah", "الأذكار": "Adhkar", "الإعدادات": "Settings", "التنقل": "Navigation", "مفعّل": "On", "غير مفعّل": "Off", "مرتبط": "Linked", "غير مرتبط": "Not linked", "مزامنة الأجهزة": "Device sync", "اللغة": "Language", "التذكير": "Reminders"};
   const TL = ["Allahu la ilaha illa huwa, al-Hayyul-Qayyum. La ta’khudhuhu sinatun wa la nawm. Lahu ma fis-samawati wa ma fil-ard. Man dhal-ladhi yashfa‘u ‘indahu illa bi-idhnih. Ya‘lamu ma bayna aydihim wa ma khalfahum, wa la yuhituna bi-shay’in min ‘ilmihi illa bima sha’. Wasi‘a kursiyyuhus-samawati wal-ard, wa la ya’uduhu hifzuhuma, wa Huwal-‘Aliyyul-‘Azim.", "Qul huwa Allahu ahad. Allahus-samad. Lam yalid wa lam yulad. Wa lam yakun lahu kufuwan ahad.", "Qul a‘udhu bi-Rabbil-falaq. Min sharri ma khalaq. Wa min sharri ghasiqin idha waqab. Wa min sharrin-naffathati fil-‘uqad. Wa min sharri hasidin idha hasad.", "Qul a‘udhu bi-Rabbin-nas. Malikin-nas. Ilahin-nas. Min sharril-waswasil-khannas. Alladhi yuwaswisu fi sudurin-nas. Minal-jinnati wan-nas.", "Asbahna wa asbahal-mulku lillah, walhamdu lillah, la ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamd, wa huwa ‘ala kulli shay’in qadir. Rabbi as’aluka khayra ma fi hadhal-yawm wa khayra ma ba‘dah, wa a‘udhu bika min sharri ma fi hadhal-yawm wa sharri ma ba‘dah. Rabbi a‘udhu bika minal-kasali wa su’il-kibar. Rabbi a‘udhu bika min ‘adhabin fin-nar wa ‘adhabin fil-qabr.", "Allahumma anta Rabbi la ilaha illa ant, khalaqtani wa ana ‘abduk, wa ana ‘ala ‘ahdika wa wa‘dika mastata‘t. A‘udhu bika min sharri ma sana‘t. Abu’u laka bi-ni‘matika ‘alayya, wa abu’u bi-dhanbi faghfir li, fa-innahu la yaghfirudh-dhunuba illa ant.", "Raditu billahi Rabba, wa bil-Islami dina, wa bi-Muhammadin sallallahu ‘alayhi wa sallama nabiyya.", "Allahumma inni asbahtu ushhiduk, wa ushhidu hamalata ‘arshik, wa mala’ikatak, wa jami‘a khalqik, annaka antallahu la ilaha illa anta wahdaka la sharika lak, wa anna Muhammadan ‘abduka wa rasuluk.", "Allahumma ma asbaha bi min ni‘matin aw bi-ahadin min khalqika faminka wahdaka la sharika lak, falakal-hamdu wa lakash-shukr.", "Hasbiyallahu la ilaha illa huw, ‘alayhi tawakkaltu wa huwa Rabbul-‘arshil-‘azim.", "Bismillahil-ladhi la yadurru ma‘asmihi shay’un fil-ardi wa la fis-sama’i wa huwas-Sami‘ul-‘Alim.", "Allahumma bika asbahna, wa bika amsayna, wa bika nahya, wa bika namut, wa ilaykan-nushur.", "Asbahna ‘ala fitratil-Islam, wa ‘ala kalimatil-ikhlas, wa ‘ala dini nabiyyina Muhammadin sallallahu ‘alayhi wa sallam, wa ‘ala millati abina Ibrahima hanifan musliman wa ma kana minal-mushrikin.", "Subhanallahi wa bihamdih, ‘adada khalqih, wa rida nafsih, wa zinata ‘arshih, wa midada kalimatih.", "Allahumma ‘afini fi badani, Allahumma ‘afini fi sam‘i, Allahumma ‘afini fi basari, la ilaha illa ant.", "Allahumma inni a‘udhu bika minal-kufri wal-faqr, wa a‘udhu bika min ‘adhabil-qabr, la ilaha illa ant.", "Allahumma inni as’alukal-‘afwa wal-‘afiyata fid-dunya wal-akhirah. Allahumma inni as’alukal-‘afwa wal-‘afiyata fi dini wa dunyaya wa ahli wa mali. Allahummastur ‘awrati wa amin raw‘ati, wahfazni min bayni yadayya wa min khalfi wa ‘an yamini wa ‘an shimali wa min fawqi, wa a‘udhu bi-‘azamatika an ughtala min tahti.", "Ya Hayyu ya Qayyum, bi-rahmatika astaghith, aslih li sha’ni kullah, wa la takilni ila nafsi tarfata ‘ayn.", "Asbahna wa asbahal-mulku lillahi Rabbil-‘alamin. Allahumma inni as’aluka khayra hadhal-yawm: fathahu, wa nasrahu, wa nurahu, wa barakatahu, wa hudah; wa a‘udhu bika min sharri ma fihi wa sharri ma ba‘dah.", "Allahumma ‘Alimal-ghaybi wash-shahadah, Fatiras-samawati wal-ard, Rabba kulli shay’in wa Malikah, ashhadu an la ilaha illa ant, a‘udhu bika min sharri nafsi, wa min sharrish-shaytani wa shirkih, wa an aqtarifa ‘ala nafsi su’an aw ajurrahu ila Muslim.", "A‘udhu bi-kalimatillahit-tammati min sharri ma khalaq.", "Allahumma salli wa sallim wa barik ‘ala nabiyyina Muhammad.", "Allahumma inna na‘udhu bika an nushrika bika shay’an na‘lamuh, wa nastaghfiruka lima la na‘lamuh.", "Allahumma inni a‘udhu bika minal-hammi wal-hazan, wa a‘udhu bika minal-‘ajzi wal-kasal, wa a‘udhu bika minal-jubni wal-bukhl, wa a‘udhu bika min ghalabatid-dayni wa qahrir-rijal.", "Astaghfirullahal-‘Azimal-ladhi la ilaha illa huwal-Hayyul-Qayyumu wa atubu ilayh.", "Ya Rabbi lakal-hamdu kama yanbaghi li-jalali wajhika wa ‘azimi sultanik.", "La ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamd, wa huwa ‘ala kulli shay’in qadir.", "Allahumma anta Rabbi la ilaha illa anta ‘alayka tawakkaltu wa anta Rabbul-‘arshil-‘azim. Ma sha’allahu kana wa ma lam yasha’ lam yakun, wa la hawla wa la quwwata illa billahil-‘Aliyyil-‘Azim. A‘lamu annallaha ‘ala kulli shay’in qadir, wa annallaha qad ahata bi-kulli shay’in ‘ilma. Allahumma inni a‘udhu bika min sharri nafsi wa min sharri kulli dabbatin anta akhidhun bi-nasiyatiha. Inna Rabbi ‘ala siratin mustaqim.", "A‘udhu bi-wajhillahil-Karim, wa bi-asma’ihil-husna ma ‘alimtu minha wa ma lam a‘lam, wa kalimatihit-tammatil-lati la yujawizuhunna barrun wa la fajir, fil-ardi wa la fis-sama’, min sharri ma khalaqa wa dhara’a wa bara’a, wa min sharri ma yanzilu minas-sama’i wa min sharri ma ya‘ruju fiha, wa min sharri ma yakhruju minal-ardi wa min sharri ma yanzilu fiha, wa min sharri fitanil-layli wan-nahar, wa min sharri kulli tariqin illa tariqan yatruqu bi-khayrin ya Rahman.", "Subhanallahi wa bihamdih."], EV_TL = {"1": "Amanar-Rasulu bima unzila ilayhi min Rabbihi wal-mu’minun. Kullun amana billahi wa mala’ikatihi wa kutubihi wa rusulih, la nufarriqu bayna ahadin min rusulih. Wa qalu sami‘na wa ata‘na, ghufranaka Rabbana wa ilaykal-masir. La yukallifullahu nafsan illa wus‘aha, laha ma kasabat wa ‘alayha maktasabat. Rabbana la tu’akhidhna in nasina aw akhta’na. Rabbana wa la tahmil ‘alayna isran kama hamaltahu ‘alal-ladhina min qablina. Rabbana wa la tuhammilna ma la taqata lana bih, wa‘fu ‘anna waghfir lana warhamna, anta mawlana fansurna ‘alal-qawmil-kafirin.", "5": "Amsayna wa amsal-mulku lillah, walhamdu lillah, la ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamd, wa huwa ‘ala kulli shay’in qadir. Rabbi as’aluka khayra ma fi hadhihil-laylah wa khayra ma ba‘daha, wa a‘udhu bika min sharri ma fi hadhihil-laylah wa sharri ma ba‘daha. Rabbi a‘udhu bika minal-kasali wa su’il-kibar. Rabbi a‘udhu bika min ‘adhabin fin-nar wa ‘adhabin fil-qabr.", "8": "Allahumma inni amsaytu ushhiduk, wa ushhidu hamalata ‘arshik, wa mala’ikatak, wa jami‘a khalqik, annaka antallahu la ilaha illa anta wahdaka la sharika lak, wa anna Muhammadan ‘abduka wa rasuluk.", "9": "Allahumma ma amsa bi min ni‘matin aw bi-ahadin min khalqika faminka wahdaka la sharika lak, falakal-hamdu wa lakash-shukr.", "12": "Allahumma bika amsayna, wa bika asbahna, wa bika nahya, wa bika namut, wa ilaykal-masir.", "13": "Amsayna ‘ala fitratil-Islam, wa ‘ala kalimatil-ikhlas, wa ‘ala dini nabiyyina Muhammadin sallallahu ‘alayhi wa sallam, wa ‘ala millati abina Ibrahima hanifan musliman wa ma kana minal-mushrikin.", "19": "Amsayna wa amsal-mulku lillahi Rabbil-‘alamin. Allahumma inni as’aluka khayra hadhihil-laylah: fathaha, wa nasraha, wa nuraha, wa barakataha, wa hudaha; wa a‘udhu bika min sharri ma fiha wa sharri ma ba‘daha."};
   const EM = ["Allah — there is no god but Him, the Ever-Living, the Sustainer of all. Neither drowsiness nor sleep overtakes Him. To Him belongs whatever is in the heavens and whatever is on the earth. Who is there that can intercede with Him except by His permission? He knows what is before them and what is behind them, and they encompass nothing of His knowledge except what He wills. His Throne extends over the heavens and the earth, and preserving them does not burden Him. And He is the Most High, the Most Great.", "Say: He is Allah, the One. Allah, the Eternal Refuge. He neither begets nor is born, and there is none comparable to Him.", "Say: I seek refuge in the Lord of daybreak, from the evil of what He created, from the evil of darkness when it settles, from the evil of those who blow on knots, and from the evil of an envier when he envies.", "Say: I seek refuge in the Lord of mankind, the King of mankind, the God of mankind, from the evil of the sneaking whisperer, who whispers in the hearts of mankind, from among jinn and mankind.", "We have entered the morning and the dominion belongs to Allah, and all praise is for Allah. There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is over all things capable. My Lord, I ask You for the good of this day and the good of what follows it, and I seek refuge in You from the evil of this day and the evil of what follows it. My Lord, I seek refuge in You from laziness and the misery of old age. My Lord, I seek refuge in You from punishment in the Fire and punishment in the grave.", "O Allah, You are my Lord; there is no god but You. You created me and I am Your servant, and I keep Your covenant and promise as best I can. I seek refuge in You from the evil of what I have done. I acknowledge Your favor upon me, and I acknowledge my sin, so forgive me, for none forgives sins but You.", "I am pleased with Allah as my Lord, with Islam as my religion, and with Muhammad ﷺ as my Prophet.", "O Allah, I have entered the morning calling You to witness, and calling to witness the bearers of Your Throne, Your angels and all Your creation, that You are Allah, there is no god but You alone, with no partner, and that Muhammad is Your servant and Messenger.", "O Allah, whatever blessing has come to me or to any of Your creation this morning is from You alone, with no partner. To You is the praise and to You is the thanks.", "Allah is sufficient for me; there is no god but Him. In Him I place my trust, and He is the Lord of the Mighty Throne.", "In the name of Allah, with whose name nothing on earth or in heaven can cause harm, and He is the All-Hearing, the All-Knowing.", "O Allah, by You we have reached the morning, by You we reach the evening, by You we live, by You we die, and to You is the resurrection.", "We have reached the morning upon the natural religion of Islam, the word of sincerity, the religion of our Prophet Muhammad ﷺ, and the creed of our father Ibrahim, upright and submissive, who was not of the polytheists.", "Glory be to Allah and praise Him, by the number of His creation, as much as pleases Him, as heavy as His Throne, and as much as the ink of His words.", "O Allah, grant me well-being in my body. O Allah, grant me well-being in my hearing. O Allah, grant me well-being in my sight. There is no god but You.", "O Allah, I seek refuge in You from disbelief and poverty, and I seek refuge in You from the punishment of the grave. There is no god but You.", "O Allah, I ask You for pardon and well-being in this world and the Hereafter. O Allah, I ask You for pardon and well-being in my religion, my worldly life, my family and my wealth. O Allah, conceal my faults and calm my fears. O Allah, protect me from before me and behind me, from my right and my left, and from above me, and I seek refuge in Your greatness from being struck from beneath me.", "O Ever-Living, O Sustainer, in Your mercy I seek relief. Set right all my affairs, and do not leave me to myself even for the blink of an eye.", "We have reached the morning and the dominion belongs to Allah, Lord of the worlds. O Allah, I ask You for the good of this day: its opening, its victory, its light, its blessing and its guidance; and I seek refuge in You from the evil in it and the evil that follows it.", "O Allah, Knower of the unseen and the seen, Originator of the heavens and the earth, Lord and Sovereign of all things: I bear witness that there is no god but You. I seek refuge in You from the evil of my own self, from the evil of Satan and his polytheism, and from bringing harm upon myself or driving it to another Muslim.", "I seek refuge in the perfect words of Allah from the evil of what He created.", "O Allah, send prayers, peace and blessings upon our Prophet Muhammad.", "O Allah, we seek refuge in You from knowingly associating anything with You, and we seek Your forgiveness for what we do not know.", "O Allah, I seek refuge in You from worry and grief, from weakness and laziness, from cowardice and miserliness, and from being overcome by debt and overpowered by men.", "I seek forgiveness from Allah the Almighty, there is no god but Him, the Ever-Living, the Sustainer, and I repent to Him.", "My Lord, to You belongs praise as befits the majesty of Your face and the greatness of Your authority.", "There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is over all things capable.", "O Allah, You are my Lord; there is no god but You. In You I place my trust, and You are the Lord of the Mighty Throne. What Allah wills happens, and what He does not will does not happen. There is no power nor strength except with Allah, the Most High, the Most Great. I know that Allah is capable of all things and that Allah encompasses all things in knowledge. O Allah, I seek refuge in You from the evil of myself and from the evil of every creature You hold by the forelock. Indeed my Lord is on a straight path.", "I seek refuge in the Noble Face of Allah and in His Beautiful Names, those I know and those I do not, and in His perfect words which neither the righteous nor the wicked can transgress, from the evil of what He created, formed and brought into being; from the evil of what descends from the sky and what ascends into it; from the evil of what comes out of the earth and what enters it; from the evil of the trials of night and day; and from the evil of every visitor at night, except one who comes with good, O Most Merciful.", "Glory be to Allah and praise Him."], EV_OWN = {"1": "The Messenger believes in what was revealed to him from his Lord, and so do the believers. Each one believes in Allah, His angels, His books and His messengers: “We make no distinction between any of His messengers.” And they say: “We hear and we obey. Your forgiveness, our Lord, and to You is the final return.” Allah does not burden a soul beyond its capacity. It will have what it has earned, and it will bear what it has earned. “Our Lord, do not hold us accountable if we forget or make a mistake. Our Lord, do not lay upon us a burden like the one You laid upon those before us. Our Lord, do not burden us with what we cannot bear. Pardon us, forgive us, and have mercy on us. You are our Protector, so help us against the disbelieving people.”", "5": "We have entered the evening and the dominion belongs to Allah, and all praise is for Allah. There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is over all things capable. My Lord, I ask You for the good of this night and the good of what follows it, and I seek refuge in You from the evil of this night and the evil of what follows it. My Lord, I seek refuge in You from laziness and the misery of old age. My Lord, I seek refuge in You from punishment in the Fire and punishment in the grave.", "8": "O Allah, I have entered the evening calling You to witness, and calling to witness the bearers of Your Throne, Your angels and all Your creation, that You are Allah, there is no god but You alone, with no partner, and that Muhammad is Your servant and Messenger.", "9": "O Allah, whatever blessing has come to me or to any of Your creation this evening is from You alone, with no partner. To You is the praise and to You is the thanks.", "12": "O Allah, by You we have reached the evening, by You we reach the morning, by You we live, by You we die, and to You is the final return.", "13": "We have reached the evening upon the natural religion of Islam, the word of sincerity, the religion of our Prophet Muhammad ﷺ, and the creed of our father Ibrahim, upright and submissive, who was not of the polytheists.", "19": "We have reached the evening and the dominion belongs to Allah, Lord of the worlds. O Allah, I ask You for the good of this night: its opening, its victory, its light, its blessing and its guidance; and I seek refuge in You from the evil in it and the evil that follows it."}, EV_MAP = {"0": 0, "2": 1, "3": 2, "4": 3, "6": 5, "7": 6, "10": 9, "11": 10, "14": 13, "15": 14, "16": 15, "17": 16, "18": 17, "20": 19, "21": 20, "22": 21, "23": 22, "24": 23, "25": 24, "26": 25, "27": 26, "28": 27, "29": 28, "30": 29}, FADL = {"0": "Whoever says it in the morning is protected from the jinn until evening, and whoever says it in the evening is protected from them until morning.", "1": "Whoever says it three times in the morning and in the evening, it will suffice him against everything.", "5": "Whoever says it with firm faith during the day and dies before evening is among the people of Paradise, and likewise whoever says it at night.", "6": "Whoever says it, it is a right upon Allah to please him on the Day of Resurrection.", "7": "Whoever says it four times, Allah frees him from the Fire.", "8": "Whoever says it has fulfilled his gratitude for his day (or his night).", "9": "Whoever says it, Allah suffices him in whatever concerns him of the matters of this world and the Hereafter.", "10": "Whoever says it, nothing will harm him.", "13": "Whoever says it, if these words were weighed against all the remembrance said since morning, they would outweigh it.", "20": "Whoever says it three times in the evening, no venomous sting will harm him that night.", "21": "Whoever sends one blessing upon me, Allah sends ten blessings upon him.", "22": "Whoever says it, Allah protects him from hidden shirk.", "23": "Whoever says it, Allah removes his worry and settles his debt.", "24": "Whoever says it is forgiven, even if he had fled from the battlefield.", "26": "Whoever says it is like one who freed four souls from the descendants of Ishmael.", "29": "Whoever says it, no one will come on the Day of Resurrection with anything better than what he brings, except one who said the like of it or more."}, BAQ = "Whoever recites the last two verses of Surat al-Baqarah at night, they will suffice him.";
   // فضل الأذكار (النص المعروض بالظبط) من مصفوفة META الأصلية
@@ -6273,7 +6510,19 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
     if((m = /^(\d+) (?:أيام|يومًا)$/.exec(x))) return m[1] + ' days';
     return x;
   };
+  Object.assign(D, { "أذكار الاستيقاظ": "Waking Up Adhkar", "أتممت أذكار الاستيقاظ": "You completed the waking up adhkar",
+    "ذكّر أحبابك بأذكار الاستيقاظ": "Remind your loved ones of the waking up adhkar", "لا تنسَ أذكار الاستيقاظ 🤍 ذكّرتك بها هنا:": "Don’t forget the waking up adhkar 🤍 I reminded you of them here:",
+    "ترتيب أذكار الاستيقاظ": "Reorder waking up adhkar", "خواتيم سورة آل عمران": "Last verses of Surah Al Imran (3:190–200)",
+    "يمسح النّوم عن وجهه بيده، ثمّ يقرأ": "Wipe the sleep from your face with your hand, then recite",
+    "إذا استيقظ من الليل": "When waking at night", "رواه البخاري ومسلم": "Narrated by al-Bukhari and Muslim", "رواه الترمذي وقال: حديث حسن": "Narrated by al-Tirmidhi, who graded it hasan",
+    "من استيقظ فذكر اللّه انحلّت عنه عقدةٌ من عقد الشّيطان": "Whoever wakes up and remembers Allah, one of Shaytan’s knots is untied",
+    "من قالها ثمّ دعا استُجيب له، فإن توضّأ وصلّى قُبلت صلاته": "Whoever says it then makes du‘a will be answered, and if he performs wudu and prays, his prayer will be accepted" });
+  Object.assign(D, { "لا تفقد عادتك": "Don't lose your habit", "ابدأ من جديد، والعود أحمد": "Start again — coming back is always good",
+    "«أحبّ الأعمال إلى الله أدومها وإن قلّ»": "“The deeds most beloved to Allah are the most consistent, even if small.”",
+    "ابدأ الآن": "Start now", "لاحقًا": "Later", "أتمّ الأذكار أو وردًا اليوم لترجع شعلتك": "Complete the adhkar or a wird today to bring your flame back" });
   const P = [
+    [/^سلسلتك (\d+) (?:أيام|يومًا)\. أتمّ الأذكار أو وردًا اليوم ترجع شعلتك وتكمل\.$/, m => 'Your streak was ' + m[1] + ' days. Complete the adhkar or a wird today to bring your flame back and continue.'],
+    [/^أطول سلسلة لك (\d+)\. أتمّ الأذكار أو وردًا اليوم لتبدأ سلسلة جديدة\.$/, m => 'Your longest streak: ' + m[1] + ' days. Complete the adhkar or a wird today to start a new one.'],
     [/^أتممت أذكار (صلاة واحدة|صلاتين|(\d+) صلوات|(\d+) صلاة) اليوم$/, m => 'Adhkar completed after ' + (m[1] === 'صلاة واحدة' ? '1 prayer' : m[1] === 'صلاتين' ? '2 prayers' : (m[2] || m[3]) + ' prayers') + ' today'],
     [/^(\d+) من (\d+)$/, m => m[1] + ' of ' + m[2]],
     [/^من (\d+)$/, m => 'of ' + m[1]],
@@ -6311,7 +6560,10 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
   // (2.4.152) أذكار النوم: 0 = السور الثلاث مع بعض، 1 = آية الكرسي، 2 = خواتيم البقرة (من المساء)، 12 = «عالم الغيب» من الصباح
   const SL_TL = [null, null, null, "Bismika Rabbi wada‘tu janbi, wa bika arfa‘uh, in amsakta nafsi farhamha, wa in arsaltaha fahfazha bima tahfazu bihi ‘ibadakas-salihin.", "Allahumma innaka khalaqta nafsi wa anta tawaffaha, laka mamatuha wa mahyaha, in ahyaytaha fahfazha, wa in amattaha faghfir laha. Allahumma inni as’alukal-‘afiyah.", "Allahumma qini ‘adhabaka yawma tab‘athu ‘ibadak.", "Bismika Allahumma amutu wa ahya.", "Subhanallah.", "Alhamdulillah.", "Allahu Akbar.", "Allahumma Rabbas-samawatis-sab‘i wa Rabbal-ardi wa Rabbal-‘arshil-‘azim, Rabbana wa Rabba kulli shay’, faliqal-habbi wan-nawa, wa munzilat-Tawrati wal-Injili wal-Furqan, a‘udhu bika min sharri kulli shay’in anta akhidhun binasiyatih. Allahumma antal-Awwalu falaysa qablaka shay’, wa antal-Akhiru falaysa ba‘daka shay’, wa antaz-Zahiru falaysa fawqaka shay’, wa antal-Batinu falaysa dunaka shay’, iqdi ‘annad-dayna wa aghnina minal-faqr.", "Alhamdu lillahil-ladhi at‘amana wa saqana, wa kafana, wa awana, fakam mimman la kafiya lahu wa la mu’wi.", null, "Allahumma aslamtu nafsi ilayk, wa wajjahtu wajhi ilayk, wa fawwadtu amri ilayk, wa alja’tu zahri ilayk, raghbatan wa rahbatan ilayk, la malja’a wa la manja minka illa ilayk, amantu bikitabikal-ladhi anzalt, wa binabiyyikal-ladhi arsalt."], SL_EM = [null, null, null, "In Your name, my Lord, I lay down my side, and by You I raise it. If You take my soul, have mercy on it, and if You release it, protect it as You protect Your righteous servants.", "O Allah, You created my soul and You take it back. Its death and its life belong to You. If You keep it alive, protect it, and if You cause it to die, forgive it. O Allah, I ask You for well-being.", "O Allah, protect me from Your punishment on the Day You resurrect Your servants.", "In Your name, O Allah, I die and I live.", "Glory be to Allah.", "All praise is for Allah.", "Allah is the Greatest.", "O Allah, Lord of the seven heavens, Lord of the earth and Lord of the mighty Throne, our Lord and Lord of all things, Splitter of the seed and the date-stone, Revealer of the Torah, the Gospel and the Criterion, I seek refuge in You from the evil of everything whose forelock You hold. O Allah, You are the First and nothing is before You; You are the Last and nothing is after You; You are the Most High and nothing is above You; You are the Most Near and nothing is beyond You. Settle our debt and free us from poverty.", "All praise is for Allah who fed us and gave us drink, sufficed us and sheltered us. How many have no one to suffice them or shelter them!", null, "O Allah, I submit myself to You, I turn my face to You, I entrust my affairs to You, and I rely on You, out of hope in You and fear of You. There is no refuge and no escape from You except to You. I believe in Your Book which You revealed and in Your Prophet whom You sent."];
   const SL_AK = data.morning.findIndex(x => x.text === data.sleep[12].text);
+  const WK_TL = ["Alhamdu lillahil-ladhi ahyana ba‘da ma amatana wa ilayhin-nushur.", "Alhamdu lillahil-ladhi ‘afani fi jasadi, wa radda ‘alayya ruhi, wa adhina li bidhikrih.", "La ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamd, wa huwa ‘ala kulli shay’in qadir. Alhamdu lillah, wa subhanallah, wa la ilaha illallah, wallahu akbar, wa la hawla wa la quwwata illa billah. Allahummaghfir li.", null];
+  const WK_EM = ["Praise is to Allah who gave us life after He had caused us to die, and to Him is the resurrection.", "Praise is to Allah who gave me well-being in my body, returned my soul to me, and permitted me to remember Him.", "There is no god but Allah alone, with no partner. His is the dominion and His is the praise, and He is over all things capable. Praise is to Allah, glory be to Allah, there is no god but Allah, Allah is the Greatest, and there is no might nor power except with Allah. O Allah, forgive me.", null];
   const pick = (mode, i, own, own_map, base) => {
+    if(mode === 'wake') return (base === EM ? WK_EM : WK_TL)[i] || null;
     if(mode === 'sleep'){
       const isEm = base === EM, arr = isEm ? SL_EM : SL_TL;
       if(arr[i]) return arr[i];
