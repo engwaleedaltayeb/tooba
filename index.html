@@ -165,8 +165,14 @@
     margin-bottom:6px;
     letter-spacing:0.2px;
   }
-  /* (2.4.179) سطر اليوم مخفي في كل الصفحات، ومكانه محفوظ علشان المحتوى ما يطلعش لفوق */
-  #dateLine{ visibility:hidden; }
+  /* (2.4.180) سطر اليوم اتشال، ومكانه أيقونة القسم كبيرة كأنها غلاف */
+  #dateLine{ display:none; }
+  .sec-ic{ height:60px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; color:var(--accent); }
+  .sec-ic svg{ width:60px; height:60px; fill:none; stroke:currentColor; stroke-width:1.15; stroke-linecap:round; stroke-linejoin:round; }
+  .sec-ic svg.ts{ fill:currentColor; stroke:none; }
+  .sec-ic.swap svg{ animation:secIn .45s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes secIn{ from{ opacity:0; transform:scale(.8) rotate(-8deg); } to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce){ .sec-ic.swap svg{ animation:none; } }
   h1{
     font-family:'Amiri', serif;
     font-size:38px;
@@ -1302,7 +1308,7 @@
   .ord-row.lift{ z-index:3; background:var(--surface); border-color:var(--accent-text); box-shadow:0 10px 28px var(--shadow); cursor:grabbing; }
   .ord-reset{ display:block; width:100%; margin-top:6px; padding:12px; background:none; border:none; color:var(--text-dim); font-family:inherit; font-size:14px; font-weight:500; cursor:pointer; }
   .ord-reset[hidden]{ display:none; }
-  body.intro-go header .kicker, body.intro-go header h1, body.intro-go .toggle, body.intro-go .font-ctrl,
+  body.intro-go header .kicker, body.intro-go header .sec-ic, body.intro-go header h1, body.intro-go .toggle, body.intro-go .font-ctrl,
   body.intro-go .progress, body.intro-go .wstrip, body.intro-go #list > *, body.intro-go .hint, body.intro-go .about-wrap{
     animation:rvIn .85s cubic-bezier(.2,.8,.3,1) backwards; animation-delay:calc(var(--i, 0) * 80ms);
   }
@@ -1311,7 +1317,7 @@
      الأزرار بتتحسب بالنسبة لها وتظهر مكان الشريط. فنلغي حركتها هناك ونخلي الأزرار تظهر بشفافية بس */
   body[data-mode="tasbeeh"] .font-ctrl{ animation:none !important; transform:none !important; }
   body.intro-go[data-mode="tasbeeh"] #tReset, body.intro-go[data-mode="tasbeeh"] #focusBtn, body.intro-go[data-mode="tasbeeh"] #hapticBtn{ animation:rvFade 1s ease backwards; animation-delay:.45s; }
-  body.intro-go header .kicker{ --i:0; } body.intro-go header h1{ --i:1; } body.intro-go .toggle{ --i:2; }
+  body.intro-go header .kicker, body.intro-go header .sec-ic{ --i:0; } body.intro-go header h1{ --i:1; } body.intro-go .toggle{ --i:2; }
   body.intro-go .font-ctrl{ --i:3; } body.intro-go .progress{ --i:4; } body.intro-go .wstrip{ --i:4; }
   body.intro-go #list > :nth-child(1){ --i:5; } body.intro-go #list > :nth-child(2){ --i:6; }
   body.intro-go #list > :nth-child(3){ --i:7; } body.intro-go #list > :nth-child(4){ --i:8; }
@@ -1907,6 +1913,7 @@
 
   <header>
     <div class="kicker" id="dateLine" aria-hidden="true">—</div>
+    <div class="sec-ic" id="secIcon" aria-hidden="true"></div>
     <h1 id="pageTitle">أذكار الصباح</h1>
   </header>
 
@@ -2061,7 +2068,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.179</div>
+    <div class="about-ver">الإصدار 2.4.180</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -2348,6 +2355,18 @@ const MODE_DONE = { morning:'أتممت أذكار الصباح', evening:'أت�
 const MODE_REMIND_BTN = { morning:'ذكّر أحبابك بأذكار الصباح', evening:'ذكّر أحبابك بأذكار المساء', prayer:'ذكّر أحبابك بأذكار بعد الصلاة', sleep:'ذكّر أحبابك بأذكار النوم', wake:'ذكّر أحبابك بأذكار الاستيقاظ' };
 const MODE_REMIND = { morning:'لا تنسَ أذكار الصباح 🤍 ذكّرتك بها هنا:', evening:'لا تنسَ أذكار المساء 🤍 ذكّرتك بها هنا:', prayer:'لا تنسَ أذكار بعد الصلاة 🤍 ذكّرتك بها هنا:', sleep:'لا تنسَ أذكار النوم 🤍 ذكّرتك بها هنا:', wake:'لا تنسَ أذكار الاستيقاظ 🤍 ذكّرتك بها هنا:' };
 const title = document.getElementById('pageTitle');
+// (2.4.180) أيقونة القسم الكبيرة فوق العنوان: نفس أيقونة شريحة القسم، والسبحة بأيقونة الحبّات
+const secIcon = document.getElementById('secIcon');
+const SEC_TS = '<svg class="ts" viewBox="0 0 24 24"><circle cx="19" cy="10" r="1.25"/><circle cx="16.95" cy="14.95" r="1.25"/><circle cx="12" cy="17" r="1.25"/><circle cx="7.05" cy="14.95" r="1.25"/><circle cx="5" cy="10" r="1.25"/><circle cx="7.05" cy="5.05" r="1.25"/><circle cx="12" cy="3" r="1.25"/><circle cx="16.95" cy="5.05" r="1.25"/><circle cx="12" cy="21" r="1.25"/></svg>';
+function setSecIcon(m){
+  if(!secIcon || secIcon.dataset.m === m) return;
+  let html = '';
+  if(m === 'tasbeeh') html = SEC_TS;
+  else { const ic = document.querySelector('.achip[data-m="' + m + '"] .aic'); if(ic){ const c = ic.cloneNode(true); c.removeAttribute('class'); html = c.outerHTML; } }
+  const first = !secIcon.dataset.m;
+  secIcon.dataset.m = m; secIcon.innerHTML = html;
+  if(!first){ secIcon.classList.remove('swap'); void secIcon.offsetWidth; secIcon.classList.add('swap'); }
+}
 const dateLine = document.getElementById('dateLine');
 const progressText = document.getElementById('progressText');
 const barFill = document.getElementById('barFill');
@@ -3730,6 +3749,7 @@ function render(){
   if(mode !== 'tasbeeh') body.classList.remove('has-wird');
   document.documentElement.style.setProperty('--accent', 'var(--accent-' + mode + ')');
   title.textContent = MODE_TITLES[mode]; delete title.dataset.w;
+  setSecIcon(mode);
   btnMorning.classList.toggle('active', mode==='morning');
   btnEvening.classList.toggle('active', mode==='evening');
   btnTasbih.classList.toggle('active', mode==='tasbeeh');
