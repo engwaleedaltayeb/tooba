@@ -173,6 +173,50 @@
   .sec-ic.swap svg{ animation:secIn .45s cubic-bezier(.2,.8,.2,1) both; }
   @keyframes secIn{ from{ opacity:0; transform:scale(.8) rotate(-8deg); } to{ opacity:1; transform:none; } }
   @media (prefers-reduced-motion: reduce){ .sec-ic.swap svg{ animation:none; } }
+  /* (2.4.190) حركة بسيطة للأيقونة الكبيرة كل ~10 ثواني وإنت فوق الصفحة بس: الصباح أشعة وحمامتين، المساء سحابتين ونجمة… */
+  .sec-ic svg{ overflow:visible; }
+  .sec-ic svg *{ transform-box:fill-box; transform-origin:center; }
+  .sec-ic .xa{ opacity:0; }
+  .sec-ic .bd path, .sec-ic .zz path{ stroke-width:1; }
+  .sec-ic .cl path{ fill:var(--bg); }
+  .sec-ic.play .ray{ animation:saRay 2.4s ease-in-out; }
+  @keyframes saRay{ 0%,100%{ transform:none; } 30%{ transform:scale(1.2) rotate(12deg); opacity:.75; } 60%{ transform:scale(.96) rotate(-3deg); opacity:1; } }
+  .sec-ic.play .bd1{ animation:saBird1 2.6s cubic-bezier(.35,.1,.3,1); }
+  .sec-ic.play .bd2{ animation:saBird2 2.6s cubic-bezier(.35,.1,.3,1) .18s; }
+  .sec-ic.play .bd3{ animation:saBird3 2.6s cubic-bezier(.35,.1,.3,1) .4s; }
+  @keyframes saBird3{ 0%{ opacity:0; transform:translate(5px,17px) scale(.7); } 18%{ opacity:1; } 75%{ opacity:1; } 100%{ opacity:0; transform:translate(-12px,15px) scale(1.1); } }
+  @keyframes saBird1{ 0%{ opacity:0; transform:translate(4px,10px) scale(.8); } 18%{ opacity:1; } 75%{ opacity:1; } 100%{ opacity:0; transform:translate(-13px,4px) scale(1.25); } }
+  @keyframes saBird2{ 0%{ opacity:0; transform:translate(18px,11px) scale(.8); } 18%{ opacity:1; } 75%{ opacity:1; } 100%{ opacity:0; transform:translate(35px,5px) scale(1.25); } }
+  .sec-ic .bd .wl{ transform-origin:100% 100%; } .sec-ic .bd .wr2{ transform-origin:0% 100%; }
+  .sec-ic.play .bd .wl{ animation:saWingL .3s ease-in-out 9 alternate; }
+  .sec-ic.play .bd .wr2{ animation:saWingR .3s ease-in-out 9 alternate; }
+  @keyframes saWingL{ from{ transform:rotate(22deg); } to{ transform:rotate(-30deg); } }
+  @keyframes saWingR{ from{ transform:rotate(-22deg); } to{ transform:rotate(30deg); } }
+  .sec-ic.play .cl1{ animation:saCloud1 3s ease-in-out; }
+  .sec-ic.play .cl2{ animation:saCloud2 3s ease-in-out .35s; }
+  @keyframes saCloud1{ 0%{ opacity:0; transform:translate(-13px,14px); } 22%,78%{ opacity:1; } 100%{ opacity:0; transform:translate(20px,14px); } }
+  @keyframes saCloud2{ 0%{ opacity:0; transform:translate(24px,5px) scale(.7); } 25%,75%{ opacity:1; } 100%{ opacity:0; transform:translate(-6px,5px) scale(.7); } }
+  .sec-ic.play .st{ animation:saStar 1.4s ease-in-out 1.75s; }
+  @keyframes saStar{ 0%,100%{ opacity:0; transform:scale(0) rotate(-90deg); } 50%{ opacity:1; transform:scale(1.15) rotate(0); } }
+  .sec-ic.play .zz1{ animation:saZ 2.2s ease-out; }
+  .sec-ic.play .zz2{ animation:saZ 2.2s ease-out .55s; }
+  @keyframes saZ{ 0%{ opacity:0; transform:translate(16px,10px) scale(.5); } 25%{ opacity:1; } 100%{ opacity:0; transform:translate(21px,-3px) scale(1.1); } }
+  .sec-ic.play .sun{ animation:saSun 2.6s cubic-bezier(.45,0,.25,1); }
+  @keyframes saSun{ 0%,100%{ transform:none; } 28%,36%{ transform:translateY(7px); } }
+  .sec-ic.play .wr{ animation:saWr 2.6s ease-in-out; }
+  @keyframes saWr{ 0%,100%{ opacity:1; transform:none; } 20%,45%{ opacity:0; transform:scale(.6); } 75%{ opacity:1; transform:scale(1.18); } }
+  .sec-ic.play .arch{ animation:saArch 2s ease-in-out; }
+  @keyframes saArch{ 0%{ stroke-dashoffset:0; } 40%{ stroke-dashoffset:1; } 100%{ stroke-dashoffset:0; } }
+  .sec-ic .arch{ stroke-dasharray:1; }
+  .sec-ic.play .mat{ animation:saMat 2s ease-in-out; }
+  @keyframes saMat{ 0%,100%{ transform:none; } 45%{ transform:scale(1.06); } }
+  .sec-ic.play svg.ts circle{ animation:saBead .5s ease-in-out; }
+  @keyframes saBead{ 0%,100%{ transform:none; } 45%{ transform:scale(1.55); } }
+  .sec-ic.play svg.ts circle:nth-child(2){ animation-delay:.07s; } .sec-ic.play svg.ts circle:nth-child(3){ animation-delay:.14s; }
+  .sec-ic.play svg.ts circle:nth-child(4){ animation-delay:.21s; } .sec-ic.play svg.ts circle:nth-child(5){ animation-delay:.28s; }
+  .sec-ic.play svg.ts circle:nth-child(6){ animation-delay:.35s; } .sec-ic.play svg.ts circle:nth-child(7){ animation-delay:.42s; }
+  .sec-ic.play svg.ts circle:nth-child(8){ animation-delay:.49s; } .sec-ic.play svg.ts circle:nth-child(9){ animation-delay:.56s; }
+  @media (prefers-reduced-motion: reduce){ .sec-ic.play *{ animation:none !important; } }
   h1{
     font-family:'Amiri', serif;
     font-size:38px;
@@ -2146,7 +2190,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.187</div>
+    <div class="about-ver">الإصدار 2.4.194</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -2436,14 +2480,52 @@ const title = document.getElementById('pageTitle');
 // (2.4.180) أيقونة القسم الكبيرة فوق العنوان: نفس أيقونة شريحة القسم، والسبحة بأيقونة الحبّات
 const secIcon = document.getElementById('secIcon');
 const SEC_TS = '<svg class="ts" viewBox="0 0 24 24"><circle cx="19" cy="10" r="1.25"/><circle cx="16.95" cy="14.95" r="1.25"/><circle cx="12" cy="17" r="1.25"/><circle cx="7.05" cy="14.95" r="1.25"/><circle cx="5" cy="10" r="1.25"/><circle cx="7.05" cy="5.05" r="1.25"/><circle cx="12" cy="3" r="1.25"/><circle cx="16.95" cy="5.05" r="1.25"/><circle cx="12" cy="21" r="1.25"/></svg>';
+// (2.4.190) حركة الأيقونة الكبيرة: نفس شكل أيقونة الشريحة + عناصر إضافية مخفية بتظهر وقت الحركة بس
+const SEC_BIRD = '<path class="wl" d="M0 0Q-1.1-1.3-2.4-.5"/><path class="wr2" d="M0 0Q1.1-1.3 2.4-.5"/>';
+const SEC_CLOUD = '<path d="M1.5 4.6a2.1 2.1 0 0 1 .3-4.2 3.1 3.1 0 0 1 5.9-.9 2.3 2.3 0 0 1 2.3 3.1 1.6 1.6 0 0 1-.3 2Z"/>';
+const SEC_Z = '<path d="M0 0h2.4L0 2.8h2.4"/>';
+const SEC_ANIM = {
+  morning:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><g class="ray"><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g><g class="xa bd bd1">' + SEC_BIRD + '</g><g class="xa bd bd2">' + SEC_BIRD + '</g><g class="xa bd bd3">' + SEC_BIRD + '</g></svg>',
+  evening:'<svg viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/><path class="xa st" d="M19 2.6v3.6M17.2 4.4h3.6"/><g class="xa cl cl1">' + SEC_CLOUD + '</g><g class="xa cl cl2">' + SEC_CLOUD + '</g></svg>',
+  sleep:'<svg viewBox="0 0 24 24"><path d="M9.4 10.1a4.2 4.2 0 0 0 6.3 6.3 6.3 6.3 0 1 1-6.3-6.3ZM13 3.5h5l-5 6h5"/><g class="xa zz zz1">' + SEC_Z + '</g><g class="xa zz zz2">' + SEC_Z + '</g></svg>',
+  wake:'<svg viewBox="0 0 24 24"><defs><clipPath id="secWkClip"><rect x="-20" y="-20" width="64" height="38"/></clipPath></defs><path d="M3 18h18"/><g clip-path="url(#secWkClip)"><g class="sun"><path d="M6.5 18a5.5 5.5 0 0 1 11 0"/><path class="wr" d="M12 6.5V9M4.6 10.6l1.7 1.5M19.4 10.6l-1.7 1.5"/></g></g></svg>',
+  prayer:'<svg viewBox="0 0 24 24"><g class="mat"><rect x="6" y="4.5" width="12" height="15" rx="1.5"/><path class="arch" pathLength="1" d="M9 17v-4.5l3-3.5 3 3.5V17"/><path d="M8 2.5v2M12 2.5v2M16 2.5v2M8 19.5v2M12 19.5v2M16 19.5v2"/></g></svg>'
+};
+// بتشتغل أول ما القسم يظهر، وبعدها كل ~10 ثواني، بس لو الأيقونة باينة فوق (مش وإنت بتقرأ تحت) والصفحة ظاهرة
+function secCanPlay(){
+  if(!secIcon || document.hidden || body.classList.contains('focus')) return false;
+  if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+  if(!secIcon.getClientRects().length) return false;
+  const r = secIcon.getBoundingClientRect();
+  return r.bottom > 0 && r.top < (window.innerHeight || 800) && window.scrollY < 160;
+}
+function secPlay(){
+  if(!secCanPlay() || secIcon.classList.contains('play')) return;   // ما نعيدش حركة شغالة من أولها
+  secIcon.classList.remove('play'); void secIcon.offsetWidth; secIcon.classList.add('play');
+  clearTimeout(secPlay.t); secPlay.t = setTimeout(() => secIcon.classList.remove('play'), 3600);
+}
+// (2.4.193) الحركة بتشتغل أول ما القسم يظهر (ومع فتح التطبيق)، وبعدها كل 10 ثواني
+let secShownAt = Date.now(), secLastPlay = 0;
+setInterval(() => {
+  const t = Date.now();
+  if(t - secLastPlay < 10000 || secIcon.classList.contains('play')) return;
+  if(secCanPlay()){ secLastPlay = t; secPlay(); }
+}, 1000);
+document.addEventListener('visibilitychange', () => { if(!document.hidden) secShownAt = Date.now(); });
+window.addEventListener('scroll', () => { if(window.scrollY > 160 && secIcon.classList.contains('play')) secIcon.classList.remove('play'); }, { passive:true });
 function setSecIcon(m){
   if(!secIcon || secIcon.dataset.m === m) return;
   let html = '';
   if(m === 'tasbeeh') html = SEC_TS;
+  else if(SEC_ANIM[m]) html = SEC_ANIM[m];
   else { const ic = document.querySelector('.achip[data-m="' + m + '"] .aic'); if(ic){ const c = ic.cloneNode(true); c.removeAttribute('class'); html = c.outerHTML; } }
   const first = !secIcon.dataset.m;
   secIcon.dataset.m = m; secIcon.innerHTML = html;
   if(!first){ secIcon.classList.remove('swap'); void secIcon.offsetWidth; secIcon.classList.add('swap'); }
+  // (2.4.194) تشغيل واحد بس: نحجز الدور علشان تايمر الـ10 ثواني ما يشغّلهاش قبل الموعد فتتقطع وتبدأ من الأول
+  secShownAt = Date.now(); secLastPlay = Date.now();
+  secIcon.classList.remove('play'); clearTimeout(secPlay.t); clearTimeout(setSecIcon.t);
+  setSecIcon.t = setTimeout(() => { if(secIcon.dataset.m === m && secCanPlay()){ secLastPlay = Date.now(); secPlay(); } }, first ? 1600 : 650);
 }
 const dateLine = document.getElementById('dateLine');
 const progressText = document.getElementById('progressText');
@@ -3331,6 +3413,7 @@ paintStreakToggle();
 const flameBtn = document.getElementById('flameBtn'), flameNum = document.getElementById('flameNum'), flameOverlay = document.getElementById('flameOverlay');
 function dayWord(n){ return n === 0 ? 'ابدأ سلسلتك اليوم' : n === 1 ? 'يوم واحد' : n === 2 ? 'يومان متتاليان' : n <= 10 ? n + ' أيام متتالية' : n + ' يومًا متتاليًا'; }
 function paintFlame(){
+  if(window.pushFlame) window.pushFlame();
   if(!flameBtn) return;
   const n = streakNow(), today = loadStreak().last === ymd(new Date());
   flameBtn.hidden = streakOff();
@@ -5095,12 +5178,14 @@ function setThemePref(v){
   setRootTheme(v);
   try{ if(v === 'auto') localStorage.removeItem(THEME_KEY); else localStorage.setItem(THEME_KEY, v); }catch(e){}
   applyThemeIcon();
+  if(window.pushFlame) window.pushFlame();
 }
 function setBrand(id){
   const c = (window.TOOBA_PAL || []).find(p => p.id === id); if(!c) return;
   window.TOOBA_BRAND = c;
   const st = document.documentElement.style; st.setProperty('--brand', c.b); st.setProperty('--brand-text', c.t); st.setProperty('--brand-dk', c.d);
   try{ if(id === 'green') localStorage.removeItem('tooba-color'); else localStorage.setItem('tooba-color', id); }catch(e){}
+  if(window.pushFlame) window.pushFlame();
 }
 window.setBrand = setBrand;
 window.setThemePref = setThemePref; window.themePref = themePref;
@@ -5362,6 +5447,45 @@ if(WB){
   setTimeout(() => { pushWidget(); widgetLaunch(); }, 1200);
   document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible'){ pushWidget(); setTimeout(widgetLaunch, 300); } });
 }
+// ---------- (2.4.189) ودجيت الشعلة (أندرويد): مقاس صغير 1×1 ومقاس عريض 2×1 بالأسبوع ----------
+// بنبعت للودجيت بيانات السلسلة الخام، والودجيت بيحسب الحالة لوحده (فبيطفي بعد نص الليل من غير ما التطبيق يتفتح).
+// الضغط على الودجيت بيفتح أذكار الوقت الحالي (الصباح من 4 لـ2 الظهر، وغير كده المساء).
+const FWB = NATIVE ? nativePlugin('FlameWidget') : null;
+window.pushFlame = function(){
+  if(!FWB) return;
+  clearTimeout(window.pushFlame.t);
+  window.pushFlame.t = setTimeout(() => {
+    try{
+      const r = loadStreak(), c = window.TOOBA_BRAND || {};
+      const p = FWB.update({
+        n:r.n || 0, last:r.last || '', g:r.g || '',
+        days:Array.from(streakDays()).sort().slice(-21).join(','),
+        cl:c.b || '#15ce57', cd:c.d || c.b || '#15ce57',
+        th:(window.themePref ? window.themePref() : 'auto'), lang:window.LANG === 'en' ? 'en' : 'ar'
+      });
+      if(p && p.catch) p.catch(() => {});
+    }catch(e){}
+  }, 300);
+};
+function openAdhkarNow(){
+  const h = new Date().getHours(), m = (h >= 4 && h < 14) ? 'morning' : 'evening';
+  document.querySelectorAll('.sheet-overlay.open').forEach(o => o.classList.remove('open'));
+  if(body.classList.contains('focus') && window.exitFocus) window.exitFocus();
+  if(body.classList.contains('settings-open') || mode === 'tasbeeh'){ const a = document.querySelector('#bnav [data-tab="adhkar"]'); if(a) a.click(); }
+  if(mode !== m) switchMode(m);
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+async function flameLaunch(){
+  try{
+    const r = await FWB.consumeLaunch();
+    if(r && r.open) setTimeout(openAdhkarNow, 150);
+  }catch(e){}
+}
+if(FWB){
+  setTimeout(() => { window.pushFlame(); flameLaunch(); }, 1300);
+  document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible'){ window.pushFlame(); setTimeout(flameLaunch, 350); } });
+  setInterval(() => { if(document.visibilityState === 'visible') window.pushFlame(); }, 300000);
+}
 async function nativeSchedule(cfg){
   let perm = await nativePerm();
   if(perm !== 'granted'){ perm = (await LN.requestPermissions()).display; }
@@ -5601,9 +5725,11 @@ rOff.addEventListener('click', async () => {
   ];
   let i = 0, copied = false, curText = MSGS[0];
   // عرض الرسالة = أعرض سطر فيها، فيكون عرض المجموعة كلها ديناميكيًا والمسافات ثابتة
-  function measure(){
-    msgEl.style.width = '';
-    const r = document.createRange(); r.selectNodeContents(msgEl);
+  // (2.4.188) القياس والظبط لكل نسخة لوحدها (الحباية تحت الأذكار + نسخة الإعدادات)، علشان الشعار والكلام يفضلوا لازقين
+  function measure(el){
+    el = el || msgEl;
+    el.style.width = '';
+    const r = document.createRange(); r.selectNodeContents(el);
     const rs = Array.from(r.getClientRects());
     if(!rs.length) return 0;
     return Math.ceil(Math.max.apply(null, rs.map(x => x.right)) - Math.min.apply(null, rs.map(x => x.left))) + 1;
@@ -5611,14 +5737,16 @@ rOff.addEventListener('click', async () => {
   function setText(t, animate){
     curText = t;
     const apply = () => {
-      const old = msgEl.getBoundingClientRect().width;
-      msgEl.style.transition = 'none';
-      msgEl.textContent = t; inMsg.textContent = t;
-      const w = measure();
-      if(animate && old){ msgEl.style.width = old + 'px'; void msgEl.offsetWidth; }
-      msgEl.style.transition = '';
-      if(w) msgEl.style.width = w + 'px';
-      msgEl.classList.remove('out'); inMsg.classList.remove('out');
+      [msgEl, inMsg].forEach(el => {
+        const old = el.getBoundingClientRect().width;
+        el.style.transition = 'none';
+        el.textContent = t;
+        const w = measure(el);
+        if(animate && old && w){ el.style.width = old + 'px'; void el.offsetWidth; }
+        el.style.transition = '';
+        if(w) el.style.width = w + 'px';
+        el.classList.remove('out');
+      });
     };
     if(animate && !reduceMotion){
       msgEl.classList.add('out'); inMsg.classList.add('out');
@@ -5680,6 +5808,12 @@ rOff.addEventListener('click', async () => {
   }, { passive:true });
   if('IntersectionObserver' in window){
     new IntersectionObserver((es) => { inlineVis = es[0].isIntersecting; applyBanner(); }, { threshold:0.6 }).observe(inline);
+    // أول ما أي نسخة تظهر (كانت مخفية فقياسها كان صفر) نعيد ظبط عرض كلامها
+    const refitIO = new IntersectionObserver((es) => es.forEach(e => {
+      if(!e.isIntersecting) return;
+      const el = e.target.querySelector('.promo-msg'); const w = el && measure(el); if(w) el.style.width = w + 'px';
+    }));
+    refitIO.observe(inline); refitIO.observe(promo);
   }
 })();
 
