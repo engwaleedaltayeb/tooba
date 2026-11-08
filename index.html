@@ -89,6 +89,11 @@
     --accent-prayer:var(--brand);
     --accent-sleep:var(--brand);
     --accent-wake:var(--brand);
+    --accent-wudu:var(--brand);
+    --accent-out:var(--brand);
+    --accent-mosque:var(--brand);
+    --accent-food:var(--brand);
+    --accent-travel:var(--brand);
     --accent-tasbeeh:var(--brand);
     --bell-on:var(--brand-text);
     --reset:#d8453a;
@@ -175,6 +180,20 @@
   @media (prefers-reduced-motion: reduce){ .sec-ic.swap svg{ animation:none; } }
   /* (2.4.190) حركة بسيطة للأيقونة الكبيرة كل ~10 ثواني وإنت فوق الصفحة بس: الصباح أشعة وحمامتين، المساء سحابتين ونجمة… */
   .sec-ic svg{ overflow:visible; }
+  /* (2.4.199) الضغط على الأيقونة الكبيرة يشغّل مشهد على الشاشة كلها (الصباح والمساء) */
+  .sec-ic{ cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .sec-ic svg{ transition:transform .18s ease; }
+  .sec-ic:active svg{ transform:scale(.92); }
+  .sec-ic.sxh{ position:relative; }
+  .sec-ic.sxh::after{ content:''; position:absolute; left:50%; top:50%; width:74px; height:74px; margin:-37px 0 0 -37px; border-radius:50%; border:2px solid var(--accent); animation:sxHint 1.4s ease-out 4; pointer-events:none; }
+  @keyframes sxHint{ 0%{ transform:scale(.7); opacity:.8; } 100%{ transform:scale(1.5); opacity:0; } }
+  .sx-layer{ position:fixed; inset:0; z-index:140; pointer-events:none; overflow:hidden; color:var(--accent); }
+  .sx-layer svg{ position:absolute; overflow:visible; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; }
+  .sx-layer svg *{ transform-box:fill-box; transform-origin:center; }
+  .sx-wash{ position:absolute; inset:0; opacity:0; }
+  .sx-bird .wl{ transform-origin:100% 100%; animation:saWingL .26s ease-in-out infinite alternate; }
+  .sx-bird .wr2{ transform-origin:0% 100%; animation:saWingR .26s ease-in-out infinite alternate; }
+  .sx-cloud path{ fill:var(--bg); }
   .sec-ic svg *{ transform-box:fill-box; transform-origin:center; }
   .sec-ic .xa{ opacity:0; }
   .sec-ic .bd path, .sec-ic .zz path{ stroke-width:1; }
@@ -210,6 +229,41 @@
   .sec-ic .arch{ stroke-dasharray:1; }
   .sec-ic.play .mat{ animation:saMat 2s ease-in-out; }
   @keyframes saMat{ 0%,100%{ transform:none; } 45%{ transform:scale(1.06); } }
+  /* (2.4.195) الوضوء: القطرة بتنضغط وترجع، وقطرة صغيرة بتنزل فيها، ولمعة جوّه */
+  .sec-ic .drop{ transform-origin:50% 100%; }
+  .sec-ic.play .drop{ animation:saDrop 2.2s ease-in-out .5s; }
+  @keyframes saDrop{ 0%,100%{ transform:none; } 18%{ transform:scale(1.08,.9); } 36%{ transform:scale(.96,1.05); } 52%{ transform:none; } }
+  .sec-ic.play .dp{ animation:saDp .7s ease-in; }
+  @keyframes saDp{ 0%{ opacity:0; transform:translateY(-7px) scale(.6); } 25%{ opacity:1; } 85%{ opacity:1; } 100%{ opacity:0; transform:translateY(3px) scale(.9); } }
+  .sec-ic.play .shn{ animation:saShn 1.6s ease-in-out .9s; }
+  @keyframes saShn{ 0%,100%{ opacity:0; } 45%{ opacity:1; } }
+  /* (2.4.196) الخروج: السهم يخرج من الباب ويرجع. المسجد: المنارتين تتمدّد بالتتابع وهلال يظهر فوق القبة */
+  .sec-ic .dr, .sec-ic .op{ transform-origin:0% 50%; }
+  .sec-ic .op{ transform-origin:100% 50%; }
+  .sec-ic .op path:first-child{ fill:var(--bg); }
+  .sec-ic .lv{ transform-origin:100% 50%; }
+  .sec-ic.play .lv{ animation:saLv 2.4s ease-in-out .2s; }
+  @keyframes saLv{ 0%,100%{ transform:none; } 8%,20%{ transform:rotate(-40deg); } 28%,80%{ transform:none; } }
+  .sec-ic.play .dr{ animation:saDr 2.4s ease-in-out .2s; }
+  @keyframes saDr{ 0%,20%{ transform:none; opacity:1; } 32%{ transform:scaleX(.05); opacity:0; } 72%{ transform:scaleX(.05); opacity:0; } 86%,100%{ transform:none; opacity:1; } }
+  .sec-ic.play .op{ animation:saOp 2.4s ease-in-out .2s; }
+  @keyframes saOp{ 0%,24%{ opacity:0; transform:scaleX(.05); } 38%,66%{ opacity:1; transform:none; } 80%,100%{ opacity:0; transform:scaleX(.05); } }
+  .sec-ic .mnr{ transform-origin:50% 100%; }
+  .sec-ic.play .mnr1{ animation:saMnr 1.1s ease-in-out .2s; }
+  .sec-ic.play .mnr2{ animation:saMnr 1.1s ease-in-out .5s; }
+  @keyframes saMnr{ 0%,100%{ transform:none; } 45%{ transform:scaleY(1.12); } }
+  .sec-ic.play .hil{ animation:saHil 1.8s ease-in-out .8s; }
+  @keyframes saHil{ 0%,100%{ opacity:0; transform:translateY(2px) scale(.4); } 40%,70%{ opacity:1; transform:none; } }
+  /* (2.4.198) الطعام: بخار يطلع من الطبق والشوكة والسكينة بيتحرّكوا. السفر: الطيارة تطير لفوق وترجع من تحت */
+  .sec-ic .stm path{ stroke-width:1; }
+  .sec-ic.play .stm1{ animation:saStm 2s ease-out .1s; }
+  .sec-ic.play .stm2{ animation:saStm 2s ease-out .45s; }
+  @keyframes saStm{ 0%{ opacity:0; transform:translateY(3px); } 30%{ opacity:.9; } 100%{ opacity:0; transform:translateY(-4px); } }
+  .sec-ic.play .frk{ animation:saFrk 1.2s ease-in-out .2s; }
+  .sec-ic.play .knf{ animation:saFrk 1.2s ease-in-out .45s; }
+  @keyframes saFrk{ 0%,100%{ transform:none; } 45%{ transform:translateY(-2px) rotate(-6deg); } }
+  .sec-ic.play .pln{ animation:saPln 2.2s cubic-bezier(.5,0,.3,1) .2s; }
+  @keyframes saPln{ 0%{ transform:none; opacity:1; } 40%{ transform:translateY(-14px) scale(.8); opacity:0; } 41%{ transform:translateY(14px) scale(.8); opacity:0; } 80%,100%{ transform:none; opacity:1; } }
   .sec-ic.play svg.ts circle{ animation:saBead .5s ease-in-out; }
   @keyframes saBead{ 0%,100%{ transform:none; } 45%{ transform:scale(1.55); } }
   .sec-ic.play svg.ts circle:nth-child(2){ animation-delay:.07s; } .sec-ic.play svg.ts circle:nth-child(3){ animation-delay:.14s; }
@@ -1451,6 +1505,12 @@
   .card-title .when-tag:not(:first-child){ margin-inline-start:8px; }
   .pr-count{ font-size:14px; color:var(--text-dim); margin-top:6px; }
   .zrow.solo{ justify-content:center; }
+  .wd-tip{ margin:4px 0 14px; padding:14px 16px; border-radius:16px; background:color-mix(in srgb, var(--accent) 8%, transparent); text-align:start; }
+  .wd-tip-t{ display:flex; align-items:center; gap:8px; font-weight:600; font-size:15px; color:var(--accent-text); }
+  .wd-tip-t svg{ flex:none; }
+  .wd-tip-h{ margin-top:8px; font-family:'Noto Naskh Arabic',serif; font-size:calc(var(--zikr-size,22px) * .66); line-height:1.85; color:var(--text); }
+  .wd-tip-s{ margin-top:6px; font-size:calc(var(--zikr-size,22px) * .56); color:var(--text-dim); }
+  html.en .wd-tip-h{ font-family:inherit; direction:ltr; }
   .card-edit-btn{
     width:34px; height:34px; margin-block:-8px; border-radius:50%;
     border:1px solid var(--border); background:transparent; color:var(--text-dim);
@@ -1796,7 +1856,7 @@
   .toggle{ display:none !important; }
   .about-wrap{ display:none !important; }
   #syncBtn{ display:none !important; }
-  body[data-mode="morning"] .font-ctrl, body[data-mode="evening"] .font-ctrl, body[data-mode="prayer"] .font-ctrl, body[data-mode="sleep"] .font-ctrl, body[data-mode="wake"] .font-ctrl{ display:none; }
+  body[data-mode="morning"] .font-ctrl, body[data-mode="evening"] .font-ctrl, body[data-mode="prayer"] .font-ctrl, body[data-mode="sleep"] .font-ctrl, body[data-mode="wake"] .font-ctrl, body[data-mode="wudu"] .font-ctrl, body[data-mode="out"] .font-ctrl, body[data-mode="mosque"] .font-ctrl, body[data-mode="food"] .font-ctrl, body[data-mode="travel"] .font-ctrl{ display:none; }
   .promo:not(.in-settings):not(.inline){ display:none !important; }   /* (2.4.153) النسخة الداخلية (حبّاية) رجعت تحت الأذكار؛ الثابت لسه مخفي */
   .wrap{ padding-bottom:calc(104px + var(--sa-bottom)) !important; }
   /* الشرائح */
@@ -2016,7 +2076,7 @@
 
   <header>
     <div class="kicker" id="dateLine" aria-hidden="true">—</div>
-    <div class="sec-ic" id="secIcon" aria-hidden="true"></div>
+    <div class="sec-ic" id="secIcon" role="button" aria-label="شغّل الحركة"></div>
     <h1 id="pageTitle">أذكار الصباح</h1>
   </header>
 
@@ -2032,7 +2092,7 @@
     </button>
   </div>
 
-  <div class="asel" id="adhkarSel" role="group" aria-label="الأذكار"><button type="button" class="achip on" data-m="morning"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg><span>الصباح</span></button><button type="button" class="achip" data-m="evening"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg><span>المساء</span></button><button type="button" class="achip" data-m="prayer"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4.5" width="12" height="15" rx="1.5"/><path d="M9 17v-4.5l3-3.5 3 3.5V17M8 2.5v2M12 2.5v2M16 2.5v2M8 19.5v2M12 19.5v2M16 19.5v2"/></svg><span>بعد الصلاة</span></button><button type="button" class="achip" data-m="sleep"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.4 10.1a4.2 4.2 0 0 0 6.3 6.3 6.3 6.3 0 1 1-6.3-6.3ZM13 3.5h5l-5 6h5"/></svg><span>النوم</span></button><button type="button" class="achip" data-m="wake"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18M6.5 18a5.5 5.5 0 0 1 11 0M12 6.5V9M4.6 10.6l1.7 1.5M19.4 10.6l-1.7 1.5"/></svg><span>الاستيقاظ</span></button><button type="button" class="achip soon" data-soon="1"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5c3.4 4.1 5.5 7 5.5 10a5.5 5.5 0 0 1-11 0c0-3 2.1-5.9 5.5-10Z"/></svg><span>الوضوء</span></button><button type="button" class="achip soon" data-soon="1"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 21h20M7 21v-7a5 5 0 0 1 10 0v7M12 9V6.5M10.5 21v-2.5a1.5 1.5 0 0 1 3 0V21M2.5 21V11.5L3.5 9l1 2.5V21M19.5 21V11.5L20.5 9l1 2.5V21"/></svg><span>المسجد</span></button><button type="button" class="achip soon" data-soon="1"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5.5"/><path d="M3 4v4a1.5 1.5 0 0 0 3 0V4M4.5 4v16M20.5 20V4c-1.5 1-2.5 3-2.5 6v3h2.5"/></svg><span>الطعام</span></button><button type="button" class="achip soon" data-soon="1"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z"/></svg><span>السفر</span></button></div>
+  <div class="asel" id="adhkarSel" role="group" aria-label="الأذكار"><button type="button" class="achip on" data-m="morning"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg><span>الصباح</span></button><button type="button" class="achip" data-m="evening"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg><span>المساء</span></button><button type="button" class="achip" data-m="wudu"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5c3.4 4.1 5.5 7 5.5 10a5.5 5.5 0 0 1-11 0c0-3 2.1-5.9 5.5-10Z"/></svg><span>الوضوء</span></button><button type="button" class="achip" data-m="out"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4.5A1.5 1.5 0 0 1 6.5 3h11A1.5 1.5 0 0 1 19 4.5V21M3 21h18M8 21V6.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5V21M13.2 13.5h1.6"/></svg><span>الخروج</span></button><button type="button" class="achip" data-m="mosque"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 21h20M7 21v-7a5 5 0 0 1 10 0v7M12 9V6.5M10.5 21v-2.5a1.5 1.5 0 0 1 3 0V21M2.5 21V11.5L3.5 9l1 2.5V21M19.5 21V11.5L20.5 9l1 2.5V21"/></svg><span>المسجد</span></button><button type="button" class="achip" data-m="prayer"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4.5" width="12" height="15" rx="1.5"/><path d="M9 17v-4.5l3-3.5 3 3.5V17M8 2.5v2M12 2.5v2M16 2.5v2M8 19.5v2M12 19.5v2M16 19.5v2"/></svg><span>بعد الصلاة</span></button><button type="button" class="achip" data-m="food"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5.5"/><path d="M3 4v4a1.5 1.5 0 0 0 3 0V4M4.5 4v16M20.5 20V4c-1.5 1-2.5 3-2.5 6v3h2.5"/></svg><span>الطعام</span></button><button type="button" class="achip" data-m="travel"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z"/></svg><span>السفر</span></button><button type="button" class="achip" data-m="sleep"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.4 10.1a4.2 4.2 0 0 0 6.3 6.3 6.3 6.3 0 1 1-6.3-6.3ZM13 3.5h5l-5 6h5"/></svg><span>النوم</span></button><button type="button" class="achip" data-m="wake"><svg class="aic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18M6.5 18a5.5 5.5 0 0 1 11 0M12 6.5V9M4.6 10.6l1.7 1.5M19.4 10.6l-1.7 1.5"/></svg><span>الاستيقاظ</span></button></div>
 
   <div class="font-ctrl" aria-label="حجم الخط">
     <button id="tReset" class="dis" aria-label="تصفير العدّاد"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
@@ -2190,7 +2250,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.194</div>
+    <div class="about-ver">الإصدار 2.4.215</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -2423,9 +2483,50 @@ data.wake = [
   {text:"إِنَّ فِي خَلْقِ السَّمَاوَاتِ وَالْأَرْضِ وَاخْتِلَافِ اللَّيْلِ وَالنَّهَارِ لَآيَاتٍ لِأُولِي الْأَلْبَابِ ۝ الَّذِينَ يَذْكُرُونَ اللَّهَ قِيَامًا وَقُعُودًا وَعَلَىٰ جُنُوبِهِمْ وَيَتَفَكَّرُونَ فِي خَلْقِ السَّمَاوَاتِ وَالْأَرْضِ رَبَّنَا مَا خَلَقْتَ هَٰذَا بَاطِلًا سُبْحَانَكَ فَقِنَا عَذَابَ النَّارِ ۝ رَبَّنَا إِنَّكَ مَنْ تُدْخِلِ النَّارَ فَقَدْ أَخْزَيْتَهُ ۖ وَمَا لِلظَّالِمِينَ مِنْ أَنْصَارٍ ۝ رَبَّنَا إِنَّنَا سَمِعْنَا مُنَادِيًا يُنَادِي لِلْإِيمَانِ أَنْ آمِنُوا بِرَبِّكُمْ فَآمَنَّا ۚ رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ ۝ رَبَّنَا وَآتِنَا مَا وَعَدْتَنَا عَلَىٰ رُسُلِكَ وَلَا تُخْزِنَا يَوْمَ الْقِيَامَةِ ۗ إِنَّكَ لَا تُخْلِفُ الْمِيعَادَ ۝ فَاسْتَجَابَ لَهُمْ رَبُّهُمْ أَنِّي لَا أُضِيعُ عَمَلَ عَامِلٍ مِنْكُمْ مِنْ ذَكَرٍ أَوْ أُنْثَىٰ ۖ بَعْضُكُمْ مِنْ بَعْضٍ ۖ فَالَّذِينَ هَاجَرُوا وَأُخْرِجُوا مِنْ دِيَارِهِمْ وَأُوذُوا فِي سَبِيلِي وَقَاتَلُوا وَقُتِلُوا لَأُكَفِّرَنَّ عَنْهُمْ سَيِّئَاتِهِمْ وَلَأُدْخِلَنَّهُمْ جَنَّاتٍ تَجْرِي مِنْ تَحْتِهَا الْأَنْهَارُ ثَوَابًا مِنْ عِنْدِ اللَّهِ ۗ وَاللَّهُ عِنْدَهُ حُسْنُ الثَّوَابِ ۝ لَا يَغُرَّنَّكَ تَقَلُّبُ الَّذِينَ كَفَرُوا فِي الْبِلَادِ ۝ مَتَاعٌ قَلِيلٌ ثُمَّ مَأْوَاهُمْ جَهَنَّمُ ۚ وَبِئْسَ الْمِهَادُ ۝ لَٰكِنِ الَّذِينَ اتَّقَوْا رَبَّهُمْ لَهُمْ جَنَّاتٌ تَجْرِي مِنْ تَحْتِهَا الْأَنْهَارُ خَالِدِينَ فِيهَا نُزُلًا مِنْ عِنْدِ اللَّهِ ۗ وَمَا عِنْدَ اللَّهِ خَيْرٌ لِلْأَبْرَارِ ۝ وَإِنَّ مِنْ أَهْلِ الْكِتَابِ لَمَنْ يُؤْمِنُ بِاللَّهِ وَمَا أُنْزِلَ إِلَيْكُمْ وَمَا أُنْزِلَ إِلَيْهِمْ خَاشِعِينَ لِلَّهِ لَا يَشْتَرُونَ بِآيَاتِ اللَّهِ ثَمَنًا قَلِيلًا ۗ أُولَٰئِكَ لَهُمْ أَجْرُهُمْ عِنْدَ رَبِّهِمْ ۗ إِنَّ اللَّهَ سَرِيعُ الْحِسَابِ ۝ يَا أَيُّهَا الَّذِينَ آمَنُوا اصْبِرُوا وَصَابِرُوا وَرَابِطُوا وَاتَّقُوا اللَّهَ لَعَلَّكُمْ تُفْلِحُونَ", count:1, note:"خواتيم سورة آل عمران", how:"يمسح النّوم عن وجهه بيده، ثمّ يقرأ"}
 ];
 
+// (2.4.195) أذكار الوضوء: التسمية قبله، والثلاثة بعده (بموافقة المستخدم على المختلف فيه مع ذكر من صحّحه)
+data.wudu = [
+  {text:"بسم اللّه", count:1, when:"قبل الوضوء"},
+  {text:"أشهد أن لا إله إلّا اللّه وحده لا شريك له، وأشهد أنّ محمّدًا عبده ورسوله", count:1, when:"بعد الوضوء"},
+  {text:"اللّهمّ اجعلني من التّوّابين، واجعلني من المتطهّرين", count:1, when:"بعد الوضوء"},
+  {text:"سبحانك اللّهمّ وبحمدك، أشهد أن لا إله إلّا أنت، أستغفرك وأتوب إليك", count:1, when:"بعد الوضوء"}
+];
+
+// (2.4.196) أذكار الخروج من المنزل والمسجد (بموافقة المستخدم على المختلف فيه مع ذكر الكلام في السند)
+data.out = [
+  {text:"بسم اللّه، توكّلت على اللّه، ولا حول ولا قوّة إلّا باللّه", count:1},
+  {text:"اللّهمّ إنّي أعوذ بك أن أَضِلّ أو أُضَلّ، أو أَزِلّ أو أُزَلّ، أو أَظلِم أو أُظلَم، أو أَجهَل أو يُجهَل عليّ", count:1}
+];
+data.mosque = [
+  {text:"اللّهمّ اجعل في قلبي نورًا، وفي لساني نورًا، واجعل في سمعي نورًا، واجعل في بصري نورًا، واجعل من خلفي نورًا، ومن أمامي نورًا، واجعل من فوقي نورًا، ومن تحتي نورًا، اللّهمّ أعطني نورًا", count:1, when:"عند الذهاب إلى المسجد"},
+  {text:"أعوذ باللّه العظيم، وبوجهه الكريم، وسلطانه القديم، من الشّيطان الرّجيم", count:1, when:"عند دخول المسجد"},
+  {text:"بسم اللّه، والسّلام على رسول اللّه", count:1, when:"عند دخول المسجد"},
+  {text:"اللّهمّ افتح لي أبواب رحمتك", count:1, when:"عند دخول المسجد"},
+  {text:"اللّهمّ إنّي أسألك من فضلك", count:1, when:"عند الخروج من المسجد"},
+  {text:"اللّهمّ اعصمني من الشّيطان الرّجيم", count:1, when:"عند الخروج من المسجد"}
+];
+
+// (2.4.198) أذكار الطعام والسفر (بموافقة المستخدم على المختلف فيه مع ذكر الكلام في السند). آية الركوب من Tanzil
+data.food = [
+  {text:"بسم اللّه", count:1, when:"قبل الطعام"},
+  {text:"بسم اللّه أوّله وآخره", count:1, when:"إذا نسي في أوّله"},
+  {text:"الحمد للّه حمدًا كثيرًا طيّبًا مباركًا فيه، غير مكفيٍّ ولا مودَّعٍ ولا مستغنًى عنه ربّنا", count:1, when:"بعد الطعام"},
+  {text:"الحمد للّه الّذي أطعمني هذا ورزقنيه من غير حولٍ منّي ولا قوّةٍ", count:1, when:"بعد الطعام"},
+  {text:"اللّهمّ بارك لهم فيما رزقتهم، واغفر لهم وارحمهم", count:1, when:"لصاحب الطعام"},
+  {text:"اللّهمّ أطعم من أطعمني، واسق من سقاني", count:1, when:"لصاحب الطعام"}
+];
+data.travel = [
+  {text:"بسم اللّه، الحمد للّه، سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ، وَإِنَّا إِلَىٰ رَبِّنَا لَمُنْقَلِبُونَ، الحمد للّه، الحمد للّه، الحمد للّه، اللّه أكبر، اللّه أكبر، اللّه أكبر، سبحانك إنّي ظلمت نفسي فاغفر لي، فإنّه لا يغفر الذّنوب إلّا أنت", count:1, when:"عند الركوب"},
+  {text:"اللّه أكبر، اللّه أكبر، اللّه أكبر، سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ، وَإِنَّا إِلَىٰ رَبِّنَا لَمُنْقَلِبُونَ، اللّهمّ إنّا نسألك في سفرنا هذا البرّ والتّقوى، ومن العمل ما ترضى، اللّهمّ هوّن علينا سفرنا هذا واطو عنّا بعده، اللّهمّ أنت الصّاحب في السّفر، والخليفة في الأهل، اللّهمّ إنّي أعوذ بك من وعثاء السّفر، وكآبة المنظر، وسوء المنقلب في المال والأهل", count:1, when:"دعاء السفر"},
+  {text:"أعوذ بكلمات اللّه التّامّات من شرّ ما خلق", count:1, when:"عند النزول في مكان"},
+  {text:"اللّهمّ ربّ السّماوات السّبع وما أظللن، وربّ الأرضين السّبع وما أقللن، وربّ الشّياطين وما أضللن، وربّ الرّياح وما ذرين، فإنّا نسألك خير هذه القرية وخير أهلها وخير ما فيها، ونعوذ بك من شرّها وشرّ أهلها وشرّ ما فيها", count:1, when:"عند دخول بلد"},
+  {text:"آيبون تائبون عابدون لربّنا حامدون", count:1, when:"عند الرجوع"},
+  {text:"أستودعكم اللّه الّذي لا تضيع ودائعه", count:1, when:"المسافر لمن يودّعه"},
+  {text:"أستودع اللّه دينك، وأمانتك، وخواتيم عملك", count:1, when:"لمن تودّعه"}
+];
+const GAP_FRESH = { wudu:30 * 60 * 1000, out:30 * 60 * 1000, mosque:120 * 60 * 1000, food:60 * 60 * 1000, travel:360 * 60 * 1000 };
 let mode = "morning";
 let bannerLockUntil = 0;
-let progress = { morning:{}, evening:{}, prayer:{}, sleep:{}, wake:{} };
+let progress = { morning:{}, evening:{}, prayer:{}, sleep:{}, wake:{}, wudu:{}, out:{}, mosque:{}, food:{}, travel:{} };
 
 // يوم تحميل الصفحة: كل ما يتحفظ يُوسَم بيه (مش بتاريخ لحظة الحفظ)، عشان لو الصفحة فضلت مفتوحة بعد منتصف الليل ما يتحسبش تقدّم أمس كأنه تقدّم اليوم
 const BOOT_DAY = new Date().toDateString();
@@ -2442,7 +2543,7 @@ const STORAGE_KEY = 'tooba-progress-v1';
   }catch(e){ /* تجاهل أي خطأ في القراءة، الصفحة تشتغل عادي بدون حفظ */ }
 })();
 
-['morning','evening','prayer','sleep','wake'].forEach(k => { if(!progress[k]) progress[k] = {}; });
+['morning','evening','prayer','sleep','wake','wudu','out','mosque','food','travel'].forEach(k => { if(!progress[k]) progress[k] = {}; });
 // (2.4.173) أرقام أذكار الاستيقاظ اتغيّرت بعد شيل أول ذكر: نصفّر تقدّمها مرة واحدة
 try{ if(localStorage.getItem('tooba-wake-v') !== '2'){ progress.wake = {}; const o = JSON.parse(localStorage.getItem('tooba-order') || 'null'); if(o && o.wake){ delete o.wake; localStorage.setItem('tooba-order', JSON.stringify(o)); } localStorage.setItem('tooba-wake-v', '2'); } }catch(e){}
 // أذكار النوم محفوظة لوحدها بمفتاح «الليلة» (من 12 الظهر لـ12 الظهر)
@@ -2460,6 +2561,7 @@ function saveProgress(){ syncTouch();
   try{ sleepFresh(); localStorage.setItem(SL_KEY, JSON.stringify({ night:sleepNight, p:progress.sleep || {} })); }catch(e){}
   if(mode === 'prayer'){ try{ const r = prMeta(); r.t = Date.now(); prSave(r); }catch(e){} }
   if(mode === 'wake'){ try{ localStorage.setItem(WK_KEY, String(Date.now())); }catch(e){} }
+  if(GAP_FRESH[mode]){ try{ localStorage.setItem('tooba-' + mode + '-t', String(Date.now())); }catch(e){} }
   try{
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       date: BOOT_DAY,
@@ -2472,10 +2574,10 @@ const listEl = document.getElementById('list');
 const body = document.body;
 const btnMorning = document.getElementById('btnMorning');
 const btnEvening = document.getElementById('btnEvening');
-const MODE_TITLES = { morning:'أذكار الصباح', evening:'أذكار المساء', prayer:'أذكار بعد الصلاة', sleep:'أذكار النوم', wake:'أذكار الاستيقاظ', tasbeeh:'السبحة' };
-const MODE_DONE = { morning:'أتممت أذكار الصباح', evening:'أتممت أذكار المساء', prayer:'أتممت أذكار بعد الصلاة', sleep:'أتممت أذكار النوم', wake:'أتممت أذكار الاستيقاظ' };
-const MODE_REMIND_BTN = { morning:'ذكّر أحبابك بأذكار الصباح', evening:'ذكّر أحبابك بأذكار المساء', prayer:'ذكّر أحبابك بأذكار بعد الصلاة', sleep:'ذكّر أحبابك بأذكار النوم', wake:'ذكّر أحبابك بأذكار الاستيقاظ' };
-const MODE_REMIND = { morning:'لا تنسَ أذكار الصباح 🤍 ذكّرتك بها هنا:', evening:'لا تنسَ أذكار المساء 🤍 ذكّرتك بها هنا:', prayer:'لا تنسَ أذكار بعد الصلاة 🤍 ذكّرتك بها هنا:', sleep:'لا تنسَ أذكار النوم 🤍 ذكّرتك بها هنا:', wake:'لا تنسَ أذكار الاستيقاظ 🤍 ذكّرتك بها هنا:' };
+const MODE_TITLES = { morning:'أذكار الصباح', evening:'أذكار المساء', prayer:'أذكار بعد الصلاة', sleep:'أذكار النوم', wake:'أذكار الاستيقاظ', wudu:'أذكار الوضوء', out:'أذكار الخروج من المنزل', mosque:'أذكار المسجد', food:'أذكار الطعام', travel:'أذكار السفر', tasbeeh:'السبحة' };
+const MODE_DONE = { morning:'أتممت أذكار الصباح', evening:'أتممت أذكار المساء', prayer:'أتممت أذكار بعد الصلاة', sleep:'أتممت أذكار النوم', wake:'أتممت أذكار الاستيقاظ', wudu:'أتممت أذكار الوضوء', out:'أتممت أذكار الخروج من المنزل', mosque:'أتممت أذكار المسجد', food:'أتممت أذكار الطعام', travel:'أتممت أذكار السفر' };
+const MODE_REMIND_BTN = { morning:'ذكّر أحبابك بأذكار الصباح', evening:'ذكّر أحبابك بأذكار المساء', prayer:'ذكّر أحبابك بأذكار بعد الصلاة', sleep:'ذكّر أحبابك بأذكار النوم', wake:'ذكّر أحبابك بأذكار الاستيقاظ', wudu:'ذكّر أحبابك بأذكار الوضوء', out:'ذكّر أحبابك بأذكار الخروج', mosque:'ذكّر أحبابك بأذكار المسجد', food:'ذكّر أحبابك بأذكار الطعام', travel:'ذكّر أحبابك بأذكار السفر' };
+const MODE_REMIND = { morning:'لا تنسَ أذكار الصباح 🤍 ذكّرتك بها هنا:', evening:'لا تنسَ أذكار المساء 🤍 ذكّرتك بها هنا:', prayer:'لا تنسَ أذكار بعد الصلاة 🤍 ذكّرتك بها هنا:', sleep:'لا تنسَ أذكار النوم 🤍 ذكّرتك بها هنا:', wake:'لا تنسَ أذكار الاستيقاظ 🤍 ذكّرتك بها هنا:', wudu:'لا تنسَ أذكار الوضوء 🤍 ذكّرتك بها هنا:', out:'لا تنسَ أذكار الخروج من المنزل 🤍 ذكّرتك بها هنا:', mosque:'لا تنسَ أذكار المسجد 🤍 ذكّرتك بها هنا:', food:'لا تنسَ أذكار الطعام 🤍 ذكّرتك بها هنا:', travel:'لا تنسَ أذكار السفر 🤍 ذكّرتك بها هنا:' };
 const title = document.getElementById('pageTitle');
 // (2.4.180) أيقونة القسم الكبيرة فوق العنوان: نفس أيقونة شريحة القسم، والسبحة بأيقونة الحبّات
 const secIcon = document.getElementById('secIcon');
@@ -2489,6 +2591,11 @@ const SEC_ANIM = {
   evening:'<svg viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/><path class="xa st" d="M19 2.6v3.6M17.2 4.4h3.6"/><g class="xa cl cl1">' + SEC_CLOUD + '</g><g class="xa cl cl2">' + SEC_CLOUD + '</g></svg>',
   sleep:'<svg viewBox="0 0 24 24"><path d="M9.4 10.1a4.2 4.2 0 0 0 6.3 6.3 6.3 6.3 0 1 1-6.3-6.3ZM13 3.5h5l-5 6h5"/><g class="xa zz zz1">' + SEC_Z + '</g><g class="xa zz zz2">' + SEC_Z + '</g></svg>',
   wake:'<svg viewBox="0 0 24 24"><defs><clipPath id="secWkClip"><rect x="-20" y="-20" width="64" height="38"/></clipPath></defs><path d="M3 18h18"/><g clip-path="url(#secWkClip)"><g class="sun"><path d="M6.5 18a5.5 5.5 0 0 1 11 0"/><path class="wr" d="M12 6.5V9M4.6 10.6l1.7 1.5M19.4 10.6l-1.7 1.5"/></g></g></svg>',
+  wudu:'<svg viewBox="0 0 24 24"><path class="drop" d="M12 3.5c3.4 4.1 5.5 7 5.5 10a5.5 5.5 0 0 1-11 0c0-3 2.1-5.9 5.5-10Z"/><path class="xa shn" d="M9.3 13.6a2.9 2.9 0 0 0 2.2 2.8"/><path class="xa dp" d="M12 .2c.7.9 1.1 1.5 1.1 2.1a1.1 1.1 0 0 1-2.2 0c0-.6.4-1.2 1.1-2.1Z"/></svg>',
+  out:'<svg viewBox="0 0 24 24"><path d="M5 21V4.5A1.5 1.5 0 0 1 6.5 3h11A1.5 1.5 0 0 1 19 4.5V21M3 21h18"/><g class="xa op"><path d="M8 21V6L4 4.6V22.4Z"/><path d="M5.2 13.5h1.1"/></g><g class="dr"><path d="M8 21V6.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5V21"/><path class="lv" d="M13.2 13.5h1.6"/></g></svg>',
+  mosque:'<svg viewBox="0 0 24 24"><path d="M2 21h20M7 21v-7a5 5 0 0 1 10 0v7M12 9V6.5M10.5 21v-2.5a1.5 1.5 0 0 1 3 0V21"/><path class="mnr mnr1" d="M2.5 21V11.5L3.5 9l1 2.5V21"/><path class="mnr mnr2" d="M19.5 21V11.5L20.5 9l1 2.5V21"/><path class="xa hil" d="M12.7 2.3a1.5 1.5 0 1 0 1 2.4 1.2 1.2 0 1 1-1-2.4Z"/></svg>',
+  food:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5.5"/><path class="frk" d="M3 4v4a1.5 1.5 0 0 0 3 0V4M4.5 4v16"/><path class="knf" d="M20.5 20V4c-1.5 1-2.5 3-2.5 6v3h2.5"/><path class="xa stm stm1" d="M11 4.6c-.8-.9.8-1.6 0-2.6"/><path class="xa stm stm2" d="M13 4.6c-.8-.9.8-1.6 0-2.6"/></svg>',
+  travel:'<svg viewBox="0 0 24 24"><g class="pln"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z"/></g></svg>',
   prayer:'<svg viewBox="0 0 24 24"><g class="mat"><rect x="6" y="4.5" width="12" height="15" rx="1.5"/><path class="arch" pathLength="1" d="M9 17v-4.5l3-3.5 3 3.5V17"/><path d="M8 2.5v2M12 2.5v2M16 2.5v2M8 19.5v2M12 19.5v2M16 19.5v2"/></g></svg>'
 };
 // بتشتغل أول ما القسم يظهر، وبعدها كل ~10 ثواني، بس لو الأيقونة باينة فوق (مش وإنت بتقرأ تحت) والصفحة ظاهرة
@@ -2513,6 +2620,221 @@ setInterval(() => {
 }, 1000);
 document.addEventListener('visibilitychange', () => { if(!document.hidden) secShownAt = Date.now(); });
 window.addEventListener('scroll', () => { if(window.scrollY > 160 && secIcon.classList.contains('play')) secIcon.classList.remove('play'); }, { passive:true });
+// (2.4.199) مشهد كبير على الشاشة كلها لما المستخدم يضغط الأيقونة (الصباح والمساء بس لحد دلوقتي)
+const SX_MODES = ['morning', 'evening', 'wudu', 'out', 'mosque', 'prayer', 'food', 'travel', 'sleep', 'wake'];
+function secBig(){
+  const m = secIcon.dataset.m;
+  if(m === 'tasbeeh' || body.classList.contains('focus')) return;
+  secIcon.classList.remove('sxh');
+  secIcon.classList.remove('play'); void secIcon.offsetWidth; secIcon.classList.add('play');
+  secLastPlay = Date.now(); clearTimeout(secPlay.t); secPlay.t = setTimeout(() => secIcon.classList.remove('play'), 3600);
+  haptic('tap');
+  if(!SX_MODES.includes(m)) return;
+  if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if(document.querySelectorAll('.sx-layer').length >= 2) return;
+  const W = window.innerWidth, H = window.innerHeight, rnd = (a, b) => a + Math.random() * (b - a);
+  const L = document.createElement('div'); L.className = 'sx-layer'; document.body.appendChild(L);
+  const NS = 'http://www.w3.org/2000/svg';
+  const mk = (vb, html, css) => { const e = document.createElementNS(NS, 'svg'); e.setAttribute('viewBox', vb); e.innerHTML = html; e.style.cssText = css; L.appendChild(e); return e; };
+  const wash = document.createElement('div'); wash.className = 'sx-wash'; L.appendChild(wash);
+  const T = 3000;
+  if(m === 'morning'){
+    wash.style.background = 'radial-gradient(120% 70% at 50% 105%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 70%)';
+    wash.animate([{ opacity:0 }, { opacity:1, offset:.3 }, { opacity:1, offset:.7 }, { opacity:0 }], { duration:T, easing:'ease-in-out' });
+    // (2.4.200) من غير الشمس الكبيرة، الطيور بس
+    for(let i = 0; i < 13; i++){
+      const sz = rnd(56, 128), y = rnd(H * .1, H * .75), d = rnd(2100, 2800), dl = rnd(0, 500);
+      const b = mk('-3 -2 6 3', SEC_BIRD, 'width:' + sz + 'px;height:' + (sz / 2) + 'px;left:0;top:0;stroke-width:.32;opacity:0;');
+      b.classList.add('sx-bird');
+      b.querySelectorAll('path').forEach(pp => pp.style.animationDelay = (-Math.random()).toFixed(2) + 's');
+      const x0 = W + sz, x1 = -sz * 1.5, arc = rnd(30, 110);
+      b.animate([{ transform:'translate(' + x0 + 'px,' + y + 'px) scale(.8)', opacity:0 }, { transform:'translate(' + (W * .7) + 'px,' + (y - arc * .4) + 'px) scale(.95)', opacity:1, offset:.18 },
+        { transform:'translate(' + (W * .25) + 'px,' + (y - arc) + 'px) scale(1.08)', opacity:1, offset:.75 }, { transform:'translate(' + x1 + 'px,' + (y - arc * 1.2) + 'px) scale(1.15)', opacity:0 }], { duration:d, delay:dl, easing:'cubic-bezier(.4,.1,.5,1)', fill:'both' });
+    }
+  } else if(m === 'evening'){
+    wash.style.background = 'radial-gradient(130% 75% at 50% -5%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%)';
+    wash.animate([{ opacity:0 }, { opacity:1, offset:.3 }, { opacity:1, offset:.7 }, { opacity:0 }], { duration:T, easing:'ease-in-out' });
+    // (2.4.200) من غير الهلال الكبير، السحاب والنجوم بس
+    for(let i = 0; i < 12; i++){
+      const sz = rnd(14, 34);
+      const st = mk('0 0 24 24', '<path d="M12 3v18M3 12h18"/>', 'width:' + sz + 'px;height:' + sz + 'px;left:' + rnd(8, W - 30) + 'px;top:' + rnd(H * .03, H * .55) + 'px;stroke-width:2;opacity:0;');
+      st.animate([{ opacity:0, transform:'scale(.3) rotate(0)' }, { opacity:1, transform:'scale(1) rotate(45deg)', offset:.45 }, { opacity:0, transform:'scale(.4) rotate(90deg)' }], { duration:rnd(900, 1500), delay:rnd(250, 1500), easing:'ease-in-out', fill:'both' });
+    }
+    const CL = [{ w:.85, y:.72, dir:1, d:2900, dl:0 }, { w:.62, y:.48, dir:-1, d:2800, dl:150 }, { w:.42, y:.33, dir:1, d:2600, dl:380 }];
+    CL.forEach(c => {
+      const w = W * c.w, h = w * .59;
+      const cl = mk('0 -1.2 10.5 6.2', SEC_CLOUD, 'width:' + w + 'px;height:' + h + 'px;left:0;top:' + (H * c.y - h / 2) + 'px;stroke-width:.19;opacity:0;');
+      cl.classList.add('sx-cloud');
+      const a = c.dir > 0 ? -w : W, b = c.dir > 0 ? W * .55 : -w * .55;
+      cl.animate([{ transform:'translateX(' + a + 'px)', opacity:0 }, { transform:'translateX(' + (a + (b - a) * .3) + 'px)', opacity:1, offset:.2 }, { transform:'translateX(' + (a + (b - a) * .8) + 'px)', opacity:1, offset:.8 }, { transform:'translateX(' + b + 'px)', opacity:0 }], { duration:c.d, delay:c.dl, easing:'cubic-bezier(.35,.1,.45,1)', fill:'both' });
+    });
+  } else if(m === 'wudu'){
+    // (2.4.201) الوضوء: قطرات صغيرة بتنزل، ولما توصل تعمل دواير زي سطح المية (من غير القطرة الكبيرة)
+    wash.style.background = 'linear-gradient(to top, color-mix(in srgb, var(--accent) 20%, transparent), transparent 55%)';
+    wash.animate([{ opacity:0 }, { opacity:1, offset:.3 }, { opacity:1, offset:.75 }, { opacity:0 }], { duration:T, easing:'ease-in-out' });
+    const DROP = '<path d="M12 3.5c3.4 4.1 5.5 7 5.5 10a5.5 5.5 0 0 1-11 0c0-3 2.1-5.9 5.5-10Z"/>';
+    for(let i = 0; i < 18; i++){
+      const sz = rnd(24, 42), x = rnd(W * .06, W * .94), y1 = rnd(H * .5, H * .9), fall = rnd(650, 1000), dl = rnd(0, 1500);
+      const dp = mk('0 0 24 24', DROP, 'width:' + sz + 'px;height:' + sz + 'px;left:' + (x - sz / 2) + 'px;top:0;stroke-width:1.5;opacity:0;');
+      dp.querySelector('path').style.fill = 'color-mix(in srgb, var(--accent) 30%, transparent)';
+      dp.animate([{ transform:'translateY(' + (-sz - 20) + 'px) scale(.8,1.1)', opacity:0 }, { transform:'translateY(' + (y1 * .15) + 'px) scale(.85,1.1)', opacity:1, offset:.15 },
+        { transform:'translateY(' + (y1 - sz * .8) + 'px) scale(.9,1.12)', opacity:1, offset:.92 }, { transform:'translateY(' + (y1 - sz * .5) + 'px) scale(1.25,.6)', opacity:0 }], { duration:fall, delay:dl, easing:'cubic-bezier(.5,0,.9,.6)', fill:'both' });
+      const rw = sz * rnd(4, 5.5);
+      [0, 170].forEach((lag, k) => {
+        const rp = mk('0 0 100 30', '<ellipse cx="50" cy="15" rx="48" ry="13"/>', 'width:' + rw + 'px;height:' + (rw * .3) + 'px;left:' + (x - rw / 2) + 'px;top:' + (y1 - rw * .15) + 'px;stroke-width:' + (k ? 2 : 3) + ';opacity:0;');
+        rp.querySelector('ellipse').setAttribute('vector-effect', 'non-scaling-stroke');
+        rp.animate([{ transform:'scale(.08)', opacity:0 }, { transform:'scale(.25)', opacity:.95, offset:.12 }, { transform:'scale(1)', opacity:0 }], { duration:900, delay:dl + fall - 40 + lag, easing:'cubic-bezier(.2,.6,.3,1)', fill:'both' });
+      });
+    }
+  }
+  if(m === 'out'){
+    // (2.4.202) الخروج: نور بيطلع من تحت كأن باب اتفتح، وعلامات حماية ونسمات هوا (من غير الباب الكبير)
+    wash.style.background = 'radial-gradient(90% 60% at 50% 105%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 70%)';
+    wash.animate([{ opacity:0 }, { opacity:1, offset:.25 }, { opacity:1, offset:.7 }, { opacity:0 }], { duration:T, easing:'ease-in-out' });
+    // (2.4.204) علامات حماية (درع من غير علامة صح، بطلب المستخدم) قليلة وكبيرة بتطلع لفوق بهدوء، بدل الأشعة وذرّات النور (طلب المستخدم). الخطوات ممنوعة
+    const SHIELD = '<path d="M12 2.8l7.2 2.9v5.5c0 4.5-3.1 8.2-7.2 10-4.1-1.8-7.2-5.5-7.2-10V5.7L12 2.8Z"/>';
+    const SP = [[.2, .9, 0], [.78, .95, 260], [.5, 1.02, 520], [.3, 1.06, 820], [.72, 1.08, 1050]];
+    SP.forEach(([fx, fy, dl], k) => {
+      const sz = Math.min(W * (k % 2 ? .16 : .2), 96), x = W * fx + rnd(-14, 14), y0 = H * fy, rise = H * rnd(.45, .6), drift = rnd(-24, 24), rot = rnd(-10, 10);
+      const sh = mk('0 0 24 24', SHIELD, 'width:' + sz + 'px;height:' + sz + 'px;left:' + (x - sz / 2) + 'px;top:' + (y0 - sz / 2) + 'px;stroke-width:1.3;opacity:0;');
+      sh.querySelector('path').style.fill = 'color-mix(in srgb, var(--accent) 18%, transparent)';
+      sh.animate([{ opacity:0, transform:'translate(0,0) scale(.6) rotate(' + rot + 'deg)' }, { opacity:1, transform:'translate(' + (drift * .3) + 'px,' + (-rise * .3) + 'px) scale(1) rotate(' + (rot * .5) + 'deg)', offset:.3 },
+        { opacity:.9, transform:'translate(' + (drift * .8) + 'px,' + (-rise * .75) + 'px) scale(1.02) rotate(0deg)', offset:.72 }, { opacity:0, transform:'translate(' + drift + 'px,' + (-rise) + 'px) scale(.9) rotate(0deg)' }], { duration:2200, delay:150 + dl, easing:'cubic-bezier(.3,.5,.4,1)', fill:'both' });
+    });
+    [[.3, 1, 0], [.5, -1, 250], [.7, 1, 450]].forEach(([yy, dir, dl]) => {
+      const bw = W * .9, bh = bw * .22;
+      const br = mk('0 0 100 22', '<path d="M2 14C20 4 34 4 46 12s28 8 40-2c4-3 8-4 12-3"/>', 'width:' + bw + 'px;height:' + bh + 'px;left:0;top:' + (H * yy - bh / 2) + 'px;stroke-width:.9;opacity:0;');
+      br.querySelector('path').setAttribute('pathLength', '1'); br.querySelector('path').style.strokeDasharray = '1'; 
+      const a0 = dir > 0 ? -bw * .6 : W - bw * .4, a1 = dir > 0 ? W - bw * .5 : -bw * .5;
+      br.animate([{ transform:'translateX(' + a0 + 'px)' + (dir < 0 ? ' scaleX(-1)' : ''), opacity:0, strokeDashoffset:1 }, { opacity:.7, strokeDashoffset:0, offset:.4 }, { transform:'translateX(' + a1 + 'px)' + (dir < 0 ? ' scaleX(-1)' : ''), opacity:0, strokeDashoffset:-1 }], { duration:2200, delay:300 + dl, easing:'cubic-bezier(.4,.1,.4,1)', fill:'both' });
+    });
+  }
+  if(m === 'mosque'){
+    // (2.4.207) المسجد: فوانيس معلّقة بتنزل من فوق وتتمرجح بهدوء ونورها بيلمع، وتوهّج من فوق (من غير القبة والمنارات والهلال)
+    wash.style.background = 'radial-gradient(110% 55% at 50% -8%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 72%)';
+    wash.animate([{ opacity:0 }, { opacity:1, offset:.3 }, { opacity:1, offset:.72 }, { opacity:0 }], { duration:T, easing:'ease-in-out' });
+    const LAN = '<path d="M12 -60V3"/><path d="M9.6 3h4.8l1.2 2.2H8.4Z"/><path class="lb" d="M8 5.2h8l1.4 3.2v6.4L16 18H8l-1.4-3.2V8.4Z"/><path class="lw" d="M10.2 8.4h3.6v6.2h-3.6Z"/><path d="M10 18h4l-1.1 2.3h-1.8ZM12 20.3v1.6"/>';
+    const LS = [[.14, .17, 0], [.38, .26, 180], [.64, .14, 90], [.87, .23, 260]];   // (2.4.208) أصغر وأعلى
+    LS.forEach(([fx, fy, dl], k) => {
+      const w = Math.min(W * (k % 2 ? .19 : .22), 96), h = w * (82 / 24), x = W * fx, yEnd = H * fy;
+      const ln = mk('0 -60 24 82', LAN, 'width:' + w + 'px;height:' + h + 'px;left:' + (x - w / 2) + 'px;top:' + (yEnd - h * (63 / 82)) + 'px;stroke-width:.85;opacity:0;');
+      ln.style.transformOrigin = '50% 0%';
+      ln.querySelector('.lb').style.fill = 'color-mix(in srgb, var(--accent) 16%, transparent)';
+      const win = ln.querySelector('.lw'); win.style.fill = 'color-mix(in srgb, var(--accent) 55%, transparent)';
+      const sw = rnd(4, 7) * (k % 2 ? 1 : -1);
+      ln.animate([{ transform:'translateY(' + (-H * .35) + 'px) rotate(0deg)', opacity:0 }, { transform:'translateY(0) rotate(' + sw + 'deg)', opacity:1, offset:.28 },
+        { transform:'translateY(0) rotate(' + (-sw * .7) + 'deg)', opacity:1, offset:.48 }, { transform:'translateY(0) rotate(' + (sw * .4) + 'deg)', opacity:1, offset:.66 },
+        { transform:'translateY(0) rotate(0deg)', opacity:1, offset:.8 }, { transform:'translateY(' + (-H * .12) + 'px) rotate(0deg)', opacity:0 }], { duration:T - 200, delay:dl, easing:'ease-in-out', fill:'both' });
+      win.animate([{ opacity:.5 }, { opacity:1, offset:.4 }, { opacity:.6, offset:.6 }, { opacity:1, offset:.8 }, { opacity:.5 }], { duration:T - 200, delay:dl, fill:'both' });
+    });
+  }
+  if(m === 'prayer'){
+    // (2.4.211) بعد الصلاة: سبحة على قوس مقلوب طالع من تحت. خيط انسيابي، الحبات أصغر في الأطراف وأكبر في النص، والسبحة كلها بتطلع من تحت بتلاشي (fade)
+    wash.style.background = 'radial-gradient(110% 55% at 50% 108%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 72%)';
+    wash.animate([{ opacity:0 }, { opacity:1, offset:.3 }, { opacity:1, offset:.72 }, { opacity:0 }], { duration:T, easing:'ease-in-out' });
+    const box = document.createElement('div');
+    box.style.cssText = 'position:absolute;inset:0;-webkit-mask-image:linear-gradient(to top, transparent 0%, #000 22%);mask-image:linear-gradient(to top, transparent 0%, #000 22%);';
+    L.appendChild(box);
+    const N = 9, a = W * .45, yBase = H * .92, bArc = H * .26, rMax = Math.min(W * .06, 30);
+    const thread = mk('0 0 ' + W + ' ' + H, '<path d="M' + (W / 2 - a).toFixed(1) + ' ' + yBase.toFixed(1) + ' A' + a.toFixed(1) + ' ' + bArc.toFixed(1) + ' 0 0 1 ' + (W / 2 + a).toFixed(1) + ' ' + yBase.toFixed(1) + '"/>', 'width:' + W + 'px;height:' + H + 'px;left:0;top:0;stroke-width:1.4;opacity:.75;');
+    box.appendChild(thread);
+    for(let i = 0; i < N; i++){
+      const th = Math.PI * (1 - i / (N - 1)), x = W / 2 + a * Math.cos(th), y = yBase - bArc * Math.sin(th);
+      const r = rMax * (.62 + .38 * Math.sin(th));
+      const b = mk('0 0 24 24', '<circle cx="12" cy="12" r="10"/>', 'width:' + (r * 2) + 'px;height:' + (r * 2) + 'px;left:' + (x - r) + 'px;top:' + (y - r) + 'px;stroke-width:' + (1.6 * rMax / r).toFixed(2) + ';');
+      box.appendChild(b);
+      const c = b.querySelector('circle'); c.style.fill = 'var(--bg)';
+      const lit = 650 + i * 120;
+      c.animate([{ fill:'var(--bg)' }, { fill:'var(--accent)', offset:.25 }, { fill:'color-mix(in srgb, var(--accent) 55%, var(--bg))' }], { duration:900, delay:lit, easing:'ease-out', fill:'forwards' });
+      b.animate([{ transform:'scale(1)' }, { transform:'scale(1.28)', offset:.3 }, { transform:'scale(1)' }], { duration:420, delay:lit, easing:'ease-out' });
+    }
+    box.animate([{ transform:'translateY(' + (H * .28) + 'px)', opacity:0, easing:'cubic-bezier(.2,.7,.3,1)' }, { transform:'translateY(0)', opacity:1, offset:.24 }, { transform:'translateY(0)', opacity:1, offset:.86, easing:'ease-in' }, { transform:'translateY(' + (H * .16) + 'px)', opacity:0 }], { duration:T + 200, easing:'linear', fill:'both' });
+  }
+  if(m === 'food'){
+    // (2.4.212) الطعام: توهّج من تحت وخيوط بخار كبيرة ناعمة بتطلع وتتموّج لفوق وتختفي (من غير الطبق والشوكة والسكينة)
+    wash.style.background = 'radial-gradient(110% 55% at 50% 108%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 72%)';
+    wash.animate([{ opacity:0 }, { opacity:1, offset:.28 }, { opacity:1, offset:.75 }, { opacity:0 }], { duration:T, easing:'ease-in-out' });
+    const box = document.createElement('div');
+    box.style.cssText = 'position:absolute;inset:0;-webkit-mask-image:linear-gradient(to top, transparent 0%, #000 16%, #000 62%, transparent 92%);mask-image:linear-gradient(to top, transparent 0%, #000 16%, #000 62%, transparent 92%);';
+    L.appendChild(box);
+    // (2.4.214) خطوط بسُمك ثابت زي 2.4.212 (الشكل المليان طلع شبه ورق الشجر)، مع أماكن وأطوال وتموّج عشوائي في كل ضغطة
+    const wisp = (amp, waves, ph) => { let d = ''; for(let q = 0; q <= 40; q++){ const t = q / 40, y = 320 - 300 * t, x = 30 + amp * Math.sin(Math.PI * waves * t + ph); d += (q ? ' L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1); } return '<path d="' + d + '"/>'; };
+    let fx = rnd(.1, .22); const SPOTS = [];
+    for(let k = 0; k < 4 && fx < .92; k++){ SPOTS.push(fx); fx += rnd(.19, .25); }
+    SPOTS.sort(() => Math.random() - .5).forEach((fxk, k) => {
+      const h = H * rnd(.38, .5), w = h * (60 / 330), x = W * fxk, y = H * .98 - h, dl = k * rnd(120, 220);
+      const st = mk('0 0 60 330', wisp(rnd(16, 22), rnd(1.6, 2.2), rnd(0, Math.PI * 2)), 'width:' + w + 'px;height:' + h + 'px;left:' + (x - w / 2) + 'px;top:' + y + 'px;stroke-width:' + rnd(2.6, 3.1).toFixed(2) + ';opacity:0;');
+      box.appendChild(st);
+      const pth = st.querySelector('path'); pth.setAttribute('pathLength', '1'); pth.style.strokeDasharray = '1';
+      pth.animate([{ strokeDashoffset:1 }, { strokeDashoffset:0, offset:.55 }, { strokeDashoffset:0 }], { duration:T - 300, delay:dl, easing:'ease-out', fill:'both' });
+      st.animate([{ transform:'translateY(' + (h * .12) + 'px)', opacity:0, easing:'ease-out' }, { transform:'translateY(0)', opacity:.9, offset:.2 }, { transform:'translateY(' + (-h * .18) + 'px)', opacity:.85, offset:.7, easing:'ease-in' }, { transform:'translateY(' + (-h * .32) + 'px)', opacity:0 }], { duration:T - 300, delay:dl, easing:'linear', fill:'both' });
+    });
+  }
+  const glowB = (pct) => { wash.style.background = 'radial-gradient(110% 55% at 50% 108%, color-mix(in srgb, var(--accent) ' + pct + '%, transparent), transparent 72%)'; wash.animate([{ opacity:0 }, { opacity:1, offset:.28 }, { opacity:1, offset:.75 }, { opacity:0 }], { duration:T, easing:'ease-in-out' }); };
+  const fadeBox = (top) => { const bx = document.createElement('div'); const g = 'linear-gradient(to top, transparent 0%, #000 14%, #000 ' + top + '%, transparent ' + (top + 22) + '%)'; bx.style.cssText = 'position:absolute;inset:0;-webkit-mask-image:' + g + ';mask-image:' + g + ';'; L.appendChild(bx); return bx; };
+  if(m === 'travel'){
+    // (2.4.215) السفر: طيارات صغيرة كتير بتطير لفوق من أماكن مختلفة على الشاشة كلها مع سحب (طلب المستخدم صراحة، استثناء من قاعدة عدم تكرار رمز الأيقونة)
+    glowB(20);
+    const PLANE = '<path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5Z"/>';
+    [[.18, 1, 0], [.45, -1, 250], [.72, 1, 120], [.9, -1, 380]].forEach(([fy, dir, dl]) => {
+      const w = W * rnd(.26, .36), h = w * .59, y = H * (fy + rnd(-.05, .05));
+      const cl = mk('0 -1.2 10.5 6.2', SEC_CLOUD, 'width:' + w + 'px;height:' + h + 'px;left:0;top:' + (y - h / 2) + 'px;stroke-width:.24;opacity:0;');
+      cl.classList.add('sx-cloud');
+      const a = dir > 0 ? -w : W, b = dir > 0 ? W * .75 : -w * .75;
+      cl.animate([{ transform:'translateX(' + a + 'px)', opacity:0 }, { opacity:.7, offset:.25 }, { opacity:.7, offset:.75 }, { transform:'translateX(' + b + 'px)', opacity:0 }], { duration:T, delay:dl, easing:'linear', fill:'both' });
+    });
+    for(let i = 0; i < 9; i++){
+      const sz = rnd(26, 46), x = rnd(W * .06, W * .94), y0 = H * rnd(.75, 1.05), dist = H * rnd(.55, .85), ang = rnd(-14, 14), dx = Math.tan(ang * Math.PI / 180) * dist;
+      const pl = mk('0 0 24 24', PLANE, 'width:' + sz + 'px;height:' + sz + 'px;left:' + (x - sz / 2) + 'px;top:' + (y0 - sz / 2) + 'px;stroke-width:1.6;opacity:0;');
+      pl.querySelector('path').style.fill = 'color-mix(in srgb, var(--accent) 25%, var(--bg))';
+      pl.animate([{ transform:'translate(0,0) rotate(' + ang + 'deg) scale(.8)', opacity:0 }, { transform:'translate(' + (dx * .2) + 'px,' + (-dist * .2) + 'px) rotate(' + ang + 'deg) scale(.95)', opacity:1, offset:.18 },
+        { transform:'translate(' + (dx * .8) + 'px,' + (-dist * .8) + 'px) rotate(' + ang + 'deg) scale(1.05)', opacity:1, offset:.8 }, { transform:'translate(' + dx + 'px,' + (-dist) + 'px) rotate(' + ang + 'deg) scale(1.1)', opacity:0 }], { duration:rnd(1900, 2500), delay:i * 110 + rnd(0, 250), easing:'cubic-bezier(.35,.1,.5,1)', fill:'both' });
+    }
+  }
+  if(m === 'sleep'){
+    // (2.4.214) النوم: الشاشة تهدى وتغمق شوية، ونجوم ناعمة (رباعية) بتلمع ببطء في النص اللي تحت، وتوهّج بيتنفّس ببطء (من غير الهلال وحروف z)
+    const dim = document.createElement('div'); dim.style.cssText = 'position:absolute;inset:0;background:color-mix(in srgb, #0b1020 30%, transparent);opacity:0;'; L.insertBefore(dim, wash);
+    dim.animate([{ opacity:0 }, { opacity:1, offset:.3 }, { opacity:1, offset:.75 }, { opacity:0 }], { duration:T, easing:'ease-in-out' });
+    wash.style.background = 'radial-gradient(100% 45% at 50% 108%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 72%)';
+    wash.animate([{ opacity:0 }, { opacity:1, offset:.3 }, { opacity:.5, offset:.5 }, { opacity:1, offset:.7 }, { opacity:0 }], { duration:T, easing:'ease-in-out' });
+    const box = L;   // (2.4.215) على الشاشة كلها
+    const STAR = '<path d="M12 2.5C12.6 8.6 15.4 11.4 21.5 12 15.4 12.6 12.6 15.4 12 21.5 11.4 15.4 8.6 12.6 2.5 12 8.6 11.4 11.4 8.6 12 2.5Z"/>';
+    for(let i = 0; i < 14; i++){
+      const sz = rnd(30, 60), x = rnd(W * .06, W * .94), y = rnd(H * .06, H * .9);
+      const st = mk('0 0 24 24', STAR, 'width:' + sz + 'px;height:' + sz + 'px;left:' + (x - sz / 2) + 'px;top:' + (y - sz / 2) + 'px;stroke-width:1.2;opacity:0;');
+      st.querySelector('path').style.fill = 'color-mix(in srgb, var(--accent) 50%, transparent)'; box.appendChild(st);
+      st.animate([{ opacity:0, transform:'scale(.4) rotate(0deg)' }, { opacity:1, transform:'scale(1) rotate(20deg)', offset:.4 }, { opacity:.6, transform:'scale(.85) rotate(30deg)', offset:.7 }, { opacity:0, transform:'scale(.5) rotate(45deg)' }], { duration:rnd(1500, 2000), delay:i * 85 + rnd(0, 250), easing:'ease-in-out', fill:'both' });
+    }
+  }
+  if(m === 'wake'){
+    // (2.4.214) الاستيقاظ: نور الفجر بيكبر من تحت ويطلع، وبقع نور كبيرة ناعمة (مغبّشة) بتطلع ببطء (من غير الشمس والأفق)
+    wash.style.background = 'radial-gradient(140% 85% at 50% 112%, color-mix(in srgb, var(--accent) 32%, transparent), transparent 70%)';
+    wash.style.transformOrigin = '50% 100%';
+    wash.animate([{ opacity:0, transform:'scaleY(.5)' }, { opacity:1, transform:'scaleY(1)', offset:.4 }, { opacity:1, transform:'scaleY(1.08)', offset:.75 }, { opacity:0, transform:'scaleY(1.1)' }], { duration:T, easing:'ease-in-out' });
+    const box = fadeBox(80);   // (2.4.215) بتنتشر لفوق أكتر
+    // (2.4.214) خطوط أفق نور ناعمة (أقواس عريضة) بتطلع من تحت ورا بعض وتختفي، زي النور وهو بيعلى وقت الفجر
+    const ARC = 4;
+    for(let i = 0; i < ARC; i++){
+      const yb = H * (1.0 + i * .03), bulge = H * rnd(.05, .09), dl = 150 + i * 280;
+      const arc = mk('0 0 ' + W + ' ' + H, '<path d="M' + (-W * .1).toFixed(1) + ' ' + yb.toFixed(1) + ' Q' + (W / 2).toFixed(1) + ' ' + (yb - bulge * 2).toFixed(1) + ' ' + (W * 1.1).toFixed(1) + ' ' + yb.toFixed(1) + '"/>', 'width:' + W + 'px;height:' + H + 'px;left:0;top:0;stroke-width:' + (3 - i * .45) + ';opacity:0;');
+      box.appendChild(arc);
+      const rise = H * rnd(.7, .85);
+      arc.animate([{ transform:'translateY(0)', opacity:0, easing:'ease-out' }, { transform:'translateY(' + (-rise * .35) + 'px)', opacity:.9, offset:.3 }, { transform:'translateY(' + (-rise * .8) + 'px)', opacity:.6, offset:.75, easing:'ease-in' }, { transform:'translateY(' + (-rise) + 'px)', opacity:0 }], { duration:2300, delay:dl, easing:'linear', fill:'both' });
+    }
+  }
+  setTimeout(() => L.remove(), T + 400);
+}
+if(secIcon) secIcon.addEventListener('click', (e) => { e.stopPropagation(); secBig(); });
+// (2.4.199) تلميح مرة واحدة بعد أول إتمام للصباح أو المساء
+function sxHint(){
+  try{ if(localStorage.getItem('tooba-sx-hint')) return; localStorage.setItem('tooba-sx-hint', '1'); }catch(e){ return; }
+  setTimeout(() => {
+    if(mode !== 'morning' && mode !== 'evening') return;
+    showCheer('جرّب الضغط على الأيقونة في الأعلى');
+    clearTimeout(cheerTimer); cheerTimer = setTimeout(() => cheerEl.classList.remove('show'), 4200);
+    secIcon.classList.add('sxh'); setTimeout(() => secIcon.classList.remove('sxh'), 5800);
+  }, 3800);
+}
 function setSecIcon(m){
   if(!secIcon || secIcon.dataset.m === m) return;
   let html = '';
@@ -2610,7 +2932,48 @@ const WK_META = [
 ["من قالها ثمّ دعا استُجيب له، فإن توضّأ وصلّى قُبلت صلاته","رواه البخاري"],
 [null,"رواه البخاري ومسلم"]
 ];
+// (2.4.195) فضل وسند أذكار الوضوء
+const WD_META = [
+[null,"رواه أبو داود وابن ماجه، وفي إسناده كلام، وحسّنه بعض أهل العلم بمجموع طرقه"],
+["من قالها بعد أن يتوضّأ فيُسبغ الوضوء فُتحت له أبواب الجنّة الثّمانية يدخل من أيّها شاء","رواه مسلم"],
+[null,"رواه الترمذي وفي إسناده كلام، وصحّحه الألباني"],
+["من قالها بعد الوضوء كُتبت في رقٍّ ثمّ طُبع عليها بطابعٍ فلم يُكسر إلى يوم القيامة","رواه النسائي في عمل اليوم والليلة والحاكم، وصحّح ابن حجر إسناده"]
+];
+const OUT_META = [
+["من قالها إذا خرج من بيته يُقال له: هُديت وكُفيت ووُقيت، وتنحّى عنه الشّيطان","رواه أبو داود والترمذي وقال: حسن صحيح غريب، وفي إسناده كلام"],
+[null,"رواه أبو داود والترمذي وقال: حسن صحيح، وفي سماع الشعبي من أم سلمة كلام"]
+];
+const MQ_META = [
+[null,"رواه مسلم"],
+["من قالها قال الشّيطان: حُفظ منّي سائر اليوم","رواه أبو داود، وحسّنه النووي وابن حجر"],
+[null,"رواه ابن ماجه والترمذي، وفي إسناده انقطاع، وصحّحه الألباني بشواهده"],
+[null,"رواه مسلم"],
+[null,"رواه مسلم"],
+[null,"رواه ابن ماجه، وصحّحه الألباني"]
+];
+const FD_META = [
+[null,"رواه البخاري ومسلم"],
+[null,"رواه أبو داود والترمذي وقال: حسن صحيح، وفي إسناده كلام"],
+[null,"رواه البخاري"],
+["من قالها بعد الطعام غُفر له ما تقدّم من ذنبه","رواه أبو داود والترمذي وحسّنه، وفي إسناده كلام"],
+[null,"رواه مسلم"],
+[null,"رواه مسلم"]
+];
+const TR_META = [
+[null,"رواه أبو داود والترمذي وقال: حسن صحيح"],
+[null,"رواه مسلم"],
+["من قالها إذا نزل منزلًا لم يضرّه شيءٌ حتّى يرتحل من منزله ذلك","رواه مسلم"],
+[null,"رواه النسائي في الكبرى وابن حبان والحاكم، وحسّنه ابن حجر"],
+[null,"رواه البخاري ومسلم"],
+[null,"رواه أحمد وابن ماجه، وحسّنه الألباني"],
+[null,"رواه أبو داود والترمذي وقال: حسن صحيح"]
+];
 function metaFor(i){
+  if(mode === 'food') return FD_META[i];
+  if(mode === 'travel') return TR_META[i];
+  if(mode === 'wudu') return WD_META[i];
+  if(mode === 'out') return OUT_META[i];
+  if(mode === 'mosque') return MQ_META[i];
   if(mode === 'prayer') return PR_META[i];
   if(mode === 'wake') return WK_META[i];
   if(mode === 'sleep') return SL_META[i];
@@ -2653,7 +3016,7 @@ async function shareOrCopy(btn, text, title){
   }catch(err){ /* المستخدم لغى المشاركة */ }
 }
 
-const ringPrev = { morning:{}, evening:{}, prayer:{}, sleep:{}, wake:{} };
+const ringPrev = { morning:{}, evening:{}, prayer:{}, sleep:{}, wake:{}, wudu:{}, out:{}, mosque:{}, food:{}, travel:{} };
 function drawRing(chip, f, prev){
   if(!chip || f <= 0) return;
   const r = chip.getBoundingClientRect();
@@ -3922,14 +4285,26 @@ function wkFresh(){
   }
   return false;
 }
+// (2.4.195-196) أقسام المواقف تبدأ من جديد بعد مدة من آخر عدّة: الوضوء والخروج 30 دقيقة، المسجد ساعتين
+function gapFresh(m){
+  const gap = GAP_FRESH[m]; if(!gap) return false;
+  const key = 'tooba-' + m + '-t';
+  let t = 0; try{ t = +localStorage.getItem(key) || 0; }catch(e){}
+  if(t && Date.now() - t > gap && Object.keys(progress[m] || {}).length){
+    progress[m] = {}; try{ lastDone[m] = null; localStorage.setItem(key, '0'); localStorage.setItem(STORAGE_KEY, JSON.stringify({ date:BOOT_DAY, progress })); }catch(e){}
+    return true;
+  }
+  return false;
+}
+function wdFresh(){ return gapFresh('wudu'); }
 function itemsOf(m){
   return data[m].concat(customAdhkar.filter(z => z.modes.includes(m)).map(z => ({ text:z.text, count:z.count, cid:z.id })));
 }
 function pkey(item, i){ return item.cid ? item.cid : i; }
 // ترتيب الأذكار المخصّص: مصفوفة مفاتيح (pkey كنص) لكل قسم، منفصلة عن الأذكار والتقدّم (ما بتغيّرش أي مفتاح تخزين قديم)
 const ORD_KEY = 'tooba-order';
-let ORDER = { morning:[], evening:[], prayer:[], sleep:[], wake:[] };
-try{ const r = JSON.parse(localStorage.getItem(ORD_KEY)); if(r) ['morning', 'evening', 'prayer', 'sleep', 'wake'].forEach(m => { if(Array.isArray(r[m])) ORDER[m] = r[m].map(String).slice(0, 80); }); }catch(e){}
+let ORDER = { morning:[], evening:[], prayer:[], sleep:[], wake:[], wudu:[], out:[], mosque:[], food:[], travel:[] };
+try{ const r = JSON.parse(localStorage.getItem(ORD_KEY)); if(r) ['morning', 'evening', 'prayer', 'sleep', 'wake', 'wudu', 'out', 'mosque', 'food', 'travel'].forEach(m => { if(Array.isArray(r[m])) ORDER[m] = r[m].map(String).slice(0, 80); }); }catch(e){}
 function saveOrder(){ syncTouch(); try{ localStorage.setItem(ORD_KEY, JSON.stringify(ORDER)); }catch(e){} }
 // الأذكار بالترتيب المعروض: المرتّب أولًا، وأي ذكر جديد (مثلًا ذكر خاص أضفته) يتضاف في الآخر
 function orderedOf(m){
@@ -3940,11 +4315,17 @@ function orderedOf(m){
   return base.filter(x => pos.has(x.k)).sort((a, b) => pos.get(a.k) - pos.get(b.k)).concat(base.filter(x => !pos.has(x.k)));
 }
 
+// (2.4.195) تذكير بسنّة ركعتي الوضوء في آخر القسم (مش ذكر بيتعدّ)
+const WD_TIP = '<div class="wd-tip"><div class="wd-tip-t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4.5" width="12" height="15" rx="1.5"/><path d="M9 17v-4.5l3-3.5 3 3.5V17"/></svg><span>ثمّ صلِّ ركعتي الوضوء</span></div><div class="wd-tip-h">«من توضّأ نحو وضوئي هذا، ثمّ صلّى ركعتين لا يحدّث فيهما نفسه، غُفر له ما تقدّم من ذنبه»</div><div class="wd-tip-s">رواه البخاري ومسلم</div></div>';
+const MQ_TIP = '<div class="wd-tip"><div class="wd-tip-t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4.5" width="12" height="15" rx="1.5"/><path d="M9 17v-4.5l3-3.5 3 3.5V17"/></svg><span>صلِّ ركعتين قبل أن تجلس</span></div><div class="wd-tip-h">«إذا دخل أحدكم المسجد فلا يجلس حتّى يصلّي ركعتين»</div><div class="wd-tip-s">رواه البخاري ومسلم</div></div>';
+const FD_TIP = '<div class="wd-tip"><div class="wd-tip-t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span>من آداب الطعام</span></div><div class="wd-tip-h">«سمِّ اللّه، وكُل بيمينك، وكُل ممّا يليك»</div><div class="wd-tip-s">رواه البخاري ومسلم</div></div>';
+const TR_TIP = '<div class="wd-tip"><div class="wd-tip-t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span>كبّر إذا صعدت، وسبّح إذا نزلت</span></div><div class="wd-tip-h">«كنّا إذا صعدنا كبّرنا، وإذا نزلنا سبّحنا»</div><div class="wd-tip-s">رواه البخاري</div></div>';
 function render(){
   if(mode !== 'tasbeeh' && body.classList.contains('focus')){ setFocus(false); exitFS(); }
   if(mode === 'prayer') prFresh();
   if(mode === 'sleep') sleepFresh();
   if(mode === 'wake') wkFresh();
+  gapFresh(mode);
   mu3Clamp();
   atSig = atSigNow();
   if(body.dataset.mode !== mode){
@@ -4120,7 +4501,11 @@ function render(){
     empty.querySelector('#remindBtn').addEventListener('click', (e) => shareOrCopy(e.currentTarget, remindText, 'أذكار الصباح والمساء'));
   }
   const ADD_BTN = '<button class="wird-add" id="addZikrBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span>إضافة ذكر أو دعاء خاص</span></button>';
-  listEl.insertAdjacentHTML('beforeend', '<div class="zrow' + (mode === 'prayer' || mode === 'sleep' || mode === 'wake' ? ' solo' : '') + '">' + (mode === 'prayer' || mode === 'sleep' || mode === 'wake' ? '' : ADD_BTN) + '<button class="ord-link" id="ordBtn" aria-label="ترتيب الأذكار"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4v16"/><path d="M4.5 7.5L8 4l3.5 3.5"/><path d="M16 20V4"/><path d="M12.5 16.5L16 20l3.5-3.5"/></svg><span>ترتيب</span></button></div>');
+  if(mode === 'wudu') listEl.insertAdjacentHTML('beforeend', WD_TIP);
+  if(mode === 'mosque') listEl.insertAdjacentHTML('beforeend', MQ_TIP);
+  if(mode === 'food') listEl.insertAdjacentHTML('beforeend', FD_TIP);
+  if(mode === 'travel') listEl.insertAdjacentHTML('beforeend', TR_TIP);
+  listEl.insertAdjacentHTML('beforeend', '<div class="zrow' + (mode === 'prayer' || mode === 'sleep' || mode === 'wake' || GAP_FRESH[mode] ? ' solo' : '') + '">' + (mode === 'prayer' || mode === 'sleep' || mode === 'wake' || GAP_FRESH[mode] ? '' : ADD_BTN) + '<button class="ord-link" id="ordBtn" aria-label="ترتيب الأذكار"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4v16"/><path d="M4.5 7.5L8 4l3.5 3.5"/><path d="M16 20V4"/><path d="M12.5 16.5L16 20l3.5-3.5"/></svg><span>ترتيب</span></button></div>');
   updateProgress();
 }
 
@@ -4217,7 +4602,7 @@ function render(){
   document.addEventListener('click', (e) => {
     if(!(e.target.closest && e.target.closest('#ordBtn')) || mode === 'tasbeeh') return;
     om = mode; dirty = false; disarm();
-    document.getElementById('ordTitle').textContent = om === 'prayer' ? 'ترتيب أذكار بعد الصلاة' : om === 'sleep' ? 'ترتيب أذكار النوم' : om === 'wake' ? 'ترتيب أذكار الاستيقاظ' : 'ترتيب أذكار ' + (om === 'evening' ? 'المساء' : 'الصباح');
+    document.getElementById('ordTitle').textContent = om === 'prayer' ? 'ترتيب أذكار بعد الصلاة' : om === 'sleep' ? 'ترتيب أذكار النوم' : om === 'wake' ? 'ترتيب أذكار الاستيقاظ' : om === 'wudu' ? 'ترتيب أذكار الوضوء' : om === 'out' ? 'ترتيب أذكار الخروج' : om === 'mosque' ? 'ترتيب أذكار المسجد' : om === 'food' ? 'ترتيب أذكار الطعام' : om === 'travel' ? 'ترتيب أذكار السفر' : 'ترتيب أذكار ' + (om === 'evening' ? 'المساء' : 'الصباح');
     build(); list.scrollTop = 0;
     ov.classList.add('open');
   });
@@ -4330,7 +4715,7 @@ function completeItem(card, index, prevRemaining){
       try{ undoState.sk = localStorage.getItem(STREAK_KEY); }catch(e){}
     } }
   // (2.4.130) اليوم يتحسب بإتمام أذكار الصباح أو المساء كاملة، مش ذكر واحد
-  if(itemsOf(mode).every((item,i) => itemOff(item) || (progress[mode][pkey(item,i)] ?? item.count) <= 0)){ bumpStreak(); paintFlame(); }
+  if(mode !== 'travel' && itemsOf(mode).every((item,i) => itemOff(item) || (progress[mode][pkey(item,i)] ?? item.count) <= 0)){ bumpStreak(); paintFlame(); }
   // الرقم يبقى صفر والإطار يكمل قبل ما الكارد تختفي
   const chip = card.querySelector('.count-chip');
   if(chip){
@@ -4431,7 +4816,7 @@ undoBtn.addEventListener('click', () => {
 const barWrap = document.getElementById('barWrap');
 const barEl = barWrap.querySelector('.bar');
 const cheerEl = document.getElementById('cheer');
-const lastDone = { morning:null, evening:null, prayer:null, sleep:null, wake:null };
+const lastDone = { morning:null, evening:null, prayer:null, sleep:null, wake:null, wudu:null, out:null, mosque:null, food:null, travel:null };
 // (2.4.149) أذكار بعد الصلاة: تتصفّر تلقائيًا بعد 40 دقيقة من آخر عدّة (جاهزة للصلاة التالية)، وعدّاد الصلوات المكتملة اليوم
 const PR_KEY = 'tooba-prayer-meta', PR_GAP = 40 * 60 * 1000;
 function prMeta(){
@@ -4452,8 +4837,8 @@ function prFresh(){
 }
 function prCountText(n){ return 'أتممت أذكار ' + (n === 1 ? 'صلاة واحدة' : n === 2 ? 'صلاتين' : n <= 10 ? n + ' صلوات' : n + ' صلاة') + ' اليوم'; }
 const atMoved = () => (mode === 'prayer' || mode === 'wake') && atSigNow() !== atSig;   // (2.4.172) دخل/خرج وقت ذكر مرتبط بوقت
-setInterval(() => { if(!document.hidden && ((mode === 'prayer' && prFresh()) || (mode === 'sleep' && sleepFresh()) || (mode === 'wake' && wkFresh()) || atMoved())) render(); }, 60000);
-document.addEventListener('visibilitychange', () => { if(!document.hidden && ((mode === 'prayer' && prFresh()) || (mode === 'sleep' && sleepFresh()) || (mode === 'wake' && wkFresh()) || atMoved())) render(); });
+setInterval(() => { if(!document.hidden && ((mode === 'prayer' && prFresh()) || (mode === 'sleep' && sleepFresh()) || (mode === 'wake' && wkFresh()) || gapFresh(mode) || atMoved())) render(); }, 60000);
+document.addEventListener('visibilitychange', () => { if(!document.hidden && ((mode === 'prayer' && prFresh()) || (mode === 'sleep' && sleepFresh()) || (mode === 'wake' && wkFresh()) || gapFresh(mode) || atMoved())) render(); });
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const MILESTONES = [[100,'ما شاء الله! أتممت الأذكار'],[75,'اقتربت من النهاية'],[50,'نصف الطريق!'],[25,'بداية ممتازة']];
 let cheerTimer = null;
@@ -4562,6 +4947,7 @@ function celebrate(prev, done, total, pct){
   const hit = MILESTONES.find(([m]) => prevPct < m && pct >= m);
   if(hit) showCheer(hit[1]);
   if(done === total){
+    if(mode === 'morning' || mode === 'evening') sxHint();
     burst(50, 10, { spreadBar:true, rect:true, colors: pal.conf, size:[6,10], dx:90, up:[30,80], fall:170, dur:[1100,1700] });
     megaCelebrate();
   }
@@ -4634,7 +5020,7 @@ function closeZikrSheet(){ zOverlay.classList.remove('open'); zTextEl.blur(); zC
   function fillPick(){
     const keep = pickEl.value, o = (v, t) => { const e = document.createElement('option'); e.value = v; e.textContent = t; return e; };
     pickEl.innerHTML = ''; pickEl.appendChild(o('', 'غير محدد'));
-    [['morning', 'أذكار الصباح'], ['evening', 'أذكار المساء'], ['prayer', 'أذكار بعد الصلاة'], ['sleep', 'أذكار النوم'], ['wake', 'أذكار الاستيقاظ']].forEach(([m, title]) => {
+    [['morning', 'أذكار الصباح'], ['evening', 'أذكار المساء'], ['prayer', 'أذكار بعد الصلاة'], ['sleep', 'أذكار النوم'], ['wake', 'أذكار الاستيقاظ'], ['wudu', 'أذكار الوضوء'], ['out', 'أذكار الخروج من المنزل'], ['mosque', 'أذكار المسجد'], ['food', 'أذكار الطعام'], ['travel', 'أذكار السفر']].forEach(([m, title]) => {
       const g = document.createElement('optgroup'); g.label = title;
       itemsOf(m).forEach((item, i) => { if(!item.cid) g.appendChild(o(title + ' · ' + (i + 1) + ' · ' + zName(item), (i + 1) + '. ' + zName(item))); });
       pickEl.appendChild(g);
@@ -4814,7 +5200,7 @@ zDelBtn.addEventListener('click', () => {
 });
 
 // التنقل بين الأقسام: الشاشة الجديدة تدخل من اتجاه زرها (صباح ← مساء ← سبحة من اليسار، والرجوع من اليمين)
-const MODE_ORDER = ['morning','evening','prayer','sleep','wake','tasbeeh'];
+const MODE_ORDER = ['morning','evening','wudu','out','mosque','prayer','food','travel','sleep','wake','tasbeeh'];
 function switchMode(m){
   const dir = (MODE_ORDER.indexOf(m) > MODE_ORDER.indexOf(mode) ? -1 : 1) * SGN;
   const same = m === mode;
@@ -4873,7 +5259,7 @@ document.addEventListener('click', (e) => {
 });
 document.addEventListener('contextmenu', (e) => { if(e.target.closest && e.target.closest('#tReset')) e.preventDefault(); });
 
-{ const qm = new URLSearchParams(location.search).get('m'); if(qm === 'morning' || qm === 'evening' || qm === 'prayer' || qm === 'sleep' || qm === 'wake') mode = qm; }
+{ const qm = new URLSearchParams(location.search).get('m'); if(qm === 'morning' || qm === 'evening' || qm === 'prayer' || qm === 'sleep' || qm === 'wake' || qm === 'wudu' || qm === 'out' || qm === 'mosque' || qm === 'food' || qm === 'travel') mode = qm; }
 render();
 
 // ---------- (2.4.135) تلميح أول مرة: إيد شفافة تنقر مرتين على عدّاد أول ذكر، للمستخدم الجديد بس ----------
@@ -4939,7 +5325,7 @@ document.addEventListener('click', (e) => {
       haptic('tap'); selectWird(ids[j], true, false);
       return;
     }
-    const AD = ['morning', 'evening', 'prayer', 'sleep', 'wake'];   // السحب بين شرائح الأذكار فقط؛ السبحة والإعدادات من البار السفلي
+    const AD = ['morning', 'evening', 'wudu', 'out', 'mosque', 'prayer', 'food', 'travel', 'sleep', 'wake'];   // السحب بين شرائح الأذكار فقط؛ السبحة والإعدادات من البار السفلي
     const j = AD.indexOf(mode) + (dir > 0 ? 1 : -1);
     if(j < 0 || j >= AD.length) return;
     haptic('tap'); switchMode(AD[j]);
@@ -6001,7 +6387,7 @@ function syncApply(st){
   syncApplying = true;
   try{
     const d = ymd(new Date()), cw = [], cz = [], ord = { morning:[], evening:[] }, byId = (p, q) => p.id < q.id ? -1 : 1;
-    progress = { morning:{}, evening:{}, prayer:progress.prayer || {}, sleep:progress.sleep || {}, wake:progress.wake || {} }; wirdCounts = {}; tasbihCount = 0; wirdTargets = {};
+    progress = { morning:{}, evening:{}, prayer:progress.prayer || {}, sleep:progress.sleep || {}, wake:progress.wake || {}, wudu:progress.wudu || {}, out:progress.out || {}, mosque:progress.mosque || {}, food:progress.food || {}, travel:progress.travel || {} }; wirdCounts = {}; tasbihCount = 0; wirdTargets = {};
     Object.keys(st).forEach(k => {
       const v = st[k].v; if(v === null || v === undefined) return;
       const a = k.split(':');
@@ -6594,7 +6980,7 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
   const nav = $('bnav'), sp = $('settingsPage'), sel = $('adhkarSel');
   if(!nav || !sp || !sel) return;
   const tabs = nav.querySelectorAll('[data-tab]'), chips = sel.querySelectorAll('[data-m]');
-  let lastAd = (mode === 'evening' || mode === 'prayer' || mode === 'sleep' || mode === 'wake') ? mode : 'morning', rt = 0;
+  let lastAd = (mode === 'evening' || mode === 'prayer' || mode === 'sleep' || mode === 'wake' || mode === 'wudu' || mode === 'out' || mode === 'mosque' || mode === 'food' || mode === 'travel') ? mode : 'morning', rt = 0;
   const isSet = () => body.classList.contains('settings-open');
   const pill = $('bpill');
   new MutationObserver(() => body.classList.toggle('nav-hidden', nav.classList.contains('hide'))).observe(nav, { attributes:true, attributeFilter:['class'] });
@@ -6830,6 +7216,51 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
     "إذا استيقظ من الليل": "When waking at night", "رواه البخاري ومسلم": "Narrated by al-Bukhari and Muslim", "رواه الترمذي وقال: حديث حسن": "Narrated by al-Tirmidhi, who graded it hasan",
     "من استيقظ فذكر اللّه انحلّت عنه عقدةٌ من عقد الشّيطان": "Whoever wakes up and remembers Allah, one of Shaytan’s knots is untied",
     "من قالها ثمّ دعا استُجيب له، فإن توضّأ وصلّى قُبلت صلاته": "Whoever says it then makes du‘a will be answered, and if he performs wudu and prays, his prayer will be accepted" });
+  Object.assign(D, { "أذكار الوضوء": "Wudu Adhkar", "الوضوء": "Wudu", "أتممت أذكار الوضوء": "You completed the wudu adhkar",
+    "ذكّر أحبابك بأذكار الوضوء": "Remind your loved ones of the wudu adhkar", "لا تنسَ أذكار الوضوء 🤍 ذكّرتك بها هنا:": "Don’t forget the wudu adhkar 🤍 I reminded you of them here:",
+    "ترتيب أذكار الوضوء": "Reorder wudu adhkar", "قبل الوضوء": "Before wudu", "بعد الوضوء": "After wudu", "رواه مسلم": "Narrated by Muslim",
+    "رواه أبو داود وابن ماجه، وفي إسناده كلام، وحسّنه بعض أهل العلم بمجموع طرقه": "Narrated by Abu Dawud and Ibn Majah; its chain is discussed, and some scholars graded it hasan by its combined routes",
+    "رواه الترمذي وفي إسناده كلام، وصحّحه الألباني": "Narrated by al-Tirmidhi; its chain is discussed, and al-Albani graded it sahih",
+    "رواه النسائي في عمل اليوم والليلة والحاكم، وصحّح ابن حجر إسناده": "Narrated by al-Nasa’i (‘Amal al-Yawm wal-Laylah) and al-Hakim; Ibn Hajar graded its chain sahih",
+    "من قالها بعد أن يتوضّأ فيُسبغ الوضوء فُتحت له أبواب الجنّة الثّمانية يدخل من أيّها شاء": "Whoever says it after performing wudu thoroughly, the eight gates of Paradise are opened for him to enter by whichever he wishes",
+    "من قالها بعد الوضوء كُتبت في رقٍّ ثمّ طُبع عليها بطابعٍ فلم يُكسر إلى يوم القيامة": "Whoever says it after wudu, it is written on a parchment and sealed, and the seal is not broken until the Day of Resurrection",
+    "ثمّ صلِّ ركعتي الوضوء": "Then pray two rak‘ahs after wudu",
+    "«من توضّأ نحو وضوئي هذا، ثمّ صلّى ركعتين لا يحدّث فيهما نفسه، غُفر له ما تقدّم من ذنبه»": "“Whoever performs wudu like this wudu of mine, then prays two rak‘ahs without letting his mind wander, his past sins are forgiven.”" });
+  Object.assign(D, { "جرّب الضغط على الأيقونة في الأعلى": "Try tapping the icon at the top", "شغّل الحركة": "Play animation" });
+  Object.assign(D, { "أذكار الطعام": "Eating Adhkar", "أذكار السفر": "Travel Adhkar",
+    "أتممت أذكار الطعام": "You completed the eating adhkar", "أتممت أذكار السفر": "You completed the travel adhkar",
+    "ذكّر أحبابك بأذكار الطعام": "Remind your loved ones of the eating adhkar", "ذكّر أحبابك بأذكار السفر": "Remind your loved ones of the travel adhkar",
+    "لا تنسَ أذكار الطعام 🤍 ذكّرتك بها هنا:": "Don’t forget the eating adhkar 🤍 I reminded you of them here:", "لا تنسَ أذكار السفر 🤍 ذكّرتك بها هنا:": "Don’t forget the travel adhkar 🤍 I reminded you of them here:",
+    "ترتيب أذكار الطعام": "Reorder eating adhkar", "ترتيب أذكار السفر": "Reorder travel adhkar",
+    "قبل الطعام": "Before eating", "إذا نسي في أوّله": "If you forgot at the start", "بعد الطعام": "After eating", "لصاحب الطعام": "For the host",
+    "عند الركوب": "When mounting", "دعاء السفر": "Travel du‘a", "عند النزول في مكان": "When stopping at a place", "عند دخول بلد": "When entering a town",
+    "عند الرجوع": "When returning", "المسافر لمن يودّعه": "Traveler to those he leaves", "لمن تودّعه": "To the one you see off",
+    "رواه البخاري": "Narrated by al-Bukhari",
+    "رواه أبو داود والترمذي وقال: حسن صحيح، وفي إسناده كلام": "Narrated by Abu Dawud and al-Tirmidhi, who graded it hasan sahih; its chain is discussed",
+    "رواه أبو داود والترمذي وحسّنه، وفي إسناده كلام": "Narrated by Abu Dawud and al-Tirmidhi, who graded it hasan; its chain is discussed",
+    "رواه أبو داود والترمذي وقال: حسن صحيح": "Narrated by Abu Dawud and al-Tirmidhi, who graded it hasan sahih",
+    "رواه النسائي في الكبرى وابن حبان والحاكم، وحسّنه ابن حجر": "Narrated by al-Nasa’i (al-Kubra), Ibn Hibban and al-Hakim; graded hasan by Ibn Hajar",
+    "رواه أحمد وابن ماجه، وحسّنه الألباني": "Narrated by Ahmad and Ibn Majah; graded hasan by al-Albani",
+    "من قالها بعد الطعام غُفر له ما تقدّم من ذنبه": "Whoever says it after eating, his past sins are forgiven",
+    "من قالها إذا نزل منزلًا لم يضرّه شيءٌ حتّى يرتحل من منزله ذلك": "Whoever says it when stopping at a place, nothing will harm him until he departs from it",
+    "من آداب الطعام": "Etiquette of eating", "«سمِّ اللّه، وكُل بيمينك، وكُل ممّا يليك»": "“Mention Allah’s name, eat with your right hand, and eat from what is nearest to you.”",
+    "كبّر إذا صعدت، وسبّح إذا نزلت": "Say Allahu Akbar going up, Subhan Allah going down",
+    "«كنّا إذا صعدنا كبّرنا، وإذا نزلنا سبّحنا»": "“When we went up we said Allahu Akbar, and when we went down we said Subhan Allah.”" });
+  Object.assign(D, { "الخروج": "Leaving Home", "أذكار الخروج من المنزل": "Leaving Home Adhkar", "أذكار المسجد": "Mosque Adhkar",
+    "أتممت أذكار الخروج من المنزل": "You completed the leaving home adhkar", "أتممت أذكار المسجد": "You completed the mosque adhkar",
+    "ذكّر أحبابك بأذكار الخروج": "Remind your loved ones of the leaving home adhkar", "ذكّر أحبابك بأذكار المسجد": "Remind your loved ones of the mosque adhkar",
+    "لا تنسَ أذكار الخروج من المنزل 🤍 ذكّرتك بها هنا:": "Don’t forget the leaving home adhkar 🤍 I reminded you of them here:", "لا تنسَ أذكار المسجد 🤍 ذكّرتك بها هنا:": "Don’t forget the mosque adhkar 🤍 I reminded you of them here:",
+    "ترتيب أذكار الخروج": "Reorder leaving home adhkar", "ترتيب أذكار المسجد": "Reorder mosque adhkar",
+    "عند الذهاب إلى المسجد": "Going to the mosque", "عند دخول المسجد": "Entering the mosque", "عند الخروج من المسجد": "Leaving the mosque",
+    "من قالها إذا خرج من بيته يُقال له: هُديت وكُفيت ووُقيت، وتنحّى عنه الشّيطان": "Whoever says it when leaving his house, it is said to him: you are guided, sufficed and protected, and Shaytan turns away from him",
+    "رواه أبو داود والترمذي وقال: حسن صحيح غريب، وفي إسناده كلام": "Narrated by Abu Dawud and al-Tirmidhi, who graded it hasan sahih gharib; its chain is discussed",
+    "رواه أبو داود والترمذي وقال: حسن صحيح، وفي سماع الشعبي من أم سلمة كلام": "Narrated by Abu Dawud and al-Tirmidhi, who graded it hasan sahih; whether al-Sha‘bi heard from Umm Salamah is discussed",
+    "من قالها قال الشّيطان: حُفظ منّي سائر اليوم": "Whoever says it, Shaytan says: he is protected from me for the rest of the day",
+    "رواه أبو داود، وحسّنه النووي وابن حجر": "Narrated by Abu Dawud; graded hasan by al-Nawawi and Ibn Hajar",
+    "رواه ابن ماجه والترمذي، وفي إسناده انقطاع، وصحّحه الألباني بشواهده": "Narrated by Ibn Majah and al-Tirmidhi; its chain is broken, and al-Albani graded it sahih by supporting narrations",
+    "رواه ابن ماجه، وصحّحه الألباني": "Narrated by Ibn Majah; graded sahih by al-Albani",
+    "صلِّ ركعتين قبل أن تجلس": "Pray two rak‘ahs before you sit",
+    "«إذا دخل أحدكم المسجد فلا يجلس حتّى يصلّي ركعتين»": "“When one of you enters the mosque, let him not sit until he prays two rak‘ahs.”" });
   Object.assign(D, { "لا تفقد عادتك": "Don't lose your habit", "ابدأ من جديد، والعود أحمد": "Start again — coming back is always good",
     "«أحبّ الأعمال إلى الله أدومها وإن قلّ»": "“The deeds most beloved to Allah are the most consistent, even if small.”",
     "ابدأ الآن": "Start now", "لاحقًا": "Later", "أتمّ الأذكار أو وردًا اليوم لترجع شعلتك": "Complete the adhkar or a wird today to bring your flame back" });
@@ -6875,7 +7306,22 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
   const SL_AK = data.morning.findIndex(x => x.text === data.sleep[12].text);
   const WK_TL = ["Alhamdu lillahil-ladhi ahyana ba‘da ma amatana wa ilayhin-nushur.", "Alhamdu lillahil-ladhi ‘afani fi jasadi, wa radda ‘alayya ruhi, wa adhina li bidhikrih.", "La ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamd, wa huwa ‘ala kulli shay’in qadir. Alhamdu lillah, wa subhanallah, wa la ilaha illallah, wallahu akbar, wa la hawla wa la quwwata illa billah. Allahummaghfir li.", null];
   const WK_EM = ["Praise is to Allah who gave us life after He had caused us to die, and to Him is the resurrection.", "Praise is to Allah who gave me well-being in my body, returned my soul to me, and permitted me to remember Him.", "There is no god but Allah alone, with no partner. His is the dominion and His is the praise, and He is over all things capable. Praise is to Allah, glory be to Allah, there is no god but Allah, Allah is the Greatest, and there is no might nor power except with Allah. O Allah, forgive me.", null];
+  const WD_TL = ["Bismillah.", "Ash-hadu an la ilaha illallahu wahdahu la sharika lah, wa ash-hadu anna Muhammadan ‘abduhu wa rasuluh.", "Allahummaj‘alni minat-tawwabin, waj‘alni minal-mutatahhirin.", "Subhanakallahumma wa bihamdik, ash-hadu an la ilaha illa ant, astaghfiruka wa atubu ilayk."];
+  const WD_EM = ["In the name of Allah.", "I bear witness that there is no god but Allah alone, with no partner, and I bear witness that Muhammad is His servant and Messenger.", "O Allah, make me among those who repent often, and make me among those who purify themselves.", "Glory be to You, O Allah, and praise be to You. I bear witness that there is no god but You. I seek Your forgiveness and repent to You."];
+  const OUT_TL = ["Bismillah, tawakkaltu ‘alallah, wa la hawla wa la quwwata illa billah.", "Allahumma inni a‘udhu bika an adilla aw udall, aw azilla aw uzall, aw azlima aw uzlam, aw ajhala aw yujhala ‘alayy."];
+  const OUT_EM = ["In the name of Allah, I place my trust in Allah, and there is no might nor power except with Allah.", "O Allah, I seek refuge in You from going astray or being led astray, from slipping or being made to slip, from wronging or being wronged, and from acting foolishly or being treated foolishly."];
+  const MQ_TL = ["Allahummaj‘al fi qalbi nura, wa fi lisani nura, waj‘al fi sam‘i nura, waj‘al fi basari nura, waj‘al min khalfi nura, wa min amami nura, waj‘al min fawqi nura, wa min tahti nura. Allahumma a‘tini nura.", "A‘udhu billahil-‘azim, wa bi wajhihil-karim, wa sultanihil-qadim, minash-shaytanir-rajim.", "Bismillah, was-salamu ‘ala rasulillah.", "Allahummaftah li abwaba rahmatik.", "Allahumma inni as’aluka min fadlik.", "Allahumma‘simni minash-shaytanir-rajim."];
+  const MQ_EM = ["O Allah, place light in my heart and light on my tongue, place light in my hearing and light in my sight, place light behind me and before me, place light above me and below me. O Allah, grant me light.", "I seek refuge in Allah the Almighty, in His noble Face and His eternal authority, from Shaytan the accursed.", "In the name of Allah, and peace be upon the Messenger of Allah.", "O Allah, open for me the gates of Your mercy.", "O Allah, I ask You of Your bounty.", "O Allah, protect me from Shaytan the accursed."];
+  const FD_TL = ["Bismillah.", "Bismillahi awwalahu wa akhirah.", "Alhamdu lillahi hamdan kathiran tayyiban mubarakan fih, ghayra makfiyyin wa la muwadda‘in wa la mustaghnan ‘anhu Rabbana.", "Alhamdu lillahil-ladhi at‘amani hadha wa razaqanihi min ghayri hawlin minni wa la quwwah.", "Allahumma barik lahum fima razaqtahum, waghfir lahum warhamhum.", "Allahumma at‘im man at‘amani, wasqi man saqani."];
+  const FD_EM = ["In the name of Allah.", "In the name of Allah at its beginning and at its end.", "Praise is to Allah, abundant, good and blessed praise, not sufficient, not bid farewell to, and not dispensed with, our Lord.", "Praise is to Allah who fed me this and provided it for me without any might or power on my part.", "O Allah, bless them in what You have provided them, forgive them and have mercy on them.", "O Allah, feed whoever fed me, and give drink to whoever gave me drink."];
+  const TR_TL = ["Bismillah, alhamdulillah, subhanal-ladhi sakhkhara lana hadha wa ma kunna lahu muqrinin, wa inna ila Rabbina lamunqalibun. Alhamdulillah, alhamdulillah, alhamdulillah, Allahu akbar, Allahu akbar, Allahu akbar. Subhanaka inni zalamtu nafsi faghfir li, fa innahu la yaghfirudh-dhunuba illa ant.", "Allahu akbar, Allahu akbar, Allahu akbar. Subhanal-ladhi sakhkhara lana hadha wa ma kunna lahu muqrinin, wa inna ila Rabbina lamunqalibun. Allahumma inna nas’aluka fi safarina hadhal-birra wat-taqwa, wa minal-‘amali ma tarda. Allahumma hawwin ‘alayna safarana hadha watwi ‘anna bu‘dah. Allahumma antas-sahibu fis-safar, wal-khalifatu fil-ahl. Allahumma inni a‘udhu bika min wa‘tha’is-safar, wa ka’abatil-manzar, wa su’il-munqalabi fil-mali wal-ahl.", "A‘udhu bikalimatillahit-tammati min sharri ma khalaq.", "Allahumma Rabbas-samawatis-sab‘i wa ma azlalna, wa Rabbal-aradinas-sab‘i wa ma aqlalna, wa Rabbash-shayatini wa ma adlalna, wa Rabbar-riyahi wa ma dharayna, fa inna nas’aluka khayra hadhihil-qaryati wa khayra ahliha wa khayra ma fiha, wa na‘udhu bika min sharriha wa sharri ahliha wa sharri ma fiha.", "Ayibuna, ta’ibuna, ‘abiduna, li Rabbina hamidun.", "Astawdi‘ukumullahal-ladhi la tadi‘u wada’i‘uh.", "Astawdi‘ullaha dinaka, wa amanataka, wa khawatima ‘amalik."];
+  const TR_EM = ["In the name of Allah. Praise is to Allah. Glory be to the One who has subjected this to us, and we could never have done it by ourselves, and to our Lord we will surely return. Praise is to Allah (three times), Allah is the Greatest (three times). Glory be to You; I have wronged myself, so forgive me, for none forgives sins but You.", "Allah is the Greatest (three times). Glory be to the One who has subjected this to us, and we could never have done it by ourselves, and to our Lord we will surely return. O Allah, we ask You on this journey of ours for righteousness and piety, and for deeds that please You. O Allah, make this journey easy for us and shorten its distance for us. O Allah, You are the Companion on the journey and the Guardian of the family. O Allah, I seek refuge in You from the hardships of travel, from distressing sights, and from an evil return to wealth and family.", "I seek refuge in the perfect words of Allah from the evil of what He has created.", "O Allah, Lord of the seven heavens and all they shade, Lord of the seven earths and all they carry, Lord of the devils and all they misguide, Lord of the winds and all they scatter: we ask You for the good of this town, the good of its people and the good of what is in it, and we seek refuge in You from its evil, the evil of its people and the evil of what is in it.", "Returning, repenting, worshipping, and praising our Lord.", "I entrust you to Allah, whose trusts are never lost.", "I entrust to Allah your religion, your trustworthiness, and the last of your deeds."];
   const pick = (mode, i, own, own_map, base) => {
+    if(mode === 'wudu') return (base === EM ? WD_EM : WD_TL)[i] || null;
+    if(mode === 'out') return (base === EM ? OUT_EM : OUT_TL)[i] || null;
+    if(mode === 'food') return (base === EM ? FD_EM : FD_TL)[i] || null;
+    if(mode === 'travel') return (base === EM ? TR_EM : TR_TL)[i] || null;
+    if(mode === 'mosque') return (base === EM ? MQ_EM : MQ_TL)[i] || null;
     if(mode === 'wake') return (base === EM ? WK_EM : WK_TL)[i] || null;
     if(mode === 'sleep'){
       const isEm = base === EM, arr = isEm ? SL_EM : SL_TL;
