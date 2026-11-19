@@ -1665,6 +1665,28 @@
     #wcOverlay .wc-fing{ display:none; }
     #wcOverlay.open .wn-badge{ animation:none; }
   }
+  /* (2.4.265) معاينة «عرض الأقسام» في الإعدادات */
+  .sp-segrow.sp-svrow{ padding:0 16px; }
+  .sp-svprev{ display:grid; grid-template-rows:0fr; opacity:0; visibility:hidden; transition:grid-template-rows .35s ease, opacity .25s ease, visibility 0s .35s; }
+  .sp-svprev > .sp-svin{ min-height:0; overflow:hidden; }
+  .sp-svrow.try .sp-svprev{ grid-template-rows:1fr; opacity:1; visibility:visible; transition-delay:0s; }
+  .sp-svrow.try .sp-svin{ padding:2px 0 14px; }
+  @media (prefers-reduced-motion: reduce){ .sp-svprev{ transition:none; } }
+  .svp{ position:relative; height:74px; border-radius:14px; background:var(--bg); border:1px solid var(--border); overflow:hidden; }
+  .svp-a, .svp-b{ position:absolute; inset:0; padding:10px 12px; display:flex; flex-direction:column; gap:7px; transition:opacity .3s ease, transform .3s ease; }
+  .svp-r{ display:flex; gap:6px; margin-inline:-12px; padding-inline:12px; }
+  .svp-p{ flex:none; width:30%; height:20px; border-radius:10px; background:var(--surface); border:1px solid var(--border); }
+  .svp-p.on, .svp-c.on{ background:var(--brand); border-color:var(--brand); }
+  .svp-g{ display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; }
+  .svp-c{ height:34px; border-radius:11px; background:var(--surface); border:1px solid var(--border); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
+  .svp-c u{ display:block; width:9px; height:9px; border-radius:50%; background:color-mix(in srgb, var(--text-dim) 40%, transparent); }
+  .svp-c u + u{ width:20px; height:4px; border-radius:2px; }
+  .svp-c.on u{ background:#fff; opacity:.9; }
+  .svp-l{ display:block; height:8px; border-radius:5px; background:color-mix(in srgb, var(--text-dim) 22%, transparent); }
+  .svp-l.s{ width:62%; }
+  #spSvPrev[data-sv="strip"] .svp-b{ opacity:0; transform:translateY(6px); }
+  #spSvPrev[data-sv="cards"] .svp-a{ opacity:0; transform:translateY(-6px); }
+  @media (prefers-reduced-motion: reduce){ .svp-a, .svp-b{ transition:none; } }
   /* (2.4.260) تخصيص الأذكار: إخفاء وتعديل العدد */
   .ord-eye{ flex:none; width:44px; height:100%; display:flex; align-items:center; justify-content:center; padding:0; background:none; border:none; color:var(--text-dim); cursor:pointer; -webkit-tap-highlight-color:transparent; }
   .ord-eye:active{ opacity:.5; }
@@ -2417,6 +2439,7 @@
       <div class="sp-segrow sp-ffseg"><div class="sp-seg" id="spFont" role="group" aria-label="خط الأذكار"><i></i><button type="button" data-sp="ff-naskh"><span>نسخ</span></button><button type="button" data-sp="ff-tooba"><span>طوبى</span></button><button type="button" data-sp="ff-amiri"><span>أميري</span></button><button type="button" data-sp="ff-sch"><span>شهرزاد</span></button></div></div>
       <div class="sp-row"><span class="sp-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span><div class="sp-t"><b>المظهر</b></div><div class="sp-seg" id="spTheme" role="group" aria-label="المظهر"><i></i><button type="button" data-sp="th-auto"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg><span>تلقائي</span></button><button type="button" data-sp="th-light"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg><span>فاتح</span></button><button type="button" data-sp="th-dark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span>داكن</span></button></div></div>
       <div class="sp-row"><span class="sp-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></svg></span><div class="sp-t"><b>عرض الأقسام</b></div><div class="sp-seg" id="spSecView" role="group" aria-label="عرض الأقسام" style="--n:2"><i></i><button type="button" data-sp="sv-strip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="9" width="5.5" height="6" rx="3"/><rect x="9.2" y="9" width="5.5" height="6" rx="3"/><rect x="16.4" y="9" width="5.5" height="6" rx="3"/></svg><span>شريط</span></button><button type="button" data-sp="sv-cards"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></svg><span>كروت</span></button></div></div>
+      <div class="sp-segrow sp-svrow" id="spSvRow"><div class="sp-svprev" aria-hidden="true"><div class="sp-svin"><div class="svp" id="spSvPrev" data-sv="strip"><div class="svp-a"><div class="svp-r"><i class="svp-p on"></i><i class="svp-p"></i><i class="svp-p"></i><i class="svp-p"></i></div><i class="svp-l"></i><i class="svp-l s"></i></div><div class="svp-b"><div class="svp-g"><i class="svp-c on"><u></u><u></u></i><i class="svp-c"><u></u><u></u></i><i class="svp-c"><u></u><u></u></i></div><i class="svp-l"></i></div></div></div></div></div>
       <div class="sp-row sp-colrow"><span class="sp-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 2.2 2.2 0 0 0 1.6-3.7 2.2 2.2 0 0 1 1.6-3.7H18a3 3 0 0 0 3-3A9 9 0 0 0 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="11" cy="7.5" r="1"/><circle cx="16" cy="8" r="1"/></svg></span><div class="sp-t"><b>اللون</b></div><div class="sp-dots" id="spColors" role="group" aria-label="اللون"><button type="button" class="sp-dot" data-sp="c-green" aria-label="أخضر" style="--dc:#15ce57"></button><button type="button" class="sp-dot" data-sp="c-blue" aria-label="أزرق" style="--dc:#2f6fe4"></button><button type="button" class="sp-dot" data-sp="c-purple" aria-label="بنفسجي" style="--dc:#7c5cdb"></button><button type="button" class="sp-dot" data-sp="c-pink" aria-label="وردي" style="--dc:#d9467f"></button><button type="button" class="sp-dot" data-sp="c-orange" aria-label="برتقالي" style="--dc:#e0701a"></button><button type="button" class="sp-dot" data-sp="c-teal" aria-label="تركواز" style="--dc:#0e9f9f"></button><button type="button" class="sp-dot" data-sp="c-gold" aria-label="ذهبي" style="--dc:#b07d08"></button></div></div>
     </div>
     <h2 class="sp-gt">التفاعل</h2>
@@ -2568,7 +2591,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.264</div>
+    <div class="about-ver">الإصدار 2.4.267</div>
     <button class="sheet-close" id="aboutClose">تمام</button>
   </div>
 </div>
@@ -6161,6 +6184,7 @@ let secView = 'strip';
 try{ if(localStorage.getItem(SV_KEY) === 'cards') secView = 'cards'; }catch(e){}
 function applySecView(){
   document.body.classList.toggle('sv-cards', secView === 'cards');
+  { const pv = document.getElementById('spSvPrev'); if(pv) pv.dataset.sv = secView; }
   if(secView === 'strip') requestAnimationFrame(() => { try{ recenterWirdStrip('adhkarSel', '.achip.on'); }catch(e){} });
 }
 function setSecView(v){
@@ -8065,7 +8089,12 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
   }
   // (2.4.234) معاينة زر التراجع في الإعدادات (نفس معاينة «جديد في طوبى»)
   const UD_CAPS = { timer:'زر التراجع مع عدّاد 5 ثوانٍ', plain:'زر التراجع بدون عدّاد، ويختفي وحده', off:'بدون زر تراجع بعد إتمام الذكر' };
-  let udTick = null, udPrev = null, udHideT = 0, udTryAt = 0;
+  let udTick = null, udPrev = null, udHideT = 0, udTryAt = 0, svHideT = 0;
+  // (2.4.266) معاينة «عرض الأقسام» تظهر بس لما المستخدم يجرّب الخيارين، وتختفي بعد لحظات (زي التراجع)
+  function showSvPrev(){
+    const r = $('spSvRow'); if(!r) return;
+    r.classList.add('try'); clearTimeout(svHideT); svHideT = setTimeout(() => r.classList.remove('try'), 2500);
+  }
   function showUdPrev(){
     const r = $('spUdRow'); if(!r) return;
     udTryAt = Date.now(); udPrev = null; r.classList.add('try');
@@ -8092,7 +8121,7 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
       $('spSyncSub').textContent = linked ? 'مرتبط' : 'غير مرتبط';
       { const tp = window.themePref ? window.themePref() : 'auto'; sp.querySelectorAll('#spTheme button').forEach(b => b.classList.toggle('on', b.dataset.sp === 'th-' + tp)); $('spTheme').style.setProperty('--i', ['auto','light','dark'].indexOf(tp)); const cb = window.TOOBA_BRAND ? window.TOOBA_BRAND.id : 'green'; sp.querySelectorAll('#spColors .sp-dot').forEach(b => b.classList.toggle('on', b.dataset.sp === 'c-' + cb)); }
       { const zf = window.zfPref ? window.zfPref() : 'naskh'; sp.querySelectorAll('#spFont button').forEach(b => b.classList.toggle('on', b.dataset.sp === 'ff-' + zf)); $('spFont').style.setProperty('--i', ['naskh','tooba','amiri','sch'].indexOf(zf)); }
-      { sp.querySelectorAll('#spSecView button').forEach(b => b.classList.toggle('on', b.dataset.sp === 'sv-' + secView)); $('spSecView').style.setProperty('--i', secView === 'cards' ? 1 : 0); }
+      { sp.querySelectorAll('#spSecView button').forEach(b => b.classList.toggle('on', b.dataset.sp === 'sv-' + secView)); $('spSecView').style.setProperty('--i', secView === 'cards' ? 1 : 0); { const pv = $('spSvPrev'); if(pv) pv.dataset.sv = secView; } }
       { const up = window.undoPref ? window.undoPref() : 'timer'; sp.querySelectorAll('#spUndo button').forEach(b => b.classList.toggle('on', b.dataset.sp === 'ud-' + up)); $('spUndo').style.setProperty('--i', ['timer','plain','off'].indexOf(up)); }
       $('spLangSub').textContent = window.LANG === 'en' ? 'English' : 'العربية';
       $('spLangAct').textContent = window.LANG === 'en' ? 'العربية' : 'English';
@@ -8142,7 +8171,7 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
     else if(a === 'sync') openSync();
     else if(a === 'lang') $('langBtn').click();
     else if(a.indexOf('th-') === 0) window.setThemePref(a.slice(3));
-    else if(a.indexOf('sv-') === 0){ haptic('tap'); setSecView(a.slice(3)); }
+    else if(a.indexOf('sv-') === 0){ haptic('tap'); setSecView(a.slice(3)); showSvPrev(); }
     else if(a.indexOf('ff-') === 0){ haptic('tap'); window.setZF(a.slice(3)); }
     else if(a.indexOf('ud-') === 0){ haptic('tap'); window.setUndoPref(a.slice(3)); showUdPrev(); }
     else if(a.indexOf('c-') === 0) window.setBrand(a.slice(2));
