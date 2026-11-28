@@ -2988,7 +2988,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.464</div>
+    <div class="about-ver">الإصدار 2.4.465</div>
     <button class="sheet-close" id="aboutClose">إغلاق</button>
   </div>
 </div>
@@ -9707,6 +9707,24 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
 })();
 </script>
 <script>
+// ---------- (2.4.465) سكرول عجلة الماوس على الويب في الأسماء والأدعية ----------
+// الشاشة كاملة لكن اللي بيسكرول هو العمود الأوسط (.sheet) بس، فالعجلة على الجنبين (أو فوق شريط التصنيفات الأفقي) ما كانتش بتحرّكه. نحوّلها للعمود هنا.
+(function(){
+  ['nmOverlay','duOverlay'].forEach((id) => {
+    const ov = document.getElementById(id), sh = ov && ov.querySelector('.sheet');
+    if(!ov || !sh) return;
+    ov.addEventListener('wheel', (e) => {
+      if(e.ctrlKey || e.defaultPrevented || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      const tg = e.target;
+      if(tg && tg.closest && tg.closest('textarea, input, select')) return;
+      const side = !sh.contains(tg) || (tg.closest && tg.closest('.du-cats'));
+      if(!side || sh.scrollHeight <= sh.clientHeight) return;
+      sh.scrollTop += e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? sh.clientHeight : 1);
+      e.preventDefault();
+    }, { passive:false });
+  });
+})();
+
 // ---------- (2.4.242) ادعم استمرار طوبى ----------
 // أندرويد (Capacitor): فوترة Google Play داخل التطبيق (منتجات استهلاكية support_1..3 تُنشأ في Play Console)
 // الويب: رابط صفحة دفع آمنة يضعه صاحب التطبيق هنا؛ لو فاضي يختفي الزر على الويب. لا يظهر أبدًا داخل تطبيق أندرويد (سياسة Google Play).
