@@ -1589,6 +1589,8 @@
   #duOverlay .du-tabs{ margin-bottom:8px; }   /* (2.4.416) التبويبات داخل الشريط الثابت مع البحث */
   #duOverlay .du-cats{ margin:0 -24px 8px; padding:2px 24px 8px; padding-inline-start:40px; }
   /* البحث: يثبت فوق بنفس شكل شريط التقدّم في الأذكار، ويفسح مكان زر الرجوع لما يثبت */
+  /* (2.4.462) منطقة شريط الحالة (الساعة) معتمة بلون الخلفية زي الأذكار (body::before)، فالمحتوى مايظهرش من تحتها وهو بيسكرول */
+  #nmOverlay::before, #duOverlay::before{ content:''; position:absolute; top:0; left:0; right:0; height:var(--sa-top); background:var(--bg); z-index:11; pointer-events:none; }
   .pg-sticky{ position:sticky; top:var(--sa-top); z-index:10; flex:none; margin:0 0 8px; padding:8px 0 10px; background:color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter:blur(14px) saturate(160%); -webkit-backdrop-filter:blur(14px) saturate(160%); border-bottom:1px solid transparent; transition:border-color .3s ease, padding .3s cubic-bezier(.2,.8,.3,1); }
   .pg-sticky.scrolled{ border-bottom-color:var(--border); padding-inline-start:46px; }
   #duOverlay.du-editing .pg-sticky{ display:none; }
@@ -2655,7 +2657,7 @@
     .sp-seg button{ padding:8px 13px; }
     .sp-dots{ gap:5px; }
     .sp-dot{ width:21px; height:21px; }
-    .sp-row{ gap:10px; padding-inline:12px; }
+    .sp-row, #spSupGroup.low .sup-card{ gap:10px; padding-inline:12px; }   /* (2.4.464) صف الدعم بنفس مسافات باقي الصفوف عشان الأيقونة تتحاذى */
   }
   .sp-promo{ margin:0 0 16px; }
   /* (2.4.153) بانر الإعدادات: من غير خط الحافة العلوي الخاص بالبانر الثابت، والمحتوى واخد العرض كله */
@@ -2986,7 +2988,7 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 12v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/></svg>
       <span id="aboutShareLabel">شارك الأجر واجعلها صدقة جارية عنك</span>
     </button>
-    <div class="about-ver">الإصدار 2.4.461</div>
+    <div class="about-ver">الإصدار 2.4.464</div>
     <button class="sheet-close" id="aboutClose">إغلاق</button>
   </div>
 </div>
@@ -9742,6 +9744,7 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
   placeSup(true);
   // قلب «ادعم طوبى» في الرئيسية: يظهر بنفس شرط ظهور الصف (مدعوم على الويب، أو منتجات Play اتحمّلت)
   const homeSup = $s('homeSup');
+  let thanked = false, homeThanks = () => {};   // (2.4.463) بعد الدفع تتحوّل الكبسولة لـ«جزاك الله خيرًا» فورًا من غير إعادة فتح التطبيق
   if(homeSup){
     // (2.4.427) جمل قصيرة بتتبدّل بهدوء (دورتين وبعدها تثبت على «ادعم طوبى»)، والكبسولة بتكبر وتصغر بسلاسة مع طول الجملة
     const HS_AR = ['ادعم طوبى', 'بلا إعلانات', 'صدقة جارية', 'تطبيق مجاني'];
@@ -9755,6 +9758,7 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
         homeSup.appendChild(m); const w = m.getBoundingClientRect().width; m.remove(); return w;
       };
       const step = () => {
+        if(thanked) return;
         n++;
         const last = n >= total, i = last ? 0 : n % HS_AR.length, en = window.LANG === 'en';
         const txt = (en ? HS_EN : HS_AR)[i];
@@ -9767,6 +9771,7 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
         t.style.width = cur + 'px'; t.classList.add('hs-morph');
         t.style.opacity = '0';
         setTimeout(() => {
+          if(thanked) return;
           t.textContent = txt;
           const w = measure(txt);
           void t.offsetWidth; t.style.width = (w || cur) + 'px';
@@ -9794,6 +9799,29 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
         let d = false; try{ d = localStorage.getItem('tooba-donor') === '1'; }catch(e){}
         if(d){ const ht = homeSup.querySelector('.hs-t'), en = window.LANG === 'en'; if(ht) ht.textContent = en ? 'Thank you, truly' : 'جزاك الله خيرًا'; }
       }
+    };
+    homeThanks = () => {
+      thanked = true;
+      const t = homeSup.querySelector('.hs-t'); if(!t) return;
+      const en = window.LANG === 'en', txt = en ? 'Thank you, truly' : 'جزاك الله خيرًا';
+      homeSup.setAttribute('aria-label', txt);
+      const calm = window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches;
+      // مش ظاهرة (مخفية، أو شاشة الدعم فوقها، أو لسه بتدخل): بدّل النص بس
+      if(calm || homeSup.hidden || !homeSup.offsetWidth || ov.classList.contains('open') || homeSup.classList.contains('hs-pre') || homeSup.classList.contains('hs-seq')){
+        t.textContent = txt; t.style.width = ''; t.style.opacity = ''; t.classList.remove('hs-morph');
+        homeSup.style.setProperty('--tw', ((t.scrollWidth) || 120) + 6 + 'px'); return;
+      }
+      const cur = t.getBoundingClientRect().width;
+      t.style.width = cur + 'px'; t.classList.add('hs-morph'); t.style.opacity = '0';
+      setTimeout(() => {
+        t.textContent = txt;
+        const m = t.cloneNode(false); m.textContent = txt;
+        m.style.cssText = 'position:absolute;visibility:hidden;width:auto;white-space:nowrap;left:0;top:0;';
+        homeSup.appendChild(m); const w = m.getBoundingClientRect().width; m.remove();
+        void t.offsetWidth; t.style.width = (w || cur) + 'px';
+        setTimeout(() => { t.style.opacity = '1'; }, 150);
+        setTimeout(() => { t.classList.remove('hs-morph'); t.style.width = ''; }, 700);
+      }, 260);
     };
     const syncHome = () => {
       paintCap();
@@ -9913,7 +9941,7 @@ if('serviceWorker' in navigator && /(^|\.)toobaapp\.com$/.test(location.hostname
             store.when()
               .productUpdated(() => renderNative())
               .approved((t) => t.finish())
-              .finished(() => { if(buying || (buyAt && Date.now() - buyAt < 180000)){ buying = false; buyAt = 0; try{ localStorage.setItem('tooba-donor', '1'); }catch(e){} say(''); showDone(); } });
+              .finished(() => { if(buying || (buyAt && Date.now() - buyAt < 180000)){ buying = false; buyAt = 0; try{ localStorage.setItem('tooba-donor', '1'); }catch(e){} homeThanks(); say(''); showDone(); } });
             store.error((e) => {
               buying = false;
               if(e && e.code === C.ErrorCode.PAYMENT_CANCELLED) return;
